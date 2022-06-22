@@ -85,10 +85,12 @@ export async function decryption(refMail, getGun, getUser, getMails) {
   let isCarbonCopy = false;
   let position = 0;
 
-  let email
-  await getGun().get(refMail).once(mail => {
-    email = mail
-  })
+  let email;
+  await getMails()
+    .get(refMail)
+    .once((mail) => {
+      email = mail;
+    });
 
   // email.cc.forEach((element, index) => {
   //   if (currentUserEmail === element.recipient) {
@@ -96,7 +98,7 @@ export async function decryption(refMail, getGun, getUser, getMails) {
   //     position = index;
   //   }
   // });
-
+  console.log("4", email);
   if (currentUserEmail === email.recipient) {
     return await decrypt(email.key, email, getGun, getUser);
   } else if (isCarbonCopy) {
