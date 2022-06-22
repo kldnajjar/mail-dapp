@@ -14,7 +14,7 @@ import PhoneIcon from "@material-ui/icons/Phone";
 import SidebarOption from "./Option";
 import { Link } from "react-router-dom";
 import { useDispatch } from "react-redux";
-import { openSendMessage } from "../../features/mailSlice";
+import { openSendMessage, selectMail } from "../../features/mailSlice";
 import styles from "./Sidebar.module.css";
 import useGunContext from "../../context/useGunContext";
 import { encryption } from "../../util/privacy";
@@ -37,11 +37,15 @@ function Sidebar() {
     console.log(newEmail);
   }
 
+  const onCompose = () => {
+    dispatch(selectMail(null));
+    dispatch(openSendMessage());
+  };
+
   return (
     <div className={styles.sidebar}>
       <Button
         className={styles["sidebar-compose"]}
-        // onClick={() => dispatch(openSendMessage())}
         onClick={createMails}
         startIcon={<AddIcon fontSize="large" />}
       >
@@ -50,8 +54,7 @@ function Sidebar() {
 
       <Button
         className={styles["sidebar-compose"]}
-        onClick={() => dispatch(openSendMessage())}
-        // onClick={onCompose}
+        onClick={onCompose}
         startIcon={<AddIcon fontSize="large" />}
       >
         Compose
