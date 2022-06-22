@@ -1,0 +1,20 @@
+{
+  "name": "mykmail-server",
+  "version": "0.0.0",
+  "license": "MIT",
+  "private": true,
+  "main": "server.js",
+  "scripts": {
+    "start": "node ./server.js",
+    "watch": "nodemon ./server.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^10.0.0",
+    "express": "^4.17.1",
+    "gun": "^0.2020.1237"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.14"
+  }
+}

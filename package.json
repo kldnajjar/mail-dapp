@@ -1,0 +1,10 @@
+{
+  "name": "mykmail-project",
+  "version": "0.0.0",
+  "license": "MIT",
+  "private": true,
+  "workspaces": [
+    "mykmail-server",
+    "mykmail-client"
+  ]
+}
