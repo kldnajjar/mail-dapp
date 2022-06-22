@@ -3,12 +3,12 @@ import "gun/sea";
 
 // ENCRYPTION
 export async function encryption(email, getGun, getUser) {
-  const encryptionKey = "myk-key"; // <-- This key is just an example. Ideally I think we should generate it every time sender sends an email.
+  const encryptionKey = "mykloud-key"; // <-- This key is just an example. Ideally I think we should generate it every time sender sends an email.
   const encryptedSubject = await SEA.encrypt(email.subject, encryptionKey);
   const encryptedMessage = await SEA.encrypt(email.body, encryptionKey);
 
-  const recipientEpub =
-    "SSxxqChjYYwjY94nZVdQLWuWLLWQtkdkaDhzpRer3o8.IsYqurZOk2Qz9Z8Ka8pYsucV9_8EWqRG78_GzCJeITU";
+  const recipientEpub = getUser().is.epub;
+  console.log("recipientEpub", recipientEpub);
   // const recipientEpub = await getRecipientEpub(email, getGun)
   const myPair = getUser()._.sea; // "getUser()" is the current user
 
@@ -82,6 +82,7 @@ async function getCCRecipients(email, encryptionKey, myPair, getGun) {
 // DECRYPTION
 export async function decryption(refMail, getGun, getUser, getMails) {
   const currentUserEmail = await getCurrentUserEmail(getUser);
+
   let isCarbonCopy = false;
   let position = 0;
 
@@ -98,7 +99,7 @@ export async function decryption(refMail, getGun, getUser, getMails) {
   //     position = index;
   //   }
   // });
-  console.log("4", email);
+
   if (currentUserEmail === email.recipient) {
     return await decrypt(email.key, email, getGun, getUser);
   } else if (isCarbonCopy) {
@@ -110,8 +111,7 @@ export async function decryption(refMail, getGun, getUser, getMails) {
 }
 
 async function decrypt(key, email, getGun, getUser) {
-  const senderEpub =
-    "6b9wNr4Kvhe6o98VS4WdXBnQZNuJVx5CuBtfBQ5tYho.grwkZkCxiRUW4yT9hdgwEK2y8VVhhhczUzxuTr0xGsw";
+  const senderEpub = getUser().is.epub;
   // const senderEpub = await getSenderEpub(email, getGun)
   const myPair = getUser()._.sea; // "getUser()" is the current user
 

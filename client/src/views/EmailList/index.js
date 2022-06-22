@@ -24,13 +24,12 @@ function EmailList() {
 
   const getDecryptedMails = (mail, getGun, getUser) => {
     const kmailsArray = Object.keys(mail).slice(1);
-    console.log("2", kmailsArray);
+
     const promises = kmailsArray.map(
       async (kmail) => await decryption(kmail, getGun, getUser, getMails)
     );
 
     Promise.all(promises).then(function (results) {
-      console.log("3", results);
       setEmails(results);
     });
   };
@@ -38,8 +37,9 @@ function EmailList() {
   const getAllEmailsFromDB = async (getGun, getUser, getMails) => {
     getMails().once((mail) => {
       if (mail) {
-        console.log("1");
         getDecryptedMails(mail, getGun, getUser);
+      } else {
+        // TODO: Show new UI when there is no emails
       }
     });
   };

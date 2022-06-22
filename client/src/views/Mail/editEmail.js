@@ -1,11 +1,14 @@
 import React, { useState } from "react";
 
 import Input from "../../components/input";
+import useGunContext from "../../context/useGunContext";
+import { encryption } from "../../util/privacy";
 
 import styles from "./Mail.module.css";
 
 function EditEmail() {
   const profile = JSON.parse(sessionStorage.getItem("profile"));
+  const { getGun, getUser, getMails } = useGunContext();
 
   const [recipient, setRecipient] = useState("");
   const [subject, setSubject] = useState("");
@@ -20,14 +23,19 @@ function EditEmail() {
   // };
 
   const sendEmail = () => {
-    const obj = {
+    const emailObject = {
       subject,
       sender: profile.email,
       recipient,
       body,
       key: "",
     };
-    console.log("email", obj);
+    createMails(emailObject);
+  };
+
+  const createMails = async (emailObject) => {
+    const newEmail = await encryption(emailObject, getGun, getUser);
+    getMails().set(newEmail);
   };
 
   return (

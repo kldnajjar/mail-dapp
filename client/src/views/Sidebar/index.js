@@ -16,26 +16,9 @@ import { Link } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { openSendMessage, selectMail } from "../../features/mailSlice";
 import styles from "./Sidebar.module.css";
-import useGunContext from "../../context/useGunContext";
-import { encryption } from "../../util/privacy";
 
 function Sidebar() {
-  const { getGun, getUser, getMails } = useGunContext();
   const dispatch = useDispatch();
-
-  let email = {
-    subject: "Hey",
-    sender: "tsar@zhuk.com",
-    recipient: "suleiman@zhukov.com",
-    body: "Hello, tsar",
-    key: "",
-  };
-
-  async function createMails() {
-    const newEmail = await encryption(email, getGun, getUser);
-    getMails().set(newEmail);
-    console.log(newEmail);
-  }
 
   const onCompose = () => {
     dispatch(selectMail(null));
@@ -44,14 +27,6 @@ function Sidebar() {
 
   return (
     <div className={styles.sidebar}>
-      <Button
-        className={styles["sidebar-compose"]}
-        onClick={createMails}
-        startIcon={<AddIcon fontSize="large" />}
-      >
-        Create Emails
-      </Button>
-
       <Button
         className={styles["sidebar-compose"]}
         onClick={onCompose}
