@@ -7,7 +7,7 @@ import styles from "./Mail.module.css";
 function EditEmail() {
   const profile = JSON.parse(sessionStorage.getItem("profile"));
 
-  const [email, setEmail] = useState("");
+  const [recipient, setRecipient] = useState("");
   const [subject, setSubject] = useState("");
   const [body, setBody] = useState("");
 
@@ -18,6 +18,17 @@ function EditEmail() {
   //   body: "Hello, tsar",
   //   key: "",
   // };
+
+  const sendEmail = () => {
+    const obj = {
+      subject,
+      sender: profile.email,
+      recipient,
+      body,
+      key: "",
+    };
+    console.log("email", obj);
+  };
 
   return (
     <div className={styles["mail-body"]}>
@@ -32,8 +43,8 @@ function EditEmail() {
           type="email"
           label="Recipient"
           placeholder="Enter email"
-          value={email}
-          onChange={(event) => setEmail(event.target.value)}
+          value={recipient}
+          onChange={(event) => setRecipient(event.target.value)}
         />
         <Input
           type="text"
@@ -53,6 +64,11 @@ function EditEmail() {
             rows={9}
           />
         </div>
+      </div>
+      <div className="d-grid">
+        <button type="button" className="btn btn-primary" onClick={sendEmail}>
+          Send
+        </button>
       </div>
     </div>
   );
