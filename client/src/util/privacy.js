@@ -7,9 +7,8 @@ export async function encryption(email, getGun, getUser) {
   const encryptedSubject = await SEA.encrypt(email.subject, encryptionKey);
   const encryptedMessage = await SEA.encrypt(email.body, encryptionKey);
 
-  const recipientEpub = getUser().is.epub;
-  console.log("recipientEpub", recipientEpub);
-  // const recipientEpub = await getRecipientEpub(email, getGun)
+  // const currentUserEpub = getUser().is.epub;
+  const recipientEpub = await getRecipientEpub(email, getGun);
   const myPair = getUser()._.sea; // "getUser()" is the current user
 
   const encryptedEncryptionKey = await SEA.encrypt(
@@ -99,8 +98,11 @@ export async function decryption(refMail, getGun, getUser, getMails) {
   //     position = index;
   //   }
   // });
-
-  if (currentUserEmail === email.recipient) {
+  console.log(email);
+  if (
+    currentUserEmail === email.recipient ||
+    currentUserEmail === email.sender
+  ) {
     return await decrypt(email.key, email, getGun, getUser);
   } else if (isCarbonCopy) {
     const key = email.keys[position].key; // get the need key from email.keys array
@@ -111,8 +113,8 @@ export async function decryption(refMail, getGun, getUser, getMails) {
 }
 
 async function decrypt(key, email, getGun, getUser) {
-  const senderEpub = getUser().is.epub;
-  // const senderEpub = await getSenderEpub(email, getGun)
+  // const senderEpub = getUser().is.epub;
+  const senderEpub = await getSenderEpub(email, getGun);
   const myPair = getUser()._.sea; // "getUser()" is the current user
 
   const decryptedEncryptionKey = await SEA.decrypt(

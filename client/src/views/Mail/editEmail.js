@@ -1,4 +1,8 @@
 import React, { useState } from "react";
+import { toast } from "react-toastify";
+
+import { useDispatch } from "react-redux";
+import { closeSendMessage } from "../../features/mailSlice";
 
 import Input from "../../components/input";
 import useGunContext from "../../context/useGunContext";
@@ -8,6 +12,7 @@ import styles from "./Mail.module.css";
 
 function EditEmail() {
   const profile = JSON.parse(sessionStorage.getItem("profile"));
+  const dispatch = useDispatch();
   const { getGun, getUser, getMails } = useGunContext();
 
   const [recipient, setRecipient] = useState("");
@@ -36,6 +41,8 @@ function EditEmail() {
   const createMails = async (emailObject) => {
     const newEmail = await encryption(emailObject, getGun, getUser);
     getMails().set(newEmail);
+    dispatch(closeSendMessage());
+    toast.success("Email sent");
   };
 
   return (
