@@ -13,11 +13,11 @@ function ReadEmail() {
           <h5>{selectedMail.subject}</h5>
           {/* <LabelImportantIcon className={styles["mail-important"]} /> */}
         </div>
-        <p className={styles["mail-time"]}>{selectedMail.time}</p>
+        {/* <p className={styles["mail-time"]}>{selectedMail.time}</p> */}
       </div>
 
       <div className={styles["mail-message"]}>
-        <p>{selectedMail.description}</p>
+        <p>{selectedMail.body}</p>
       </div>
     </div>
   );

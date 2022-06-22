@@ -6,17 +6,13 @@ import { selectMail, openSendMessage } from "../../features/mailSlice";
 import { useDispatch } from "react-redux";
 import styles from "./EmailRow.module.css";
 
-function EmailRow({ id, title, subject, description, time }) {
+function EmailRow({ subject, sender, recipient, body }) {
   const dispatch = useDispatch();
 
   const openMail = () => {
     dispatch(
       selectMail({
-        id,
-        title,
-        subject,
-        description,
-        time,
+        subject, sender, recipient, body
       })
     );
     dispatch(openSendMessage());
@@ -33,17 +29,16 @@ function EmailRow({ id, title, subject, description, time }) {
           <LabelImportantOutlinedIcon />
         </IconButton>
       </div>
-      <h3 className={`${styles["emailRow-title"]} mb-0`}>{title}</h3>
       <div className={styles["emailRow-message"]}>
         <h4>
           {subject}{" "}
           <span className={styles["emailRow-description"]}>
             {" "}
-            - {description}
+            - {body}
           </span>
         </h4>
       </div>
-      <p className={`${styles["emailRow-time"]} mb-0`}>{time}</p>
+      {/* <p className={`${styles["emailRow-time"]} mb-0`}>{time}</p> */}
     </div>
   );
 }

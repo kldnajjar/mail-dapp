@@ -1,5 +1,5 @@
 import { Checkbox, IconButton } from "@material-ui/core";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import ArrowDropDownIcon from "@material-ui/icons/ArrowDropDown";
 import MoreVertIcon from "@material-ui/icons/MoreVert";
 import RedoIcon from "@material-ui/icons/Redo";
@@ -18,39 +18,30 @@ import { decryption } from "../../util/privacy";
 import "gun/sea";
 // import { db } from "../../firebase";
 
-const loopThrough = async (getGun, getUser, getMails) => {
-  await getUser()
-    .get("pub")
-    .once(async (myPub) => {
-      getMails()
-        .map()
-        .once(async (mail) => {
-          console.log("inside getMails.map().once(cb)");
-          const newMail = await decryption(mail, getGun, getUser);
-          console.log(newMail);
-        });
-    });
-};
-
 function EmailList() {
   const [emails, setEmails] = useState([]);
   const { getGun, getUser, getMails } = useGunContext();
 
-  console.log("before");
-  loopThrough(getGun, getUser, getMails);
-  console.log("after");
+const getDecryptedMails = (mail, getGun, getUser) =>{
+  const kmailsArray = Object.keys(mail).slice(1)
+  const promises =  kmailsArray.map(async kmail => await decryption(kmail, getGun, getUser));
+  
+  Promise.all(promises).then(function(results) {
+    setEmails(results)
+  })
+}
+
+  const getAllEmailsFromDB = async (getGun, getUser, getMails) => {
+    await getUser()
+      .get("alias")
+      .once(async (alias) => {
+        getMails().once(mail => getDecryptedMails(mail, getGun, getUser));
+      });
+  };
+  
 
   useEffect(() => {
-    // db.collection("emails")
-    //   .orderBy("timestamp", "desc")
-    //   .onSnapshot((snapshot) =>
-    //     setEmails(
-    //       snapshot.docs.map((doc) => ({
-    //         id: doc.id,
-    //         data: doc.data(),
-    //       }))
-    //     )
-    //   );
+    getAllEmailsFromDB(getGun, getUser, getMails);
   }, []);
 
   return (
@@ -90,22 +81,16 @@ function EmailList() {
       </div> */}
 
       <div className={styles["emailList-list"]}>
-        {emails.map(({ id, data: { to, subject, message, timestamp } }) => (
+        {emails.map(({ subject, sender, recipient, body }, reactKey) => (
           <EmailRow
-            id={id}
-            key={id}
-            title={to}
+            key={`email-row-${reactKey}`}
+            sender={sender}
+            recipient={recipient}
             subject={subject}
-            description={message}
-            time={new Date(timestamp?.seconds * 1000).toUTCString()}
+            body={body}
+            // time={new Date(timestamp?.seconds * 1000).toUTCString()}
           />
         ))}
-        <EmailRow
-          title="Twitch"
-          subject="Hey fellow streamer!!"
-          description="This is a DOPE"
-          time="10pm"
-        />
       </div>
     </div>
   );

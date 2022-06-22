@@ -1,5 +1,5 @@
 import "gun/sea";
-import regeneratorRuntime from "regenerator-runtime";
+// import regeneratorRuntime from "regenerator-runtime";
 
 // ENCRYPTION
 export async function encryption(email, getGun, getUser) {
@@ -8,7 +8,7 @@ export async function encryption(email, getGun, getUser) {
   const encryptedMessage = await SEA.encrypt(email.body, encryptionKey);
 
   const recipientEpub =
-    "-FffX8xxRgkAz04427GNnO9l7PE77_fM3c0v4u1j70M.lG8MW0FdJ-vm9JnZlgNYs8qpZYiIstxf5PkFVUfM7OU";
+    "SSxxqChjYYwjY94nZVdQLWuWLLWQtkdkaDhzpRer3o8.IsYqurZOk2Qz9Z8Ka8pYsucV9_8EWqRG78_GzCJeITU";
   // const recipientEpub = await getRecipientEpub(email, getGun)
   const myPair = getUser()._.sea; // "getUser()" is the current user
 
@@ -80,10 +80,15 @@ async function getCCRecipients(email, encryptionKey, myPair, getGun) {
 }
 
 // DECRYPTION
-export async function decryption(email, getGun, getUser) {
+export async function decryption(refMail, getGun, getUser, getMails) {
   const currentUserEmail = await getCurrentUserEmail(getUser);
   let isCarbonCopy = false;
   let position = 0;
+
+  let email
+  await getGun().get(refMail).once(mail => {
+    email = mail
+  })
 
   // email.cc.forEach((element, index) => {
   //   if (currentUserEmail === element.recipient) {
@@ -93,19 +98,18 @@ export async function decryption(email, getGun, getUser) {
   // });
 
   if (currentUserEmail === email.recipient) {
-    return await decrypt(email.key, email, getGun);
+    return await decrypt(email.key, email, getGun, getUser);
   } else if (isCarbonCopy) {
     const key = email.keys[position].key; // get the need key from email.keys array
-    return await decrypt(key, email, getGun);
+    return await decrypt(key, email, getGun, getUser);
   } else {
     return;
   }
 }
 
-async function decrypt(key, email, getGun) {
-  console.log("decrypt function privacy.js");
+async function decrypt(key, email, getGun, getUser) {
   const senderEpub =
-    "92Z5HPvaQ850f0BtSCayAGg2ocxrRCZOouhxN15Vuw4.UI8q8BKxVEr1_sqn378Fqxa36Olc3u2Wg4jS3_oxOqw";
+    "6b9wNr4Kvhe6o98VS4WdXBnQZNuJVx5CuBtfBQ5tYho.grwkZkCxiRUW4yT9hdgwEK2y8VVhhhczUzxuTr0xGsw";
   // const senderEpub = await getSenderEpub(email, getGun)
   const myPair = getUser()._.sea; // "getUser()" is the current user
 
@@ -114,8 +118,8 @@ async function decrypt(key, email, getGun) {
     await SEA.secret(senderEpub, myPair)
   );
 
-  const decryptedSubject = await SEA.decrypt(email.subject, email.key);
-  const decryptedMessage = await SEA.decrypt(email.body, email.key);
+  const decryptedSubject = await SEA.decrypt(email.subject, key);
+  const decryptedMessage = await SEA.decrypt(email.body, key);
 
   email.subject = decryptedSubject;
   email.body = decryptedMessage;
@@ -138,7 +142,7 @@ async function getCurrentUserEmail(getUser) {
   await getUser()
     .get("alias")
     .once((user) => {
-      currentAlias = user.email;
+      currentAlias = user;
     });
   return currentAlias;
 }
