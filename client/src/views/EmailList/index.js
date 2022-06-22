@@ -22,23 +22,24 @@ function EmailList() {
   const [emails, setEmails] = useState([]);
   const { getGun, getUser, getMails } = useGunContext();
 
-const getDecryptedMails = (mail, getGun, getUser) =>{
-  const kmailsArray = Object.keys(mail).slice(1)
-  const promises =  kmailsArray.map(async kmail => await decryption(kmail, getGun, getUser));
-  
-  Promise.all(promises).then(function(results) {
-    setEmails(results)
-  })
-}
+  const getDecryptedMails = (mail, getGun, getUser) => {
+    const kmailsArray = Object.keys(mail).slice(1);
+    const promises = kmailsArray.map(
+      async (kmail) => await decryption(kmail, getGun, getUser)
+    );
+
+    Promise.all(promises).then(function (results) {
+      setEmails(results);
+    });
+  };
 
   const getAllEmailsFromDB = async (getGun, getUser, getMails) => {
-    await getUser()
-      .get("alias")
-      .once(async (alias) => {
-        getMails().once(mail => getDecryptedMails(mail, getGun, getUser));
-      });
+    getMails().once((mail) => {
+      if (mail) {
+        getDecryptedMails(mail, getGun, getUser);
+      }
+    });
   };
-  
 
   useEffect(() => {
     getAllEmailsFromDB(getGun, getUser, getMails);
