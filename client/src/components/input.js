@@ -2,7 +2,7 @@ import React from "react";
 
 const Input = (props) => {
   return (
-    <div className="mb-3">
+    <div className="form-group mb-3">
       <label>{props.label}</label>
       <input
         type={props.type}
