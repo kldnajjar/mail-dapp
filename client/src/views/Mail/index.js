@@ -12,21 +12,20 @@ import UnfoldMoreIcon from "@material-ui/icons/UnfoldMore";
 import PrintIcon from "@material-ui/icons/Print";
 import ExitToAppIcon from "@material-ui/icons/ExitToApp";
 import { IconButton } from "@material-ui/core";
-import { useNavigate } from "react-router-dom";
-import { selectOpenMail } from "../../features/mailSlice";
+import { useDispatch } from "react-redux";
+import { selectOpenMail, closeSendMessage } from "../../features/mailSlice";
 import { useSelector } from "react-redux";
 import styles from "./Mail.module.css";
 
 function Mail() {
-  const navigate = useNavigate();
-
+  const dispatch = useDispatch();
   const selectedMail = useSelector(selectOpenMail);
 
   return (
     <div className={styles.mail}>
       <div className={styles["mail-tools"]}>
         <div className={styles["mail-toolsLeft"]}>
-          <IconButton onClick={() => navigate("/profile")}>
+          <IconButton onClick={() => dispatch(closeSendMessage())}>
             <ArrowBackIcon />
           </IconButton>
 

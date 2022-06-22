@@ -4,7 +4,6 @@ import { Routes, Route } from "react-router-dom";
 const SignIn = lazy(() => import("./views/Signin"));
 const SignUp = lazy(() => import("./views/Signup"));
 const Profile = lazy(() => import("./views/Profile"));
-const Mail = lazy(() => import("./views/Mail"));
 
 const Navigator = () => {
   const loading = <div className="loading-content">Loading...</div>;
@@ -16,14 +15,6 @@ const Navigator = () => {
           element={
             <Suspense fallback={loading}>
               <Profile />
-            </Suspense>
-          }
-        />
-        <Route
-          path="/mail"
-          element={
-            <Suspense fallback={loading}>
-              <Mail />
             </Suspense>
           }
         />

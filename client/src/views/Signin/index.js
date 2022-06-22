@@ -45,7 +45,6 @@ const SignIn = () => {
       value: window.sessionStorage.getItem("pair"),
     });
 
-    console.log("khaled", getUser().is.pub);
     getGun()
       .get("profiles")
       .get(getUser().is.pub)

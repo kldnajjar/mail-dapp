@@ -31,8 +31,7 @@ function Sidebar() {
     key: "",
   };
 
-  async function onCompose(e) {
-    e.preventDefault();
+  async function createMails() {
     const newEmail = await encryption(email, getGun, getUser);
     getMails().set(newEmail);
     console.log(newEmail);
@@ -43,11 +42,21 @@ function Sidebar() {
       <Button
         className={styles["sidebar-compose"]}
         // onClick={() => dispatch(openSendMessage())}
-        onClick={onCompose}
+        onClick={createMails}
+        startIcon={<AddIcon fontSize="large" />}
+      >
+        Create Emails
+      </Button>
+
+      <Button
+        className={styles["sidebar-compose"]}
+        onClick={() => dispatch(openSendMessage())}
+        // onClick={onCompose}
         startIcon={<AddIcon fontSize="large" />}
       >
         Compose
       </Button>
+
       <Link to="/" className={styles["sidebar-link"]}>
         <SidebarOption
           Icon={InboxIcon}
