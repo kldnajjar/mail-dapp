@@ -2,13 +2,11 @@ import { Checkbox, IconButton } from "@material-ui/core";
 import React from "react";
 import StarBorderOutlinedIcon from "@material-ui/icons/StarBorderOutlined";
 import LabelImportantOutlinedIcon from "@material-ui/icons/LabelImportantOutlined";
-import { useNavigate } from "react-router-dom";
-import { selectMail } from "../../features/mailSlice";
+import { selectMail, openSendMessage } from "../../features/mailSlice";
 import { useDispatch } from "react-redux";
 import styles from "./EmailRow.module.css";
 
 function EmailRow({ id, title, subject, description, time }) {
-  const navigate = useNavigate();
   const dispatch = useDispatch();
 
   const openMail = () => {
@@ -21,7 +19,7 @@ function EmailRow({ id, title, subject, description, time }) {
         time,
       })
     );
-    navigate("/mail");
+    dispatch(openSendMessage());
   };
 
   return (

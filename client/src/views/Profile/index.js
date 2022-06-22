@@ -12,7 +12,6 @@ import { selectSendMessageIsOpen } from "../../features/mailSlice";
 
 const Profile = () => {
   const navigate = useNavigate();
-  const [isComposing, setIsComposing] = useState(false);
   const sendMessageIsOpen = useSelector(selectSendMessageIsOpen);
   const profile = JSON.parse(sessionStorage.getItem("profile"));
 
@@ -27,7 +26,7 @@ const Profile = () => {
       <div className="app">
         <Header />
         <div className="app-body">
-          <Sidebar isComposing={isComposing} setIsComposing={setIsComposing} />
+          <Sidebar />
           {sendMessageIsOpen ? <Mail /> : <EmailList />}
         </div>
       </div>
