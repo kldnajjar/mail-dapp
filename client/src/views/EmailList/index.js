@@ -25,9 +25,9 @@ function EmailList() {
   const getDecryptedMails = (mail, getGun, getUser) => {
     const kmailsArray = Object.keys(mail).slice(1);
 
-    const promises = kmailsArray.map(
-      async (kmail) => await decryption(kmail, getGun, getUser, getMails)
-    );
+    // if (kmailsArray[1]) console.log(kmailsArray[1])
+
+    const promises = kmailsArray.map(async (kmail) => await decryption(kmail, getGun, getUser, getMails));
 
     Promise.all(promises).then(function (results) {
       setEmails(results);
@@ -35,7 +35,7 @@ function EmailList() {
   };
 
   const getAllEmailsFromDB = async (getGun, getUser, getMails) => {
-    getMails().once((mail) => {
+    getMails().on((mail) => {
       if (mail) {
         getDecryptedMails(mail, getGun, getUser);
       } else {
@@ -46,7 +46,7 @@ function EmailList() {
 
   useEffect(() => {
     getAllEmailsFromDB(getGun, getUser, getMails);
-  }, []);
+  }, [emails.length]);
 
   return (
     <div className={styles.emailList}>
@@ -83,6 +83,8 @@ function EmailList() {
         <Section Icon={PeopleIcon} title="Social" color="#1A73E8" />
         <Section Icon={LocalOfferIcon} title="Promotions" color="green" />
       </div> */}
+
+
 
       <div className={styles["emailList-list"]}>
         {emails.map(({ subject, sender, recipient, body }, reactKey) => (
