@@ -39,8 +39,8 @@ function EditEmail() {
   };
 
   const createMails = async (emailObject) => {
-    const newEmail = await encryption(emailObject, getGun, getUser);
-    getMails().set(newEmail);
+    const ObjectToSend = await encryption(emailObject, getGun, getUser);
+    getMails().set(ObjectToSend.email).get("keys").put(ObjectToSend.keys);
     dispatch(closeSendMessage());
     toast.success("Email sent");
   };

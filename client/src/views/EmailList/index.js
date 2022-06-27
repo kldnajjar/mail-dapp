@@ -25,8 +25,6 @@ function EmailList() {
   const getDecryptedMails = (mail, getGun, getUser) => {
     const kmailsArray = Object.keys(mail).slice(1);
 
-    // if (kmailsArray[1]) console.log(kmailsArray[1])
-
     const promises = kmailsArray.map(async (kmail) => await decryption(kmail, getGun, getUser, getMails));
 
     Promise.all(promises).then(function (results) {
