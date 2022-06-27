@@ -80,11 +80,8 @@ export async function decryption(refMail, getGun, getUser, getMails) {
     } else {
       return email
     }
-  } else if (isCarbonCopy) {
-    const key = email.keys[position].key;
-    return await decrypt(email, getGun, getUser, currentUserEmail);
   } else {
-    return email;
+    return null
   }
 }
 

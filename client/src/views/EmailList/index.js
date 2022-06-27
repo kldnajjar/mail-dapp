@@ -27,7 +27,12 @@ function EmailList() {
 
     const promises = kmailsArray.map(async (kmail) => await decryption(kmail, getGun, getUser, getMails));
 
-    Promise.all(promises).then(function (results) {
+    Promise.all(promises).then((results) => {
+      // for (let i = 0; i < results.length; i++) {
+      //   if (results[i] === null) {
+      //     results.splice[i, 1];
+      //   }
+      // }
       setEmails(results);
     });
   };

@@ -44,7 +44,13 @@ const SignUp = () => {
 
   const registerNewUser = (pub) => {
     // add user to user/profile list
-    getGun().get("profiles").get(pub).put({ email, firstName, lastName });
+    // getGun().get("profiles").get(pub).put({ email, firstName, lastName });
+    getGun()
+      .get("profiles")
+      .get(pub)
+      .put({
+        email, firstName, lastName
+      });
 
     toast.success("User created");
     navigate("/sign-in", { replace: true });
