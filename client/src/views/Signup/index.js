@@ -9,7 +9,7 @@ import Input from "../../components/input";
 
 const SignUp = () => {
   let navigate = useNavigate();
-  const { getGun, getUser } = useGunContext();
+  const { getGun, getUser, getMail } = useGunContext();
 
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
@@ -46,11 +46,15 @@ const SignUp = () => {
     // add user to user/profile list
     // getGun().get("profiles").get(pub).put({ email, firstName, lastName });
     getGun()
-      .get("profiles")
-      .get(pub)
-      .put({
-        email, firstName, lastName
-      });
+    .get("profiles")
+    .get(pub)
+    .put({
+      email,
+      firstName,
+      lastName,
+    });
+
+    getMail().get(`${email}`);
 
     toast.success("User created");
     navigate("/sign-in", { replace: true });
@@ -78,7 +82,7 @@ const SignUp = () => {
       <Input
         type="email"
         label="Email address"
-        placeholder="Enter email"
+        placeholder="Email address"
         value={email}
         onChange={(event) => setEmail(event.target.value)}
       />
@@ -90,6 +94,7 @@ const SignUp = () => {
         value={password}
         onChange={(event) => setPassword(event.target.value)}
       />
+
       <div className="d-grid">
         <button type="submit" className="btn btn-primary">
           Register

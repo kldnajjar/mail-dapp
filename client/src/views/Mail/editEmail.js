@@ -40,10 +40,37 @@ function EditEmail() {
 
   const createMails = async (emailObject) => {
     const ObjectToSend = await encryption(emailObject, getGun, getUser);
-    getMails().set(ObjectToSend.email).get("keys").put(ObjectToSend.keys);
+
+    const senderAlias = ObjectToSend.email.sender
+    const recipientAlias = ObjectToSend.email.recipient
+
+    getMails().get(senderAlias).get("inbox").set(ObjectToSend.email).get("keys").put(ObjectToSend.keys);
+    getMails().get(recipientAlias).get("inbox").set(ObjectToSend.email).get("keys").put(ObjectToSend.keys);
+
     dispatch(closeSendMessage());
     toast.success("Email sent");
   };
+
+  // Later
+  async function getRecipientUserAlias(email, getGun) {
+    let recipientAlias;
+    await getGun()
+      .get(`~@${email.recipient}`)
+      .map()
+      .once((user) => {
+        recipientAlias = user.epub;
+      });
+    return recipientAlias;
+  }
+
+  // Later
+  async function getSenderUserAlias(getUser) {
+    let name
+    await getUser().get("alias").once((alias) => {
+      name = alias
+    });
+    return name
+  }
 
   return (
     <div className={styles["mail-body"]}>

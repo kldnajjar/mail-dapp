@@ -22,10 +22,10 @@ function EmailList() {
   const [emails, setEmails] = useState([]);
   const { getGun, getUser, getMails } = useGunContext();
 
-  const getDecryptedMails = (mail, getGun, getUser) => {
+  const getDecryptedMails = (mail, getGun, getUser, currentAlias) => {
     const kmailsArray = Object.keys(mail).slice(1);
-
-    const promises = kmailsArray.map(async (kmail) => await decryption(kmail, getGun, getUser, getMails));
+    
+    const promises = kmailsArray.map(async (kmail) => await decryption(kmail, getGun, getUser, getMails, currentAlias));
 
     Promise.all(promises).then((results) => {
       // for (let i = 0; i < results.length; i++) {
@@ -38,14 +38,40 @@ function EmailList() {
   };
 
   const getAllEmailsFromDB = async (getGun, getUser, getMails) => {
-    getMails().on((mail) => {
+    const currentAlias = await getCurrentUserAlias(getUser)
+
+    await getMails().get(currentAlias).get("inbox").on(async (mail) => {
+      // const promises = new Promise(async (resolve, reject) => {
+      //   const decryptedEmail = await decryption(kmail, getGun, getUser, getMails, currentAlias);
+      //   resolve(decryptedEmail)
+      // })
+
+      // promises.then(decryptedEmail => {
+      //   setEmails(...emails, decryptedEmail)
+      // })
       if (mail) {
-        getDecryptedMails(mail, getGun, getUser);
+        getDecryptedMails(mail, getGun, getUser, currentAlias);
       } else {
         // TODO: Show new UI when there is no emails
       }
-    });
+    })
+
+    // getMails().on((mail) => {
+    //   if (mail) {
+    //     getDecryptedMails(mail, getGun, getUser);
+    //   } else {
+    //     // TODO: Show new UI when there is no emails
+    //   }
+    // });
   };
+
+  async function getCurrentUserAlias(getUser) {
+    let name
+    await getUser().get("alias").once((alias) => {
+      name = alias
+    });
+    return name
+  }
 
   useEffect(() => {
     getAllEmailsFromDB(getGun, getUser, getMails);

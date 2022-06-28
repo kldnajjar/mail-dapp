@@ -10,7 +10,7 @@ export async function encryption(email, getGun, getUser) {
   const encryptedMessage = await SEA.encrypt(email.body, encryptionKey);
 
   const recipientEpub = await getRecipientEpub(email, getGun);
-  const currentUserEpub = getUser()._.sea.epub
+  const currentUserEpub = getUser()._.sea.epub;
   const myPair = getUser()._.sea;
 
   const encryptedEncryptionKeyRecipient = await SEA.encrypt(
@@ -25,19 +25,18 @@ export async function encryption(email, getGun, getUser) {
 
   const keys = {
     recipientKey: encryptedEncryptionKeyRecipient,
-  }
+    senderKey: encryptedEncryptionKeySender
+  };
 
-  email.recipientKey = encryptedEncryptionKeyRecipient
-  email.senderKey = encryptedEncryptionKeySender
   email.subject = encryptedSubject;
   email.body = encryptedMessage;
-  email.isEncrypted = true
-  email.isSender = false
+  email.isEncrypted = true;
+  email.isSender = false;
 
   const ObjectToSend = {
     email: email,
-    keys: keys
-  }
+    keys: keys,
+  };
 
   return ObjectToSend;
 }
@@ -54,14 +53,17 @@ async function getRecipientEpub(email, getGun) {
 }
 
 // DECRYPTION
-export async function decryption(refMail, getGun, getUser, getMails) {
-  const currentUserEmail = await getCurrentUserEmail(getUser);
+export async function decryption(refMail, getGun, getUser, getMails, currentAlias) {
+  // const currentUserEmail = await getCurrentUserEmail(getUser);
+  const currentUserEmail = currentAlias
 
   let isCarbonCopy = false;
   let position = 0;
 
   let email;
   await getMails()
+    .get(currentUserEmail)
+    .get("inbox")
     .get(refMail)
     .once((mail) => {
       email = mail;
@@ -73,40 +75,49 @@ export async function decryption(refMail, getGun, getUser, getMails) {
   ) {
     if (email.isEncrypted) {
       if (currentUserEmail === email.sender) {
-        email.isSender = true
+        email.isSender = true;
       }
-      const decryptedEmail = await decrypt(email, getGun, getUser, getMails, refMail);
-      return decryptedEmail
+      const decryptedEmail = await decrypt(
+        email,
+        getGun,
+        getUser,
+        getMails,
+        refMail,
+        currentUserEmail
+      );
+      return decryptedEmail;
     } else {
-      return email
+      return email;
     }
   } else {
-    return null
+    return null;
   }
 }
 
-async function decrypt(email, getGun, getUser, getMails, refMail) {
+async function decrypt(email, getGun, getUser, getMails, refMail, currentUserEmail) {
   const senderEpubPromise = new Promise(async (resolve, reject) => {
-    let senderEpub = await getSenderEpub(email, getGun)
-    resolve(senderEpub)
-  })
-  
+    let senderEpub = await getSenderEpub(email, getGun);
+    resolve(senderEpub);
+  });
+
   const myPair = getUser()._.sea;
 
-  return senderEpubPromise.then(senderEpub => {
-    return decryptedKeyPromiseFun(senderEpub, myPair, email, getMails, refMail).then(key => {
-      return decryptEmailPromiseFun(key, email).then(result => {
-        return result
-      })
-    })
-  })
+  return senderEpubPromise.then((senderEpub) => {
+    return decryptedKeyPromiseFun(senderEpub, myPair, email, getMails, refMail, currentUserEmail).then((key) => {
+      return decryptEmailPromiseFun(key, email).then((result) => {
+        return result;
+      });
+    });
+  });
 }
 
-async function decryptedKeyPromiseFun(senderEpub, myPair, email, getMails, refMail) {
+async function decryptedKeyPromiseFun(senderEpub, myPair, email, getMails, refMail, currentUserEmail) {
   return new Promise(async (resolve, reject) => {
     let senderKey;
     let recipientKey;
     await getMails()
+      .get(currentUserEmail)
+      .get("inbox")
       .get(refMail)
       .get("keys")
       .once((keys) => {
@@ -114,18 +125,22 @@ async function decryptedKeyPromiseFun(senderEpub, myPair, email, getMails, refMa
         senderKey = keys.senderKey
       });
 
+    console.log(`senderKey: ${senderKey}`)
+    console.log(`recipientKey: ${recipientKey}`)
+
     if (email.isSender) {
-      const secret = await SEA.secret(senderEpub, myPair)
+      console.log(`senderEpub: ${senderEpub}`)
+      const secret = await SEA.secret(senderEpub, myPair);
       const decryptedEncryptionKey = await SEA.decrypt(senderKey, secret);
-  
-      resolve(decryptedEncryptionKey)
+
+      resolve(decryptedEncryptionKey);
     } else {
-      const secret = await SEA.secret(senderEpub, myPair)
+      const secret = await SEA.secret(senderEpub, myPair);
       const decryptedEncryptionKey = await SEA.decrypt(recipientKey, secret);
-  
-      resolve(decryptedEncryptionKey)
+
+      resolve(decryptedEncryptionKey);
     }
-  })
+  });
 }
 
 async function decryptEmailPromiseFun(key, email) {
@@ -135,9 +150,9 @@ async function decryptEmailPromiseFun(key, email) {
 
     email.subject = decryptedSubject;
     email.body = decryptedMessage;
-    email.isEncrypted = false
-    resolve(email)
-  })
+    email.isEncrypted = false;
+    resolve(email);
+  });
 }
 
 async function getSenderEpub(email, getGun) {
