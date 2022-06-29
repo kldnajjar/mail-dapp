@@ -24,6 +24,7 @@ const SignUp = () => {
     event.preventDefault();
 
     // check if user with email already exists
+
     getGun()
       .get(`~@${email}`)
       .once((user) => {
@@ -81,8 +82,8 @@ const SignUp = () => {
         label="Email address"
         placeholder="Email address"
         posttext="@mykloud.io"
-        value={email}
-        onChange={(event) => setEmail(event.target.value)}
+        value={email.substring(0, email.indexOf("@mykloud.io"))}
+        onChange={(event) => setEmail(`${event.target.value}@mykloud.io`)}
       />
 
       <Input
