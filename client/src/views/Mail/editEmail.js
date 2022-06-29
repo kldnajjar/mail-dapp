@@ -16,6 +16,8 @@ function EditEmail() {
   const { getGun, getUser, getMails } = useGunContext();
 
   const [recipient, setRecipient] = useState("");
+  const [emailCC, setEmailCC] = useState("");
+  const [emailBCC, setEmailBCC] = useState("");
   const [subject, setSubject] = useState("");
   const [body, setBody] = useState("");
 
@@ -41,11 +43,21 @@ function EditEmail() {
   const createMails = async (emailObject) => {
     const ObjectToSend = await encryption(emailObject, getGun, getUser);
 
-    const senderAlias = ObjectToSend.email.sender
-    const recipientAlias = ObjectToSend.email.recipient
+    const senderAlias = ObjectToSend.email.sender;
+    const recipientAlias = ObjectToSend.email.recipient;
 
-    getMails().get(senderAlias).get("inbox").set(ObjectToSend.email).get("keys").put(ObjectToSend.keys);
-    getMails().get(recipientAlias).get("inbox").set(ObjectToSend.email).get("keys").put(ObjectToSend.keys);
+    getMails()
+      .get(senderAlias)
+      .get("inbox")
+      .set(ObjectToSend.email)
+      .get("keys")
+      .put(ObjectToSend.keys);
+    getMails()
+      .get(recipientAlias)
+      .get("inbox")
+      .set(ObjectToSend.email)
+      .get("keys")
+      .put(ObjectToSend.keys);
 
     dispatch(closeSendMessage());
     toast.success("Email sent");
@@ -65,11 +77,13 @@ function EditEmail() {
 
   // Later
   async function getSenderUserAlias(getUser) {
-    let name
-    await getUser().get("alias").once((alias) => {
-      name = alias
-    });
-    return name
+    let name;
+    await getUser()
+      .get("alias")
+      .once((alias) => {
+        name = alias;
+      });
+    return name;
   }
 
   return (
@@ -84,9 +98,23 @@ function EditEmail() {
         <Input
           type="email"
           label="Recipient"
-          placeholder="Enter email"
+          placeholder="Seperate multiple emails with ;"
           value={recipient}
           onChange={(event) => setRecipient(event.target.value)}
+        />
+        <Input
+          type="email"
+          label="CC"
+          placeholder="Seperate multiple emails with ;"
+          value={emailCC}
+          onChange={(event) => setEmailCC(event.target.value)}
+        />
+        <Input
+          type="email"
+          label="Bcc"
+          placeholder="Seperate multiple emails with ;"
+          value={emailBCC}
+          onChange={(event) => setEmailBCC(event.target.value)}
         />
         <Input
           type="text"
