@@ -78,7 +78,7 @@ const SignUp = () => {
       />
 
       <Input
-        type="email"
+        type="text"
         label="Email address"
         placeholder="Email address"
         posttext="@mykloud.io"
