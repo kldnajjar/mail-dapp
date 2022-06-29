@@ -1,0 +1,14 @@
+.input-container {
+  display: flex;
+  position: relative;
+}
+
+.post-input-padding {
+  padding-right: 100px;
+}
+
+.input-post-text {
+  position: absolute;
+  right: 6px;
+  top: 6px;
+}

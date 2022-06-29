@@ -45,10 +45,7 @@ const SignUp = () => {
   const registerNewUser = (pub) => {
     // add user to user/profile list
     // getGun().get("profiles").get(pub).put({ email, firstName, lastName });
-    getGun()
-    .get("profiles")
-    .get(pub)
-    .put({
+    getGun().get("profiles").get(pub).put({
       email,
       firstName,
       lastName,
@@ -83,6 +80,7 @@ const SignUp = () => {
         type="email"
         label="Email address"
         placeholder="Email address"
+        posttext="@mykloud.io"
         value={email}
         onChange={(event) => setEmail(event.target.value)}
       />
