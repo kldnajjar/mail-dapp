@@ -34,6 +34,8 @@ function EditEmail() {
       subject,
       sender: profile.email,
       recipient,
+      cc: emailCC,
+      bcc: emailBCC,
       body,
       key: "",
     };
