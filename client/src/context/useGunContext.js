@@ -47,7 +47,7 @@ export const GunContextProvider = ({ children }) => {
       // use broadcast channels to sync between tabs
       .recall({ sessionStorage: true });
 
-    const mails = gun.get("kloud.io");
+    const mails = gun.get("mails");
 
     gunRef.current = gun;
     userRef.current = user;

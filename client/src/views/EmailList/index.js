@@ -24,7 +24,7 @@ function EmailList() {
 
   const getDecryptedMails = (mail, getGun, getUser, currentAlias) => {
     const kmailsArray = Object.keys(mail).slice(1);
-    
+  
     const promises = kmailsArray.map(async (kmail) => await decryption(kmail, getGun, getUser, getMails, currentAlias));
 
     Promise.all(promises).then((results) => {
@@ -39,22 +39,32 @@ function EmailList() {
 
   const getAllEmailsFromDB = async (getGun, getUser, getMails) => {
     const currentAlias = await getCurrentUserAlias(getUser)
+    const currentPub = await getCurrentUserPub(getUser)
 
-    await getMails().get(currentAlias).get("inbox").on(async (mail) => {
-      // const promises = new Promise(async (resolve, reject) => {
-      //   const decryptedEmail = await decryption(kmail, getGun, getUser, getMails, currentAlias);
-      //   resolve(decryptedEmail)
-      // })
-
-      // promises.then(decryptedEmail => {
-      //   setEmails(...emails, decryptedEmail)
-      // })
+    await getGun().get("profiles").get(currentPub).get("messages").once(mail => {
       if (mail) {
+        console.log(mail)
         getDecryptedMails(mail, getGun, getUser, currentAlias);
       } else {
         // TODO: Show new UI when there is no emails
       }
     })
+
+    // await getMails().get(currentAlias).get("inbox").on(async (mail) => {
+    //   // const promises = new Promise(async (resolve, reject) => {
+    //   //   const decryptedEmail = await decryption(kmail, getGun, getUser, getMails, currentAlias);
+    //   //   resolve(decryptedEmail)
+    //   // })
+
+    //   // promises.then(decryptedEmail => {
+    //   //   setEmails(...emails, decryptedEmail)
+    //   // })
+    //   if (mail) {
+    //     getDecryptedMails(mail, getGun, getUser, currentAlias);
+    //   } else {
+    //     // TODO: Show new UI when there is no emails
+    //   }
+    // })
 
     // getMails().on((mail) => {
     //   if (mail) {
@@ -64,6 +74,14 @@ function EmailList() {
     //   }
     // });
   };
+
+  async function getCurrentUserPub(getUser) {
+    let name
+    await getUser().get("pub").once((alias) => {
+      name = alias
+    });
+    return name
+  }
 
   async function getCurrentUserAlias(getUser) {
     let name

@@ -9,6 +9,7 @@ import useGunContext from "../../context/useGunContext";
 import { encryption } from "../../util/privacy";
 
 import styles from "./Mail.module.css";
+import { v4 as uuid } from 'uuid';
 
 function EditEmail() {
   const profile = JSON.parse(sessionStorage.getItem("profile"));
@@ -37,55 +38,57 @@ function EditEmail() {
       cc: emailCC,
       bcc: emailBCC,
       body,
-      key: "",
     };
     createMails(emailObject);
   };
 
   const createMails = async (emailObject) => {
-    const ObjectToSend = await encryption(emailObject, getGun, getUser);
+    const email = await encryption(emailObject, getGun, getUser);
 
-    const senderAlias = ObjectToSend.email.sender;
-    const recipientAlias = ObjectToSend.email.recipient;
+    console.log(email)
+    const senderPub = await getSenderUserPub(getUser)
+    let recipientPub
+    if (!emailObject.recipient.includes(";")) {
+      recipientPub = await getRecipientUserPub(email.recipients.recipient, getGun)
 
-    getMails()
-      .get(senderAlias)
-      .get("inbox")
-      .set(ObjectToSend.email)
-      .get("keys")
-      .put(ObjectToSend.keys);
-    getMails()
-      .get(recipientAlias)
-      .get("inbox")
-      .set(ObjectToSend.email)
-      .get("keys")
-      .put(ObjectToSend.keys);
+      const conversationId = uuid()
+      const messageId = uuid()
+      const conversation = getGun().get("mails").get(conversationId).get(messageId).put(email)
+      // conversation.get(messageId).put(email)
+      // console.log(typeof conversation)
+      getGun().get("profiles").get(senderPub).get("messages").set(conversation)
+      getGun().get("profiles").get(recipientPub).get("messages").set(conversation)
 
-    dispatch(closeSendMessage());
-    toast.success("Email sent");
+      dispatch(closeSendMessage());
+      toast.success("Email sent");
+    } else {
+      email.recipients.map(recipient => {
+        recipientPub = await getRecipientUserPub(recipient, getGun)
+      })
+    }
   };
 
   // Later
-  async function getRecipientUserAlias(email, getGun) {
-    let recipientAlias;
+  async function getRecipientUserPub(recipient, getGun) {
+    let recipientPub;
     await getGun()
-      .get(`~@${email.recipient}`)
+      .get(`~@${recipient}`)
       .map()
       .once((user) => {
-        recipientAlias = user.epub;
+        recipientPub = user.pub;
       });
-    return recipientAlias;
+    return recipientPub;
   }
 
   // Later
-  async function getSenderUserAlias(getUser) {
-    let name;
+  async function getSenderUserPub(getUser) {
+    let pubKey;
     await getUser()
-      .get("alias")
-      .once((alias) => {
-        name = alias;
+      .get("pub")
+      .once((pub) => {
+        pubKey = pub;
       });
-    return name;
+    return pubKey;
   }
 
   return (
