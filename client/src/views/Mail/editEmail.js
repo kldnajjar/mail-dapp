@@ -22,14 +22,7 @@ function EditEmail() {
   const [subject, setSubject] = useState("");
   const [body, setBody] = useState("");
 
-  // let email = {
-  //   subject: "Hey",
-  //   sender: "tsar@zhuk.com",
-  //   recipient: "suleiman@zhukov.com",
-  //   body: "Hello, tsar",
-  //   key: "",
-  // };
-
+ 
   const sendEmail = () => {
     const emailObject = {
       subject,
@@ -43,29 +36,57 @@ function EditEmail() {
   };
 
   const createMails = async (emailObject) => {
+
     const recipientsArray = emailObject.recipient.split(";")
-    const email = await encryption(emailObject, getGun, getUser);
 
-    const senderAlias = await getSenderAlias(getUser)
+    const email = await encryption({ subject : emailObject.subject , sender: emailObject.sender , recipients:recipientsArray , body:emailObject.body }, getGun, getUser);
+    const conversationId = uuid();
+    const messageId = uuid();
 
-    if (!emailObject.recipients.recipient.includes(";")) {
-      const recipientAlias = await getRecipientAlias(email.recipients.recipient, getGun)
+    console.log(email)
 
-      const conversationId = uuid()
-      const messageId = uuid()
-      const conversation = await getGun().get("mails").get(conversationId)
-      getGun().get("mails").get(conversationId).get(messageId).put(email)
+    await getMails().get(conversationId).put({
+      id : conversationId,
+      subject : email?.encryptedSubject,
+    }).get(messageId).put({
+        id : messageId,
+        body : email?.encryptedMessage,
+        sender : emailObject?.sender,
+        recipients : emailObject?.recipient,
+        keys : email?.encryptedKeysByUsers
+    })
 
-      getGun().get("profiles").get(senderAlias).get("folders").get("sent").set(conversation)
-      getGun().get("profiles").get(recipientAlias).get("folders").get("inbox").set(conversation)
+    const conversation = getMails().get(conversationId);
+    console.log(conversation)
 
-      dispatch(closeSendMessage());
-      toast.success("Email sent");
-    } else {
-      email.recipients.map(async recipient => {
-        const recipientPub = await getRecipientUserPub(recipient, getGun)
-      })
+    getGun().get("profiles").get(emailObject.sender).get("folders").get("sent").set(conversation);
+
+    for(let i = 0; i < recipientsArray.length; i++){
+      getGun().get("profiles").get(recipientsArray[i]).get("folders").get("inbox").set(conversation);
     }
+    dispatch(closeSendMessage());
+    toast.success("Email sent");
+
+    // const senderAlias = await getSenderAlias(getUser)
+
+    // if (!emailObject.recipients.recipient.includes(";")) {
+    //   const recipientAlias = await getRecipientAlias(email.recipients.recipient, getGun)
+
+    //   const conversationId = uuid()
+    //   const messageId = uuid()
+    //   const conversation = await getGun().get("mails").get(conversationId)
+    //   getGun().get("mails").get(conversationId).get(messageId).put(email)
+
+    //   getGun().get("profiles").get(senderAlias).get("folders").get("sent").set(conversation)
+    //   getGun().get("profiles").get(recipientAlias).get("folders").get("inbox").set(conversation)
+
+    //   dispatch(closeSendMessage());
+    //   toast.success("Email sent");
+    // } else {
+    //   email.recipients.map(async recipient => {
+    //     const recipientPub = await getRecipientUserPub(recipient, getGun)
+    //   })
+    // }
   };
 
   // Later

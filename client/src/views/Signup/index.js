@@ -36,7 +36,7 @@ const SignUp = () => {
               console.log(`Error: creating user: ${err}`);
               toast.error(err);
             } else {
-              registerNewUser(pub);
+              registerNewUser(email);
             }
           });
         }
@@ -46,6 +46,7 @@ const SignUp = () => {
   const registerNewUser = (email) => {
     // add user to user/profile list
     // getGun().get("profiles").get(pub).put({ email, firstName, lastName });
+    
     getGun().get("profiles").get(email).put({
       email,
       firstName,
@@ -53,11 +54,11 @@ const SignUp = () => {
     });
 
     getGun().get("profiles").get(email).get("folders").get("inbox").put({
-      inbox: "inbox"
+      label: "inbox"
     });
 
     getGun().get("profiles").get(email).get("folders").get("sent").put({
-      sent: "sent"
+      label: "sent"
     });
 
     toast.success("User created");

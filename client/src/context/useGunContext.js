@@ -47,7 +47,7 @@ export const GunContextProvider = ({ children }) => {
       // use broadcast channels to sync between tabs
       .recall({ sessionStorage: true });
 
-    const mails = gun.get("mails");
+    const mails = gun.get("conversations");
 
     gunRef.current = gun;
     userRef.current = user;

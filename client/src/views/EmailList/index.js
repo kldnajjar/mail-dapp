@@ -92,8 +92,13 @@ function EmailList() {
   }
 
   useEffect(() => {
-    getAllEmailsFromDB(getGun, getUser, getMails);
-  }, [emails.length]);
+    getGun().get("profiles").get("omar@mykloud.io").get("folders").get("sent").map().once((data)=>{
+      console.log(data)
+      const Array = Object.keys(data)
+      console.log(Array)
+    })
+    // getAllEmailsFromDB(getGun, getUser, getMails);
+  }, []);
 
   return (
     <div className={styles.emailList}>

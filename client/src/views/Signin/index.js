@@ -47,7 +47,7 @@ const SignIn = () => {
 
     getGun()
       .get("profiles")
-      .get(getUser().is.pub)
+      .get(getUser().is.alias)
       .on((profile) => {
         // setUserProfile(profile);
         console.log("User profile", profile);
