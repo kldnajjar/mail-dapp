@@ -16,15 +16,25 @@ import styles from "./EmailList.module.css";
 import useGunContext from "../../context/useGunContext";
 import { decryption } from "../../util/privacy";
 import "gun/sea";
+import "gun/lib/path.js"
+
 // import { db } from "../../firebase";
 
 function EmailList() {
   const [emails, setEmails] = useState([]);
   const { getGun, getUser, getMails } = useGunContext();
 
-  const getDecryptedMails = (mail, getGun, getUser, currentAlias) => {
+  const getDecryptedMails =  async (mail, getGun, getUser, currentAlias) => {
     const kmailsArray = Object.keys(mail).slice(1);
-  
+    kmailsArray.pop()
+    console.log(kmailsArray)
+
+    let ref
+    await getGun().path(kmailsArray[0] + "/ids").once(data => {
+      ref = data
+    })
+    console.log(ref)
+
     const promises = kmailsArray.map(async (kmail) => await decryption(kmail, getGun, getUser, getMails, currentAlias));
 
     Promise.all(promises).then((results) => {
@@ -37,11 +47,11 @@ function EmailList() {
     });
   };
 
-  const getAllEmailsFromDB = async (getGun, getUser, getMails) => {
+  const getAllEmailsFromDB = async (getGun, getUser) => {
     const currentAlias = await getCurrentUserAlias(getUser)
     const currentPub = await getCurrentUserPub(getUser)
 
-    await getGun().get("profiles").get(currentPub).get("messages").once(mail => {
+    await getGun().get("profiles").get(currentAlias).get("folders").get("sent").once(mail => {
       console.log(mail)
       if (mail) {
         getDecryptedMails(mail, getGun, getUser, currentAlias);
@@ -92,12 +102,12 @@ function EmailList() {
   }
 
   useEffect(() => {
-    getGun().get("profiles").get("omar@mykloud.io").get("folders").get("sent").map().once((data)=>{
-      console.log(data)
-      const Array = Object.keys(data)
-      console.log(Array)
-    })
-    // getAllEmailsFromDB(getGun, getUser, getMails);
+    // getGun().get("profiles").get("omar@mykloud.io").get("folders").get("sent").map().once((data)=>{
+    //   console.log(data)
+    //   const Array = Object.keys(data)
+    //   console.log(Array)
+    // })
+    getAllEmailsFromDB(getGun, getUser);
   }, []);
 
   return (
@@ -138,7 +148,7 @@ function EmailList() {
 
 
 
-      <div className={styles["emailList-list"]}>
+      {/* <div className={styles["emailList-list"]}>
         {emails.map(({ subject, sender, recipient, body }, reactKey) => (
           <EmailRow
             key={`email-row-${reactKey}`}
@@ -149,7 +159,7 @@ function EmailList() {
             // time={new Date(timestamp?.seconds * 1000).toUTCString()}
           />
         ))}
-      </div>
+      </div> */}
     </div>
   );
 }

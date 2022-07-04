@@ -24,16 +24,16 @@ export async function encryption(email, getGun, getUser) {
   for (const key in recipientEpubObj) {
     const encryptedEncryptionKeyRecipient = await SEA.encrypt(
           encryptionKey,
-          await SEA.secret(recipientEpubObj[key], senderPair)  
+          await SEA.secret(recipientEpubObj[key], senderPair)
     );
     encryptedKeysByUsers[key] = encryptedEncryptionKeyRecipient;
   }
   console.log(encryptedKeysByUsers)
 
   return {
-    encryptedSubject : encryptedSubject,
-    encryptedMessage : encryptedMessage , 
-    encryptedKeysByUsers : encryptedKeysByUsers,
+    encryptedSubject: encryptedSubject,
+    encryptedMessage: encryptedMessage , 
+    encryptedKeysByUsers: encryptedKeysByUsers,
   }
 
 
@@ -134,45 +134,24 @@ async function encryptTheKey(epub, myPair, encryptionKey) {
 
 // DECRYPTION
 export async function decryption(refMail, getGun, getUser, getMails, currentAlias) {
-  let email;
-  await getGun()
-    .path(refMail)
-    .once((mail) => {
-      email = mail;
-    });
+  const email = await getByReference(refMail, getGun)
+  console.log(refMail)
 
-    prepare
+  const refConversation = prepareConversationNode(refMail)
+  const subject = await getByReference(refMail, getGun)
 
-    const refArray = refMail.split("/")
-    refArray.pop()
-    refConversation = refArray.toString()
-    refConversation.replaceAll(",", "/")
+  console.log(subject)
 
-    let subject;
-    await getGun()
-      .path()
-      .once((data) => {
-        subject = data;
-      });
+  // const decryptedEmail = await decryptNew(
+  //   email,
+  //   getGun,
+  //   getUser,
+  //   getMails,
+  //   refMail,
+  //   currentAlias
+  // );
 
-  console.log(email)
-
-  if (email.isEncrypted) {
-    // if (currentUserEmail === email.sender) {
-    //   email.isSender = true;
-    // }
-    const decryptedEmail = await decryptNew(
-      email,
-      getGun,
-      getUser,
-      getMails,
-      refMail,
-      currentAlias
-    );
-    return decryptedEmail;
-  } else {
-    return email;
-  }
+  // return decryptedEmail
 
   // if (
   //   currentUserEmail === email.recipient ||
@@ -300,4 +279,23 @@ async function getSenderEpub(email, getGun) {
       senderEpub = user.epub;
     });
   return senderEpub;
+}
+
+async function getByReference(path, getGun) {
+  let result;
+  await getGun()
+    .path(path)
+    .once((obj) => {
+      result = obj;
+    });
+    return result
+}
+
+function prepareConversationNode(refMail) {
+  const refArray = refMail.split("/")
+  refArray.pop()
+  let refConversation = refArray.toString()
+  refConversation.replaceAll(",", "/")
+  console.log(refConversation)
+  return refConversation
 }

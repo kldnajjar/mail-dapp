@@ -42,12 +42,14 @@ function EditEmail() {
     const email = await encryption({ subject : emailObject.subject , sender: emailObject.sender , recipients:recipientsArray , body:emailObject.body }, getGun, getUser);
     const conversationId = uuid();
     const messageId = uuid();
-
-    console.log(email)
+    const key = String.math
 
     await getMails().get(conversationId).put({
       id : conversationId,
       subject : email?.encryptedSubject,
+      ids: {
+        id: messageId
+      }
     }).get(messageId).put({
         id : messageId,
         body : email?.encryptedMessage,
@@ -57,11 +59,10 @@ function EditEmail() {
     })
 
     const conversation = getMails().get(conversationId);
-    console.log(conversation)
 
     getGun().get("profiles").get(emailObject.sender).get("folders").get("sent").set(conversation);
 
-    for(let i = 0; i < recipientsArray.length; i++){
+    for (let i = 0; i < recipientsArray.length; i++) {
       getGun().get("profiles").get(recipientsArray[i]).get("folders").get("inbox").set(conversation);
     }
     dispatch(closeSendMessage());
