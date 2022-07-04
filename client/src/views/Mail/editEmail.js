@@ -43,20 +43,21 @@ function EditEmail() {
   };
 
   const createMails = async (emailObject) => {
+    const recipientsArray = emailObject.recipient.split(";")
     const email = await encryption(emailObject, getGun, getUser);
 
-    const senderPub = await getSenderUserPub(getUser)
+    const senderAlias = await getSenderAlias(getUser)
 
     if (!emailObject.recipients.recipient.includes(";")) {
-      const recipientPub = await getRecipientUserPub(email.recipients.recipient, getGun)
+      const recipientAlias = await getRecipientAlias(email.recipients.recipient, getGun)
 
       const conversationId = uuid()
       const messageId = uuid()
       const conversation = await getGun().get("mails").get(conversationId)
       getGun().get("mails").get(conversationId).get(messageId).put(email)
-      // console.log(typeof conversation)
-      getGun().get("profiles").get(senderPub).get("messages").set(conversation)
-      getGun().get("profiles").get(recipientPub).get("messages").set(conversation)
+
+      getGun().get("profiles").get(senderAlias).get("folders").get("sent").set(conversation)
+      getGun().get("profiles").get(recipientAlias).get("folders").get("inbox").set(conversation)
 
       dispatch(closeSendMessage());
       toast.success("Email sent");
@@ -68,26 +69,26 @@ function EditEmail() {
   };
 
   // Later
-  async function getRecipientUserPub(recipient, getGun) {
-    let recipientPub;
+  async function getRecipientAlias(recipient, getGun) {
+    let name;
     await getGun()
       .get(`~@${recipient}`)
       .map()
       .once((user) => {
-        recipientPub = user.pub;
+        name = user.alias;
       });
-    return recipientPub;
+    return name;
   }
 
   // Later
-  async function getSenderUserPub(getUser) {
-    let pubKey;
+  async function getSenderAlias(getUser) {
+    let name;
     await getUser()
-      .get("pub")
-      .once((pub) => {
-        pubKey = pub;
+      .get("alias")
+      .once((alias) => {
+        name = alias;
       });
-    return pubKey;
+    return name;
   }
 
   return (

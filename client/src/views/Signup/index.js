@@ -43,17 +43,21 @@ const SignUp = () => {
       });
   };
 
-  const registerNewUser = (pub) => {
+  const registerNewUser = (email) => {
     // add user to user/profile list
     // getGun().get("profiles").get(pub).put({ email, firstName, lastName });
-    getGun().get("profiles").get(pub).put({
+    getGun().get("profiles").get(email).put({
       email,
       firstName,
       lastName,
     });
 
-    getGun().get("profiles").get(pub).get("messages").put({
-      node: "messages"
+    getGun().get("profiles").get(email).get("folders").get("inbox").put({
+      inbox: "inbox"
+    });
+
+    getGun().get("profiles").get(email).get("folders").get("sent").put({
+      sent: "sent"
     });
 
     toast.success("User created");
