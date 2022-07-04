@@ -42,8 +42,8 @@ function EmailList() {
     const currentPub = await getCurrentUserPub(getUser)
 
     await getGun().get("profiles").get(currentPub).get("messages").once(mail => {
+      console.log(mail)
       if (mail) {
-        console.log(mail)
         getDecryptedMails(mail, getGun, getUser, currentAlias);
       } else {
         // TODO: Show new UI when there is no emails

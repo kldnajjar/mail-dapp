@@ -45,16 +45,15 @@ function EditEmail() {
   const createMails = async (emailObject) => {
     const email = await encryption(emailObject, getGun, getUser);
 
-    console.log(email)
     const senderPub = await getSenderUserPub(getUser)
-    let recipientPub
-    if (!emailObject.recipient.includes(";")) {
-      recipientPub = await getRecipientUserPub(email.recipients.recipient, getGun)
+
+    if (!emailObject.recipients.recipient.includes(";")) {
+      const recipientPub = await getRecipientUserPub(email.recipients.recipient, getGun)
 
       const conversationId = uuid()
       const messageId = uuid()
-      const conversation = getGun().get("mails").get(conversationId).get(messageId).put(email)
-      // conversation.get(messageId).put(email)
+      const conversation = await getGun().get("mails").get(conversationId)
+      getGun().get("mails").get(conversationId).get(messageId).put(email)
       // console.log(typeof conversation)
       getGun().get("profiles").get(senderPub).get("messages").set(conversation)
       getGun().get("profiles").get(recipientPub).get("messages").set(conversation)
@@ -62,8 +61,8 @@ function EditEmail() {
       dispatch(closeSendMessage());
       toast.success("Email sent");
     } else {
-      email.recipients.map(recipient => {
-        recipientPub = await getRecipientUserPub(recipient, getGun)
+      email.recipients.map(async recipient => {
+        const recipientPub = await getRecipientUserPub(recipient, getGun)
       })
     }
   };

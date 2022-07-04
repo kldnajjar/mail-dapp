@@ -52,7 +52,9 @@ const SignUp = () => {
       lastName,
     });
 
-    getGun().get("profiles").get(pub).get("messages");
+    getGun().get("profiles").get(pub).get("messages").put({
+      node: "messages"
+    });
 
     toast.success("User created");
     navigate("/sign-in", { replace: true });

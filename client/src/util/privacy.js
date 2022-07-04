@@ -30,7 +30,7 @@ export async function encryption(email, getGun, getUser) {
     email.subject = encryptedSubject;
     email.body = encryptedMessage;
     email.keys = keys
-    email.recipient = recipients
+    email.recipients = recipients
     email.isEncrypted = true;
     email.isSender = false;
   
@@ -39,7 +39,6 @@ export async function encryption(email, getGun, getUser) {
     const myPair = getUser()._.sea
     const recipientArray = email.recipient.split(";")
     const keys = {}
-    const recipients = {}
     const promises = recipientArray.map(async (recipient) => await getKeyForRecipient(recipient, getGun, myPair, encryptionKey));
 
     Promise.all(promises).then((resultKeys) => {
@@ -47,14 +46,11 @@ export async function encryption(email, getGun, getUser) {
 
       for (let i = 0; i < recipientArray.length; i++) {
         keys[recipientArray[i]] = resultKeys[i]
-        recipients[recipientArray[i]] = recipientArray[i]
       }
-
-      console.log(keys)
+      
       email.subject = encryptedSubject;
       email.body = encryptedMessage;
       email.keys = keys
-      email.recipients
       email.isEncrypted = true;
       email.isSender = false;
     
@@ -96,6 +92,7 @@ export async function decryption(refMail, getGun, getUser, getMails, currentAlia
   let isCarbonCopy = false;
   let position = 0;
 
+  console.log(refMail)
   let email;
   await getGun()
     .path(refMail)
@@ -103,7 +100,7 @@ export async function decryption(refMail, getGun, getUser, getMails, currentAlia
       email = mail;
     });
 
-    console.log(email)
+    console.log(email.recipient)
 
   if (
     currentUserEmail === email.recipient ||
