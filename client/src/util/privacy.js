@@ -28,7 +28,12 @@ export async function encryption(email, getGun, getUser) {
     );
     encryptedKeysByUsers[key] = encryptedEncryptionKeyRecipient;
   }
+
+
   console.log(encryptedKeysByUsers)
+
+
+  
 
   return {
     encryptedSubject: encryptedSubject,
@@ -92,7 +97,7 @@ export async function encryption(email, getGun, getUser) {
 
 
 async function getRecipientEpub(email, getGun) {
-  console.log(email)
+  
   const epubObj = {}
   for( let i = 0 ; i < email.length ; i++){
     let j = i ;
@@ -133,14 +138,79 @@ async function encryptTheKey(epub, myPair, encryptionKey) {
 // }
 
 // DECRYPTION
-export async function decryption(refMail, getGun, getUser, getMails, currentAlias) {
-  const email = await getByReference(refMail, getGun)
-  console.log(refMail)
+export async function decryption(refConversation , getGun, getUser, getMails, currentAlias) {
 
-  const refConversation = prepareConversationNode(refMail)
-  const subject = await getByReference(refMail, getGun)
+  const conversation = await getByReference(refConversation, getGun);
+  // conversation.get('keys').once((key) => {console.log(key)})
+  // console.log(conversation.keys)
 
-  console.log(subject)
+
+
+  let senderEpub;
+  await getGun()
+    .get(`~@${conversation.sender}`)
+    .map()
+    .once((user) => {
+      senderEpub = user.epub;
+    });
+
+
+  
+  // const encryptionKeyForDecryption = await getEcryptionKeyForDecryption(`${refConversation}/keys` , getGun , currentAlias);
+
+  getGun().path(`${refConversation}/keys`).once( async (key)=>{
+    console.log(key)
+
+
+    const myPair = getUser()._.sea;
+
+
+  const decryptedEncryptionKeyForUser = await SEA.decrypt(
+    key.currentAlias, 
+    await SEA.secret(senderEpub, myPair)
+  );
+  
+  // const decryptedEncryptionKeyForUser= "mykloud-key"
+
+  const decryptedSubject = await SEA.decrypt(conversation?.subject, decryptedEncryptionKeyForUser);
+  
+  const decryptedBody = await SEA.decrypt(conversation?.recentBody, decryptedEncryptionKeyForUser);
+
+  console.log(decryptedSubject)
+
+
+
+
+  })
+  
+  // const myPair = getUser()._.sea;
+
+
+  // const decryptedEncryptionKeyForUser = await SEA.decrypt(
+  //   encryptionKeyForDecryption, 
+  //   await SEA.secret(senderEpub, myPair)
+  // );
+  
+  // // const decryptedEncryptionKeyForUser= "mykloud-key"
+
+  // const decryptedSubject = await SEA.decrypt(conversation?.subject, decryptedEncryptionKeyForUser);
+  
+  // const decryptedBody = await SEA.decrypt(conversation?.recentBody, decryptedEncryptionKeyForUser);
+  
+
+  
+
+
+  // return {
+  //   sender : conversation?.sender,
+  //   subject : decryptedSubject,
+  //   body : decryptedBody
+  // }
+
+  // const refConversation = prepareConversationNode(refConversation)
+  // const subject = await getByReference(refConversation, getGun)
+
+  
 
   // const decryptedEmail = await decryptNew(
   //   email,
@@ -273,7 +343,7 @@ async function decryptEmailPromiseFun(key, email) {
 async function getSenderEpub(email, getGun) {
   let senderEpub;
   await getGun()
-    .get(`~@${email.sender}`)
+    .get(`~@${email}`)
     .map()
     .once((user) => {
       senderEpub = user.epub;
@@ -288,7 +358,24 @@ async function getByReference(path, getGun) {
     .once((obj) => {
       result = obj;
     });
+
+  
+
+
+
     return result
+}
+
+async function getEcryptionKeyForDecryption(path, getGun , email) {
+  let result;
+   await getGun()
+    .path(path)
+    .once((obj) => {
+      result = obj;
+    });
+
+    return result[email]
+    
 }
 
 function prepareConversationNode(refMail) {
@@ -296,6 +383,6 @@ function prepareConversationNode(refMail) {
   refArray.pop()
   let refConversation = refArray.toString()
   refConversation.replaceAll(",", "/")
-  console.log(refConversation)
+  
   return refConversation
 }

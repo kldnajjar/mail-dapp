@@ -5,8 +5,16 @@ export const mailSlice = createSlice({
   initialState: {
     selectedMail: null,
     sendMessageIsOpen: false,
+    folderOpened  : "inbox",
+    emailsList :[],
   },
   reducers: {
+    addEmailList : (state, action) => {
+      state.emailsList.push(action.payload);
+    },
+    setFolder : (state, action) => {
+      state.folderOpened = action.payload.value;
+    },
     selectMail: (state, action) => {
       state.selectedMail = action.payload;
     },
@@ -19,7 +27,7 @@ export const mailSlice = createSlice({
   },
 });
 
-export const { selectMail, openSendMessage, closeSendMessage } =
+export const { selectMail, openSendMessage, closeSendMessage , setFolder , addEmailList } =
   mailSlice.actions;
 
 export const selectOpenMail = (state) => state.mail.selectedMail;

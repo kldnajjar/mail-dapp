@@ -47,15 +47,14 @@ function EditEmail() {
     await getMails().get(conversationId).put({
       id : conversationId,
       subject : email?.encryptedSubject,
-      ids: {
-        id: messageId
-      }
-    }).get(messageId).put({
+      recentBody : email?.encryptedMessage,
+      keys : email?.encryptedKeysByUsers,
+      sender : emailObject?.sender,
+    }).get("messages").get(messageId).put({
         id : messageId,
         body : email?.encryptedMessage,
         sender : emailObject?.sender,
-        recipients : emailObject?.recipient,
-        keys : email?.encryptedKeysByUsers
+        recipients : emailObject?.recipient,  
     })
 
     const conversation = getMails().get(conversationId);
