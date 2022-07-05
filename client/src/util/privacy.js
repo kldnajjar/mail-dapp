@@ -34,58 +34,6 @@ export async function encryption(email, getGun, getUser) {
     encryptedKeysByUsers,
     senderEpub,
   };
-
-  // const encryptionKey = "mykloud-key"; // <-- This key is just an example. Ideally I think we should generate it every time sender sends an email.
-  // const encryptedSubject = await SEA.encrypt(email.subject, encryptionKey);
-  // const encryptedMessage = await SEA.encrypt(email.body, encryptionKey);
-
-  // if (!email.recipient.includes(";")) {
-  //   const recipientEpub = await getRecipientEpub(email.recipient, getGun);
-  //   const currentUserEpub = getUser()._.sea.epub;
-  //   const myPair = getUser()._.sea;
-
-  //   const encryptedEncryptionKeyRecipient = await encryptTheKey(recipientEpub, myPair, encryptionKey)
-  //   const encryptedEncryptionKeySender = await encryptTheKey(currentUserEpub, myPair, encryptionKey)
-
-  //   const keys = {
-  //     recipientKey: encryptedEncryptionKeyRecipient,
-  //     senderKey: encryptedEncryptionKeySender
-  //   };
-
-  //   const recipients = {
-  //     recipient: email.recipient
-  //   }
-
-  //   email.subject = encryptedSubject;
-  //   email.body = encryptedMessage;
-  //   email.keys = keys
-  //   email.recipients = recipients
-  //   email.isEncrypted = true;
-  //   email.isSender = false;
-
-  //   return email;
-  // } else {
-  //   const myPair = getUser()._.sea
-  //   const recipientArray = email.recipient.split(";")
-  //   const keys = {}
-  //   const promises = recipientArray.map(async (recipient) => await getKeyForRecipient(recipient, getGun, myPair, encryptionKey));
-
-  //   Promise.all(promises).then((resultKeys) => {
-  //     console.log(resultKeys)
-
-  //     for (let i = 0; i < recipientArray.length; i++) {
-  //       keys[recipientArray[i]] = resultKeys[i]
-  //     }
-
-  //     email.subject = encryptedSubject;
-  //     email.body = encryptedMessage;
-  //     email.keys = keys
-  //     email.isEncrypted = true;
-  //     email.isSender = false;
-
-  //     return email;
-  //   })
-  // }
 }
 
 async function getRecipientEpub(email, getGun) {
@@ -103,46 +51,16 @@ async function getRecipientEpub(email, getGun) {
   return epubObj;
 }
 
-// async function getKeyForRecipient(recipient, getGun, myPair, encryptionKey) {
-//   const recipientEpub = await getRecipientEpub(recipient, getGun)
-//   const encryptedKey = await encryptTheKey(recipientEpub, myPair, encryptionKey)
-//   return encryptedKey
-// }
-
-async function encryptTheKey(epub, myPair, encryptionKey) {
-  const encryptedEncryptionKey = await SEA.encrypt(
-    encryptionKey,
-    await SEA.secret(epub, myPair)
-  );
-  return encryptedEncryptionKey;
-}
-
-// async function getRecipientEpub(recipient, getGun) {
-//   let recipientEpub;
-//   await getGun()
-//     .get(`~@${recipient}`)
-//     .map()
-//     .once((user) => {
-//       recipientEpub = user.epub;
-//     });
-//   return recipientEpub;
-// }
-
 // DECRYPTION
 export async function decryption(
   refConversation,
   getGun,
   getUser,
-  getMails,
   currentAlias
 ) {
   const conversation = await getByReference(refConversation, getGun);
   const keysObject = JSON.parse(conversation?.keys);
-  // const encryptionKeyForDecryption = await getEcryptionKeyForDecryption(
-  //   `${refConversation}/keys`,
-  //   getGun,
-  //   currentAlias
-  // );
+
   const myPair = await getUser()._.sea;
   const decryptedEncryptionKeyForUser = await SEA.decrypt(
     keysObject[currentAlias],
@@ -161,199 +79,16 @@ export async function decryption(
     subject: decryptedSubject,
     body: decryptedBody,
   };
-
-  // const refConversation = prepareConversationNode(refConversation)
-  // const subject = await getByReference(refConversation, getGun)
-
-  // const decryptedEmail = await decryptNew(
-  //   email,
-  //   getGun,
-  //   getUser,
-  //   getMails,
-  //   refMail,
-  //   currentAlias
-  // );
-
-  // return decryptedEmail
-
-  // if (
-  //   currentUserEmail === email.recipient ||
-  //   currentUserEmail === email.sender
-  // ) {
-  // if (email.isEncrypted) {
-  //   if (currentUserEmail === email.sender) {
-  //     email.isSender = true;
-  //   }
-  //   const decryptedEmail = await decrypt(
-  //     email,
-  //     getGun,
-  //     getUser,
-  //     getMails,
-  //     refMail,
-  //     currentUserEmail
-  //   );
-  //   return decryptedEmail;
-  // } else {
-  //   return email;
-  // }
-  // } else {
-  //   return null;
-  // }
-}
-
-async function decryptNew(email, getGun, getUser, refMail, currentAlias) {
-  const senderEpubPromise = new Promise(async (resolve, reject) => {
-    let senderEpub = await getSenderEpub(email, getGun);
-    resolve(senderEpub);
-  });
-
-  const myPair = getUser()._.sea;
-
-  return senderEpubPromise.then((senderEpub) => {
-    return decryptedKeyPromiseFun(
-      senderEpub,
-      myPair,
-      getGun,
-      refMail,
-      currentAlias
-    ).then((key) => {
-      return decryptEmailPromiseFun(key, email).then((result) => {
-        return result;
-      });
-    });
-  });
-}
-
-async function decrypt(
-  email,
-  getGun,
-  getUser,
-  getMails,
-  refMail,
-  currentUserEmail
-) {
-  const senderEpubPromise = new Promise(async (resolve, reject) => {
-    let senderEpub = await getSenderEpub(email, getGun);
-    resolve(senderEpub);
-  });
-
-  const myPair = getUser()._.sea;
-
-  return senderEpubPromise.then((senderEpub) => {
-    return decryptedKeyPromiseFun(
-      senderEpub,
-      myPair,
-      email,
-      getGun,
-      refMail,
-      currentUserEmail
-    ).then((key) => {
-      return decryptEmailPromiseFun(key, email).then((result) => {
-        return result;
-      });
-    });
-  });
-}
-
-async function decryptedKeyPromiseFun(
-  senderEpub,
-  myPair,
-  getGun,
-  refMail,
-  currentAlias
-) {
-  return new Promise(async (resolve, reject) => {
-    let myKey;
-    await getGun()
-      .path(refMail + "/keys")
-      .once((keys) => {
-        myKey = keys[currentAlias];
-      });
-
-    const secret = await SEA.secret(senderEpub, myPair);
-    const decryptedEncryptionKey = await SEA.decrypt(myKey, secret);
-
-    resolve(decryptedEncryptionKey);
-  });
-}
-
-// async function decryptedKeyPromiseFun(senderEpub, myPair, email, getGun, refMail, currentUserEmail) {
-//   return new Promise(async (resolve, reject) => {
-//     let senderKey;
-//     let recipientKey;
-//     await getGun()
-//       .path(refMail + "/keys")
-//       .once((keys) => {
-//         recipientKey = keys.recipientKey,
-//         senderKey = keys.senderKey
-//       });
-
-//     console.log(`senderKey: ${senderKey}`)
-//     console.log(`recipientKey: ${recipientKey}`)
-
-//     if (email.isSender) {
-//       console.log(`senderEpub: ${senderEpub}`)
-//       const secret = await SEA.secret(senderEpub, myPair);
-//       const decryptedEncryptionKey = await SEA.decrypt(senderKey, secret);
-
-//       resolve(decryptedEncryptionKey);
-//     } else {
-//       const secret = await SEA.secret(senderEpub, myPair);
-//       const decryptedEncryptionKey = await SEA.decrypt(recipientKey, secret);
-
-//       resolve(decryptedEncryptionKey);
-//     }
-//   });
-// }
-
-async function decryptEmailPromiseFun(key, email) {
-  return new Promise(async (resolve, reject) => {
-    const decryptedSubject = await SEA.decrypt(email.subject, key);
-    const decryptedMessage = await SEA.decrypt(email.body, key);
-
-    email.subject = decryptedSubject;
-    email.body = decryptedMessage;
-    email.isEncrypted = false;
-    resolve(email);
-  });
-}
-
-async function getSenderEpub(email, getGun) {
-  let senderEpub;
-  await getGun()
-    .get(`~@${email}`)
-    .map()
-    .once((user) => {
-      senderEpub = user.epub;
-    });
-  return senderEpub;
 }
 
 async function getByReference(path, getGun) {
+  console.log(path)
   let result;
   await getGun()
     .path(path)
     .once((obj) => {
       result = obj;
     });
+  console.log(result)
   return result;
-}
-
-async function getEcryptionKeyForDecryption(path, getGun, email) {
-  let result;
-  await getGun()
-    .path(path)
-    .once((obj) => {
-      result = obj;
-    });
-  return result[email];
-}
-
-function prepareConversationNode(refMail) {
-  const refArray = refMail.split("/");
-  refArray.pop();
-  let refConversation = refArray.toString();
-  refConversation.replaceAll(",", "/");
-
-  return refConversation;
 }

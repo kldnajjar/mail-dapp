@@ -51,12 +51,9 @@ function EditEmail() {
   }
 
   const createMails = async (emailObject) => {
-    console.log("DDDDDD");
-
     const recipientsArray = emailObject.recipient.split(";");
 
-    const email = await encryption(
-      {
+    const email = await encryption({
         subject: emailObject.subject,
         sender: emailObject.sender,
         recipients: recipientsArray,
