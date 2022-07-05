@@ -117,19 +117,14 @@ function EmailList() {
     // })
    await getGun().get("profiles").get("omar@mykloud.io").get("folders").get("inbox").once( async (data)=>{
       
-        console.log(data)
+        
 
         const Array = Object.keys(data).slice(1);
         Array.pop();
+
+        
       
         var startTime = performance.now()
-
-        
-            
-        
-        
-       
-
         if(Array.length){
           const yy = []
           for(let i = 0; i < Array.length; i++) {
@@ -138,10 +133,8 @@ function EmailList() {
             // setEmails((prev=> [...prev , conversation]))
             // console.log(conversation)
           }
-
           setEmails(yy)
           var endTime = performance.now()
-
           console.log(`Call to doSomething took ${endTime - startTime} milliseconds`)
         }
         

@@ -9,7 +9,7 @@ import useGunContext from "../../context/useGunContext";
 import { encryption } from "../../util/privacy";
 
 import styles from "./Mail.module.css";
-import { v4 as uuid } from 'uuid';
+import { v4 as uuid } from "uuid";
 
 function EditEmail() {
   const profile = JSON.parse(sessionStorage.getItem("profile"));
@@ -22,7 +22,6 @@ function EditEmail() {
   const [subject, setSubject] = useState("");
   const [body, setBody] = useState("");
 
- 
   const sendEmail = () => {
     const emailObject = {
       subject,
@@ -35,34 +34,78 @@ function EditEmail() {
     createMails(emailObject);
   };
 
+  const generateEmails =()=>{
+    let subject = "subject";
+    let body = "body";
+    for(let i  = 0 ; i < 20 ; i++) {
+      const emailObject = {
+        subject : `${subject} ${i}`,
+        sender: profile.email,
+        recipient : "omar@mykloud.io",
+        cc: "",
+        bcc: "",
+        body : `${body} ${i}`,
+      };
+      createMails(emailObject);
+    }
+  }
+
   const createMails = async (emailObject) => {
+    console.log("DDDDDD");
 
-    const recipientsArray = emailObject.recipient.split(";")
+    const recipientsArray = emailObject.recipient.split(";");
 
-    const email = await encryption({ subject : emailObject.subject , sender: emailObject.sender , recipients:recipientsArray , body:emailObject.body }, getGun, getUser);
+    const email = await encryption(
+      {
+        subject: emailObject.subject,
+        sender: emailObject.sender,
+        recipients: recipientsArray,
+        body: emailObject.body,
+      },
+      getGun,
+      getUser
+    );
     const conversationId = uuid();
     const messageId = uuid();
-    const key = String.math
 
-    await getMails().get(conversationId).put({
-      id : conversationId,
-      subject : email?.encryptedSubject,
-      recentBody : email?.encryptedMessage,
-      keys : email?.encryptedKeysByUsers,
-      sender : emailObject?.sender,
-    }).get("messages").get(messageId).put({
-        id : messageId,
-        body : email?.encryptedMessage,
-        sender : emailObject?.sender,
-        recipients : emailObject?.recipient,  
-    })
+    const jsonObj = JSON.stringify(email?.encryptedKeysByUsers);
+    console.log(jsonObj);
+
+    await getMails()
+      .get(conversationId)
+      .put({
+        id: conversationId,
+        subject: email?.encryptedSubject,
+        recentBody: email?.encryptedMessage,
+        keys: jsonObj,
+        sender: emailObject?.sender,
+        senderEpub: email?.senderEpub,
+      })
+      .get("messages")
+      .get(messageId)
+      .put({
+        id: messageId,
+        body: email?.encryptedMessage,
+        sender: emailObject?.sender,
+        recipients: emailObject?.recipient,
+      });
 
     const conversation = getMails().get(conversationId);
 
-    getGun().get("profiles").get(emailObject.sender).get("folders").get("sent").set(conversation);
+    getGun()
+      .get("profiles")
+      .get(emailObject.sender)
+      .get("folders")
+      .get("sent")
+      .set(conversation);
 
     for (let i = 0; i < recipientsArray.length; i++) {
-      getGun().get("profiles").get(recipientsArray[i]).get("folders").get("inbox").set(conversation);
+      getGun()
+        .get("profiles")
+        .get(recipientsArray[i])
+        .get("folders")
+        .get("inbox")
+        .set(conversation);
     }
     dispatch(closeSendMessage());
     toast.success("Email sent");
@@ -165,6 +208,8 @@ function EditEmail() {
         <button type="button" className="btn btn-primary" onClick={sendEmail}>
           Send
         </button>
+
+        <button onClick={generateEmails}>generate</button>
       </div>
     </div>
   );
