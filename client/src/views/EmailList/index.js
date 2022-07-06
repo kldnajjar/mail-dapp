@@ -40,18 +40,17 @@ function EmailList() {
 
   async function getAllEmails(getGun, getUser, profile) {
     const alias = await getCurrentUserAlias(getUser)
-    await getGun().get("profiles").get(alias).get("folders").get("inbox").on( async (data)=>{
-      console.log(data)
+    await getGun().get("profiles").get(alias).get("folders").get("inbox").once( async (data)=>{
+      delete data.label;
       if (data) {
         const Array = Object.keys(data).slice(1);
-        const refArray = Array.filter(arr => arr.length > 10)
-        console.log(refArray)
+        console.log(Array)
       
         var startTime = performance.now()
-        if (refArray.length) {
+        if (Array.length) {
           const yy = []
-          for (let i = 0; i < refArray.length; i++) {
-            const conversation = await decryption(refArray[i], getGun, getUser, profile.email);
+          for (let i = 0; i < Array.length; i++) {
+            const conversation = await decryption(Array[i], getGun, getUser, profile.email);
             yy.push(conversation)
           }
           setEmails(yy)

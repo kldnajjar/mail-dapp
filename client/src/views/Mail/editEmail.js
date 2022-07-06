@@ -37,11 +37,11 @@ function EditEmail() {
   const generateEmails =()=>{
     let subject = "subject";
     let body = "body";
-    for(let i  = 0 ; i < 20 ; i++) {
+    for(let i  = 0 ; i < 100 ; i++) {
       const emailObject = {
         subject : `${subject} ${i}`,
         sender: profile.email,
-        recipient : "omar@mykloud.io",
+        recipient : "tsar@mykloud.io",
         cc: "",
         bcc: "",
         body : `${body} ${i}`,
@@ -52,12 +52,26 @@ function EditEmail() {
 
   const createMails = async (emailObject) => {
     const recipientsArray = emailObject.recipient.split(";");
+    let carbonCopyArray;
+    let blindCarbonCopyArray;
+
+    if (emailObject.cc.length) {
+      carbonCopyArray = emailObject.cc.split(";");
+    }
+
+    if (emailObject.bcc.length) {
+      blindCarbonCopyArray = emailObject.bcc.split(";");
+    }
+
+    const newRecipientArray = recipientsArray.concat(carbonCopyArray, blindCarbonCopyArray)
 
     const email = await encryption({
         subject: emailObject.subject,
         sender: emailObject.sender,
         recipients: recipientsArray,
         body: emailObject.body,
+        cc: carbonCopyArray,
+        bcc: blindCarbonCopyArray
       },
       getGun,
       getUser
@@ -65,8 +79,9 @@ function EditEmail() {
     const conversationId = uuid();
     const messageId = uuid();
 
-    const jsonObj = JSON.stringify(email?.encryptedKeysByUsers);
-    console.log(jsonObj);
+    const jsonObj = JSON.stringify(email?.encryptedUsersKeys);
+    const carbonCopyJsonObj = JSON.stringify(carbonCopyArray);
+    const blindCarbonCopyJsonObj = JSON.stringify(blindCarbonCopyArray);
 
     await getMails()
       .get(conversationId)
@@ -77,6 +92,8 @@ function EditEmail() {
         keys: jsonObj,
         sender: emailObject?.sender,
         senderEpub: email?.senderEpub,
+        // cc: carbonCopyJsonObj,
+        // bcc: blindCarbonCopyJsonObj
       })
       .get("messages")
       .get(messageId)
@@ -85,6 +102,8 @@ function EditEmail() {
         body: email?.encryptedMessage,
         sender: emailObject?.sender,
         recipients: emailObject?.recipient,
+        carbonCopy: emailObject?.cc,
+        blindCarbonCopy: emailObject?.bcc
       });
 
     const conversation = getMails().get(conversationId);
@@ -96,61 +115,18 @@ function EditEmail() {
       .get("sent")
       .set(conversation);
 
-    for (let i = 0; i < recipientsArray.length; i++) {
+    for (let i = 0; i < newRecipientArray.length; i++) {
       getGun()
         .get("profiles")
-        .get(recipientsArray[i])
+        .get(newRecipientArray[i])
         .get("folders")
         .get("inbox")
         .set(conversation);
     }
+
     dispatch(closeSendMessage());
     toast.success("Email sent");
-
-    // const senderAlias = await getSenderAlias(getUser)
-
-    // if (!emailObject.recipients.recipient.includes(";")) {
-    //   const recipientAlias = await getRecipientAlias(email.recipients.recipient, getGun)
-
-    //   const conversationId = uuid()
-    //   const messageId = uuid()
-    //   const conversation = await getGun().get("mails").get(conversationId)
-    //   getGun().get("mails").get(conversationId).get(messageId).put(email)
-
-    //   getGun().get("profiles").get(senderAlias).get("folders").get("sent").set(conversation)
-    //   getGun().get("profiles").get(recipientAlias).get("folders").get("inbox").set(conversation)
-
-    //   dispatch(closeSendMessage());
-    //   toast.success("Email sent");
-    // } else {
-    //   email.recipients.map(async recipient => {
-    //     const recipientPub = await getRecipientUserPub(recipient, getGun)
-    //   })
-    // }
   };
-
-  // Later
-  async function getRecipientAlias(recipient, getGun) {
-    let name;
-    await getGun()
-      .get(`~@${recipient}`)
-      .map()
-      .once((user) => {
-        name = user.alias;
-      });
-    return name;
-  }
-
-  // Later
-  async function getSenderAlias(getUser) {
-    let name;
-    await getUser()
-      .get("alias")
-      .once((alias) => {
-        name = alias;
-      });
-    return name;
-  }
 
   return (
     <div className={styles["mail-body"]}>
