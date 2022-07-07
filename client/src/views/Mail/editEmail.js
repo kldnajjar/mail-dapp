@@ -92,8 +92,8 @@ function EditEmail() {
         keys: jsonObj,
         sender: emailObject?.sender,
         senderEpub: email?.senderEpub,
-        // cc: carbonCopyJsonObj,
-        // bcc: blindCarbonCopyJsonObj
+        cc: typeof carbonCopyJsonObj === "undefined" ? "" : carbonCopyJsonObj,
+        bcc: typeof blindCarbonCopyJsonObj === "undefined" ? "" : blindCarbonCopyJsonObj
       })
       .get("messages")
       .get(messageId)

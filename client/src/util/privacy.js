@@ -102,27 +102,42 @@ export async function decryption(
   const conversation = await getByReference(refConversation, getGun);
   const keysObject = JSON.parse(conversation?.keys);
 
-  console.log(keysObject.encryptedKeysByUsers[currentAlias])
+  if (typeof keysObject.encryptedKeysByUsers[currentAlias] === "undefined") {
+    const carbonCopyUsers = JSON.parse(conversation?.cc)
+    const blindCarbonCopyUsers = JSON.parse(conversation?.bcc)
+    if (keysObject.encryptedKeysCarbonCopy[currentAlias]) {
+      for (let i = 0; i < carbonCopyUsers.length; i++) {
+        if (carbonCopyUsers[i] === currentAlias) {
+          return decryptFunction(getUser, keysObject.encryptedKeysCarbonCopy[currentAlias], conversation)
+        }
+      }
+    } else if (keysObject.encryptedKeysBlindCarbonCopy[currentAlias]) {
+      for (let i = 0; i < blindCarbonCopyUsers.length; i++) {
+        if (blindCarbonCopyUsers[i] === currentAlias) {
+          return decryptFunction(getUser, keysObject.encryptedKeysBlindCarbonCopy[currentAlias], conversation)
+        }
+      }
+    }
+  } else {
+    return decryptFunction(getUser, keysObject.encryptedKeysByUsers[currentAlias], conversation)
+  }
+}
 
-  // console.log("before ----------------- if (currentAlias)")
-  // if (keysObject.encryptedKeysByUsers[currentAlias]) {
-  //   console.log("if (currentAlias)")
-  // }
-
+async function decryptFunction(getUser, key, conversation) {
   const myPair = await getUser()._.sea;
-  const decryptedEncryptionKeyForUser = await SEA.decrypt(
-    keysObject.encryptedKeysByUsers[currentAlias],
+  const decryptedKey = await SEA.decrypt(
+    key,
     await SEA.secret(conversation?.senderEpub, myPair)
   );
 
   const decryptedSubject = await SEA.decrypt(
     conversation?.subject,
-    decryptedEncryptionKeyForUser
+    decryptedKey
   );
 
   const decryptedBody = await SEA.decrypt(
     conversation?.recentBody,
-    decryptedEncryptionKeyForUser
+    decryptedKey
   );
 
   return {

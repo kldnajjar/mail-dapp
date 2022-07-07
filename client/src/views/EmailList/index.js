@@ -40,6 +40,7 @@ function EmailList() {
 
   async function getAllEmails(getGun, getUser, profile) {
     const alias = await getCurrentUserAlias(getUser)
+
     await getGun().get("profiles").get(alias).get("folders").get("inbox").once( async (data)=>{
       delete data.label;
       if (data) {
