@@ -6,6 +6,8 @@ import styles from "./Mail.module.css";
 function ReadEmail() {
   const selectedMail = useSelector(selectOpenMail);
 
+  console.log(selectedMail)
+
   return (
     <div className={styles["mail-body"]}>
       <div className={styles["mail-bodyHeader"]}>

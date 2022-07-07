@@ -6,13 +6,13 @@ import { selectMail, openSendMessage } from "../../features/mailSlice";
 import { useDispatch } from "react-redux";
 import styles from "./EmailRow.module.css";
 
-function EmailRow({ subject, sender, recipient, body }) {
+function EmailRow({ subject, sender, recipient, body, id }) {
   const dispatch = useDispatch();
 
   const openMail = () => {
     dispatch(
       selectMail({
-        subject, sender, recipient, body
+        subject, sender, recipient, body, id
       })
     );
     dispatch(openSendMessage());

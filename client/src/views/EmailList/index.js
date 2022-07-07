@@ -52,6 +52,7 @@ function EmailList() {
           const yy = []
           for (let i = 0; i < Array.length; i++) {
             const conversation = await decryption(Array[i], getGun, getUser, profile.email);
+            conversation.id = Array[i]
             yy.push(conversation)
           }
           setEmails(yy)
@@ -119,13 +120,14 @@ function EmailList() {
 
   
       <div className={styles["emailList-list"]}>
-        {emails?.map(({ subject, sender, body }, reactKey) => (
+        {emails?.map(({ subject, sender, body, id }, reactKey) => (
           <EmailRow
             key={`email-row-${reactKey}`}
             sender={sender}
             // recipient={recipient}
             subject={subject}
             body={body}
+            id={id}
             // time={new Date(timestamp?.seconds * 1000).toUTCString()}
           />
         ))}

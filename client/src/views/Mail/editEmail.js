@@ -11,6 +11,8 @@ import { encryption } from "../../util/privacy";
 import styles from "./Mail.module.css";
 import { v4 as uuid } from "uuid";
 
+// import { createMails } from "./createEmail";
+
 function EditEmail() {
   const profile = JSON.parse(sessionStorage.getItem("profile"));
   const dispatch = useDispatch();
@@ -31,7 +33,11 @@ function EditEmail() {
       bcc: emailBCC,
       body,
     };
-    createMails(emailObject);
+
+    const conversationId = uuid();
+    const messageId = uuid();
+    
+    createMails(emailObject, conversationId, messageId);
   };
 
   const generateEmails =()=>{
@@ -50,7 +56,7 @@ function EditEmail() {
     }
   }
 
-  const createMails = async (emailObject) => {
+  const createMails = async (emailObject, conversationId, messageId) => {
     const recipientsArray = emailObject.recipient.split(";");
     let carbonCopyArray;
     let blindCarbonCopyArray;
@@ -76,8 +82,8 @@ function EditEmail() {
       getGun,
       getUser
     );
-    const conversationId = uuid();
-    const messageId = uuid();
+    // const conversationId = uuid();
+    // const messageId = uuid();
 
     const jsonObj = JSON.stringify(email?.encryptedUsersKeys);
     const carbonCopyJsonObj = JSON.stringify(carbonCopyArray);
@@ -127,6 +133,20 @@ function EditEmail() {
     dispatch(closeSendMessage());
     toast.success("Email sent");
   };
+
+  /**
+   * This reply function is not for this file 'editEmails.js'.
+   */
+  async function reply(conversationId, recipient) {
+    const emailObject = {
+      sender: profile.email,
+      body,
+    };
+
+    const messageId = uuid();
+
+    createMails(emailObject, conversationId, messageId)
+  }
 
   return (
     <div className={styles["mail-body"]}>
