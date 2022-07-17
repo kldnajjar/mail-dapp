@@ -17,7 +17,7 @@ import styles from "./EmailList.module.css";
 import useGunContext from "../../context/useGunContext";
 import { decryption } from "../../util/privacy";
 import { useSelector, useDispatch } from "react-redux";
-import { setReply } from "../../features/mailSlice";
+import { resetEmailActions } from "../../features/mailSlice";
 import "gun/sea";
 import "gun/lib/path.js";
 
@@ -81,7 +81,7 @@ function EmailList() {
   }
 
   useEffect(async () => {
-    dispatch(setReply(false));
+    dispatch(resetEmailActions());
     getAllEmails(getGun, getUser, profile);
   }, []);
 

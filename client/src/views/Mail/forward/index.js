@@ -1,28 +1,19 @@
 import React, { useState, useEffect } from "react";
 import { toast } from "react-toastify";
 
-import { useSelector, useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { closeSendMessage, selectOpenMail } from "../../../features/mailSlice";
 
+import Input from "../../../components/input";
 import useGunContext from "../../../context/useGunContext";
 import { encryption } from "../../../util/privacy";
 
 import styles from "../Mail.module.css";
 import { v4 as uuid } from "uuid";
 
-export async function reply(conversationId, recipient) {
-  const emailObject = {
-    sender: profile.email,
-    recipient,
-    body,
-  };
+// import { createMails } from "./createEmail";
 
-  const messageId = uuid();
-
-  createMails(emailObject, conversationId, messageId);
-}
-
-function ReplyEmail() {
+function ForwardEmail() {
   const profile = JSON.parse(sessionStorage.getItem("profile"));
   const dispatch = useDispatch();
   const { getGun, getUser, getMails } = useGunContext();
@@ -44,10 +35,30 @@ function ReplyEmail() {
       bcc: emailBCC,
       body,
     };
-    createMails(emailObject);
+
+    const conversationId = uuid();
+    const messageId = uuid();
+
+    createMails(emailObject, conversationId, messageId);
   };
 
-  const createMails = async (emailObject) => {
+  const generateEmails = () => {
+    let subject = "subject";
+    let body = "body";
+    for (let i = 0; i < 100; i++) {
+      const emailObject = {
+        subject: `${subject} ${i}`,
+        sender: profile.email,
+        recipient: "tsar@mykloud.io",
+        cc: "",
+        bcc: "",
+        body: `${body} ${i}`,
+      };
+      createMails(emailObject);
+    }
+  };
+
+  const createMails = async (emailObject, conversationId, messageId) => {
     const recipientsArray = emailObject.recipient.split(";");
     let carbonCopyArray;
     let blindCarbonCopyArray;
@@ -77,8 +88,8 @@ function ReplyEmail() {
       getGun,
       getUser
     );
-    const conversationId = uuid();
-    const messageId = uuid();
+    // const conversationId = uuid();
+    // const messageId = uuid();
 
     const jsonObj = JSON.stringify(email?.encryptedUsersKeys);
     const carbonCopyJsonObj = JSON.stringify(carbonCopyArray);
@@ -132,9 +143,23 @@ function ReplyEmail() {
     toast.success("Email sent");
   };
 
+  /**
+   * This reply function is not for this file 'editEmails.js'.
+   */
+  async function reply(conversationId, recipient) {
+    const emailObject = {
+      sender: profile.email,
+      body,
+    };
+
+    const messageId = uuid();
+
+    createMails(emailObject, conversationId, messageId);
+  }
+
   useEffect(() => {
     setBody(`\n\n\n${selectedMail.body}`);
-    // setSubject(`fwd: ${selectedMail.subject}`);
+    setSubject(`fwd: ${selectedMail.subject}`);
   }, []);
 
   return (
@@ -146,12 +171,34 @@ function ReplyEmail() {
             <b>{profile.email}</b>
           </div>
         </div>
-        <div className="form-group mb-3">
-          <label>Recipient</label>
-          <div className="mb-3">
-            <b>{selectedMail.sender}</b>
-          </div>
-        </div>
+        <Input
+          type="email"
+          label="Recipient"
+          placeholder="Seperate multiple emails with ;"
+          value={recipient}
+          onChange={(event) => setRecipient(event.target.value)}
+        />
+        <Input
+          type="email"
+          label="CC"
+          placeholder="Seperate multiple emails with ;"
+          value={emailCC}
+          onChange={(event) => setEmailCC(event.target.value)}
+        />
+        <Input
+          type="email"
+          label="Bcc"
+          placeholder="Seperate multiple emails with ;"
+          value={emailBCC}
+          onChange={(event) => setEmailBCC(event.target.value)}
+        />
+        <Input
+          type="text"
+          label="Subject"
+          placeholder="Subject"
+          value={subject}
+          onChange={(event) => setSubject(event.target.value)}
+        />
       </div>
 
       <div className={styles["mail-message"]}>
@@ -173,4 +220,4 @@ function ReplyEmail() {
   );
 }
 
-export default ReplyEmail;
+export default ForwardEmail;

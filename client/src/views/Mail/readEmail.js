@@ -1,9 +1,16 @@
 import React from "react";
-import { selectOpenMail, setReply } from "../../features/mailSlice";
+import {
+  selectOpenMail,
+  setReply,
+  setReplyToAll,
+  setForward,
+} from "../../features/mailSlice";
 import { useSelector, useDispatch } from "react-redux";
 
 import { IconButton } from "@material-ui/core";
 import ReplyIcon from "@material-ui/icons/Reply";
+import ReplyAllIcon from "@material-ui/icons/ReplyAll";
+import ForwardIcon from "@material-ui/icons/Forward";
 
 import styles from "./Mail.module.css";
 
@@ -30,6 +37,14 @@ function ReadEmail() {
         <div className="">
           <IconButton onClick={() => dispatch(setReply(true))}>
             <ReplyIcon />
+          </IconButton>
+
+          <IconButton onClick={() => dispatch(setReplyToAll(true))}>
+            <ReplyAllIcon />
+          </IconButton>
+
+          <IconButton onClick={() => dispatch(setForward(true))}>
+            <ForwardIcon />
           </IconButton>
         </div>
         {/* <p className={styles["mail-time"]}>{selectedMail.time}</p> */}

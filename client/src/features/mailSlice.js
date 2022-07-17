@@ -7,6 +7,8 @@ export const mailSlice = createSlice({
     sendMessageIsOpen: false,
     folderOpened: "inbox",
     isReply: false,
+    isReplyToAll: false,
+    isForward: false,
     emailsList: [],
   },
   reducers: {
@@ -28,6 +30,17 @@ export const mailSlice = createSlice({
     setReply: (state, action) => {
       state.isReply = action.payload;
     },
+    setReplyToAll: (state, action) => {
+      state.isReplyToAll = action.payload;
+    },
+    setForward: (state, action) => {
+      state.isForward = action.payload;
+    },
+    resetEmailActions: (state) => {
+      state.isReply = false;
+      state.isReplyToAll = false;
+      state.isForward = false;
+    },
   },
 });
 
@@ -38,10 +51,15 @@ export const {
   setFolder,
   addEmailList,
   setReply,
+  setReplyToAll,
+  setForward,
+  resetEmailActions,
 } = mailSlice.actions;
 
 export const selectOpenMail = (state) => state.mail.selectedMail;
 export const selectSendMessageIsOpen = (state) => state.mail.sendMessageIsOpen;
 export const selectedMailToReply = (state) => state.mail.isReply;
+export const selectedMailToReplyAll = (state) => state.mail.isReplyToAll;
+export const selectedMailToForward = (state) => state.mail.isForward;
 
 export default mailSlice.reducer;
