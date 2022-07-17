@@ -36,43 +36,45 @@ function ReplyEmail() {
   const [body, setBody] = useState("");
 
   const sendEmail = () => {
+    const recipient = selectedMail.sender
+
     const emailObject = {
       subject,
       sender: profile.email,
       recipient,
-      cc: emailCC,
-      bcc: emailBCC,
       body,
     };
     createMails(emailObject);
   };
 
   const createMails = async (emailObject) => {
-    const recipientsArray = emailObject.recipient.split(";");
-    let carbonCopyArray;
-    let blindCarbonCopyArray;
+    // const recipientsArray = emailObject.recipient.split(";");
 
-    if (emailObject.cc.length) {
-      carbonCopyArray = emailObject.cc.split(";");
-    }
+    // let carbonCopyArray;
+    // let blindCarbonCopyArray;
 
-    if (emailObject.bcc.length) {
-      blindCarbonCopyArray = emailObject.bcc.split(";");
-    }
+    // if (emailObject.cc.length) {
+    //   carbonCopyArray = emailObject.cc.split(";");
+    // }
 
-    const newRecipientArray = recipientsArray.concat(
-      carbonCopyArray,
-      blindCarbonCopyArray
-    );
+    // if (emailObject.bcc.length) {
+    //   blindCarbonCopyArray = emailObject.bcc.split(";");
+    // }
+
+    // const newRecipientArray = recipientsArray.concat(
+    //   carbonCopyArray,
+    //   blindCarbonCopyArray
+    // );
+
+    const recipientArray = [emailObject?.recipient]
+    console.log(recipientArray)
 
     const email = await encryption(
       {
         subject: emailObject.subject,
         sender: emailObject.sender,
-        recipients: recipientsArray,
+        recipients: recipientArray,
         body: emailObject.body,
-        cc: carbonCopyArray,
-        bcc: blindCarbonCopyArray,
       },
       getGun,
       getUser
@@ -81,8 +83,6 @@ function ReplyEmail() {
     const messageId = uuid();
 
     const jsonObj = JSON.stringify(email?.encryptedUsersKeys);
-    const carbonCopyJsonObj = JSON.stringify(carbonCopyArray);
-    const blindCarbonCopyJsonObj = JSON.stringify(blindCarbonCopyArray);
 
     await getMails()
       .get(conversationId)
@@ -93,11 +93,8 @@ function ReplyEmail() {
         keys: jsonObj,
         sender: emailObject?.sender,
         senderEpub: email?.senderEpub,
-        cc: typeof carbonCopyJsonObj === "undefined" ? "" : carbonCopyJsonObj,
-        bcc:
-          typeof blindCarbonCopyJsonObj === "undefined"
-            ? ""
-            : blindCarbonCopyJsonObj,
+        cc: "",
+        bcc: "",
       })
       .get("messages")
       .get(messageId)
@@ -106,8 +103,9 @@ function ReplyEmail() {
         body: email?.encryptedMessage,
         sender: emailObject?.sender,
         recipients: emailObject?.recipient,
-        carbonCopy: emailObject?.cc,
-        blindCarbonCopy: emailObject?.bcc,
+        carbonCopy: "",
+        blindCarbonCopy: "",
+        type: "reply"
       });
 
     const conversation = getMails().get(conversationId);
@@ -119,10 +117,10 @@ function ReplyEmail() {
       .get("sent")
       .set(conversation);
 
-    for (let i = 0; i < newRecipientArray.length; i++) {
+    for (let i = 0; i < 1; i++) {
       getGun()
         .get("profiles")
-        .get(newRecipientArray[i])
+        .get(emailObject?.recipient)
         .get("folders")
         .get("inbox")
         .set(conversation);

@@ -134,11 +134,11 @@ function EmailList() {
       }}>TEST</button> */}
 
       <div className={styles["emailList-list"]}>
-        {emails?.map(({ subject, sender, body, id }, reactKey) => (
+        {emails?.map(({ subject, sender, recipient, body, id }, reactKey) => (
           <EmailRow
             key={`email-row-${reactKey}`}
             sender={sender}
-            // recipient={recipient}
+            recipient={recipient}
             subject={subject}
             body={body}
             id={id}

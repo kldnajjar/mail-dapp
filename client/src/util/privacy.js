@@ -52,12 +52,9 @@ export async function encryption(email, getGun, getUser) {
     encryptedKeysBlindCarbonCopy
   };
 
-  console.log(encryptedUsersKeys)
-
   return {
     encryptedSubject,
     encryptedMessage,
-    encryptedKeysByUsers,
     encryptedUsersKeys,
     senderEpub,
   };
@@ -76,17 +73,17 @@ async function getRecipientKeys(encryptedKeysObj, recipients, getGun, encryption
   console.log(encryptedKeysObj)
 }
 
-async function getRecipientEpub(email, getGun) {
+async function getRecipientEpub(emails, getGun) {
   const epubObj = {};
-  for (let i = 0; i < email.length; i++) {
+  for (let i = 0; i < emails.length; i++) {
     let j = i;
     await getGun()
-      .get(`~@${email[i]}`)
+      .get(`~@${emails[i]}`)
       .map()
       .once((user) => {
-        epubObj[`${email[j]}`] = user.epub;
+        epubObj[`${emails[j]}`] = user.epub;
       });
-    getGun().get(`~@${email[i]}`).off();
+    getGun().get(`~@${emails[i]}`).off();
   }
   console.log(epubObj);
   return epubObj;
@@ -103,8 +100,17 @@ export async function decryption(
   const keysObject = JSON.parse(conversation?.keys);
 
   if (typeof keysObject.encryptedKeysByUsers[currentAlias] === "undefined") {
-    const carbonCopyUsers = JSON.parse(conversation?.cc)
-    const blindCarbonCopyUsers = JSON.parse(conversation?.bcc)
+    let carbonCopyUsers
+    let blindCarbonCopyUsers
+
+    if (conversation?.cc.length > 3) {
+      carbonCopyUsers = JSON.parse(conversation?.cc)
+    }
+    
+    if (conversation?.bcc.length > 3) {
+      blindCarbonCopyUsers = JSON.parse(conversation?.bcc)
+    }
+    
     if (keysObject.encryptedKeysCarbonCopy[currentAlias]) {
       for (let i = 0; i < carbonCopyUsers.length; i++) {
         if (carbonCopyUsers[i] === currentAlias) {
@@ -139,6 +145,8 @@ async function decryptFunction(getUser, key, conversation) {
     conversation?.recentBody,
     decryptedKey
   );
+
+  console.log(conversation)
 
   return {
     sender: conversation?.sender,

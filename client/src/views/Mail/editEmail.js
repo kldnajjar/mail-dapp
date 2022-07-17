@@ -109,7 +109,8 @@ function EditEmail() {
         sender: emailObject?.sender,
         recipients: emailObject?.recipient,
         carbonCopy: emailObject?.cc,
-        blindCarbonCopy: emailObject?.bcc
+        blindCarbonCopy: emailObject?.bcc,
+        type: "",
       });
 
     const conversation = getMails().get(conversationId);
@@ -133,20 +134,6 @@ function EditEmail() {
     dispatch(closeSendMessage());
     toast.success("Email sent");
   };
-
-  /**
-   * This reply function is not for this file 'editEmails.js'.
-   */
-  async function reply(conversationId, recipient) {
-    const emailObject = {
-      sender: profile.email,
-      body,
-    };
-
-    const messageId = uuid();
-
-    createMails(emailObject, conversationId, messageId)
-  }
 
   return (
     <div className={styles["mail-body"]}>
