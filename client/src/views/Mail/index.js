@@ -1,18 +1,33 @@
 import React from "react";
-import { selectOpenMail } from "../../features/mailSlice";
+import { selectedMailToReply, selectOpenMail } from "../../features/mailSlice";
 import { useSelector } from "react-redux";
-import styles from "./Mail.module.css";
+
 import MailTool from "./mailTool";
+import ReplyEmail from "./reply";
 import EditEmail from "./editEmail";
 import ReadEmail from "./readEmail";
 
-function Mail() {
-  const selectedMail = useSelector(selectOpenMail);
+import styles from "./Mail.module.css";
 
+function renderPage() {
+  const selectedMail = useSelector(selectOpenMail);
+  const reply = useSelector(selectedMailToReply);
+
+  if (selectedMail) {
+    if (reply) {
+      return <ReplyEmail />;
+    }
+    return <ReadEmail />;
+  } else {
+    return <EditEmail />;
+  }
+}
+
+function Mail() {
   return (
     <div className={styles.mail}>
       <MailTool />
-      {selectedMail ? <ReadEmail /> : <EditEmail />}
+      {renderPage()}
     </div>
   );
 }

@@ -29,7 +29,7 @@ function MailTool() {
           <ArrowBackIcon />
         </IconButton>
 
-        <IconButton>
+        <IconButton onClick={() => dispatch(closeSendMessage())}>
           <MoveToInboxIcon />
         </IconButton>
 
