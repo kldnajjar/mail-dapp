@@ -82,9 +82,8 @@ function EditEmail() {
       getGun,
       getUser
     );
-    // const conversationId = uuid();
-    // const messageId = uuid();
 
+    // const recipientJsonObj = JSON.stringify(email?.recipient);
     const jsonObj = JSON.stringify(email?.encryptedUsersKeys);
     const carbonCopyJsonObj = JSON.stringify(carbonCopyArray);
     const blindCarbonCopyJsonObj = JSON.stringify(blindCarbonCopyArray);

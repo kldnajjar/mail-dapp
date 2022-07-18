@@ -10,18 +10,6 @@ import { encryption } from "../../../util/privacy";
 import styles from "../Mail.module.css";
 import { v4 as uuid } from "uuid";
 
-export async function reply(conversationId, recipient) {
-  const emailObject = {
-    sender: profile.email,
-    recipient,
-    body,
-  };
-
-  const messageId = uuid();
-
-  createMails(emailObject, conversationId, messageId);
-}
-
 function ReplyEmail() {
   const profile = JSON.parse(sessionStorage.getItem("profile"));
   const dispatch = useDispatch();
@@ -35,11 +23,10 @@ function ReplyEmail() {
   const [subject, setSubject] = useState("");
   const [body, setBody] = useState("");
 
-  const sendEmail = () => {
+  const reply = () => {
     const recipient = selectedMail.sender
 
     const emailObject = {
-      subject,
       sender: profile.email,
       recipient,
       body,
@@ -79,22 +66,18 @@ function ReplyEmail() {
       getGun,
       getUser
     );
-    const conversationId = uuid();
+
+    const conversationId = selectedMail.id.split("/")[1];
     const messageId = uuid();
 
-    const jsonObj = JSON.stringify(email?.encryptedUsersKeys);
+    // const jsonObj = JSON.stringify(email?.encryptedUsersKeys);
+
+    console.log(email)
 
     await getMails()
       .get(conversationId)
       .put({
-        id: conversationId,
-        subject: email?.encryptedSubject,
         recentBody: email?.encryptedMessage,
-        keys: jsonObj,
-        sender: emailObject?.sender,
-        senderEpub: email?.senderEpub,
-        cc: "",
-        bcc: "",
       })
       .get("messages")
       .get(messageId)
@@ -108,23 +91,23 @@ function ReplyEmail() {
         type: "reply"
       });
 
-    const conversation = getMails().get(conversationId);
+    // const conversation = getMails().get(conversationId);
 
-    getGun()
-      .get("profiles")
-      .get(emailObject.sender)
-      .get("folders")
-      .get("sent")
-      .set(conversation);
+    // getGun()
+    //   .get("profiles")
+    //   .get(emailObject.sender)
+    //   .get("folders")
+    //   .get("sent")
+    //   .set(conversation);
 
-    for (let i = 0; i < 1; i++) {
-      getGun()
-        .get("profiles")
-        .get(emailObject?.recipient)
-        .get("folders")
-        .get("inbox")
-        .set(conversation);
-    }
+    // for (let i = 0; i < 1; i++) {
+    //   getGun()
+    //     .get("profiles")
+    //     .get(emailObject?.recipient)
+    //     .get("folders")
+    //     .get("inbox")
+    //     .set(conversation);
+    // }
 
     dispatch(closeSendMessage());
     toast.success("Email sent");
@@ -163,8 +146,8 @@ function ReplyEmail() {
         </div>
       </div>
       <div className="d-grid">
-        <button type="button" className="btn btn-primary" onClick={sendEmail}>
-          Send
+        <button type="button" className="btn btn-primary" onClick={reply}>
+          Reply
         </button>
       </div>
     </div>

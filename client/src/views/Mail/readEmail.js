@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   selectOpenMail,
   setReply,
@@ -11,62 +11,76 @@ import { IconButton } from "@material-ui/core";
 import ReplyIcon from "@material-ui/icons/Reply";
 import ReplyAllIcon from "@material-ui/icons/ReplyAll";
 import ForwardIcon from "@material-ui/icons/Forward";
+import { resetEmailActions } from "../../features/mailSlice";
+
+import useGunContext from "../../context/useGunContext";
+import { decryptionMessage } from "../../util/privacy";
+import "gun/sea";
+import "gun/lib/path.js";
 
 import styles from "./Mail.module.css";
 
 function ReadEmail() {
+  const { getGun, getUser, getMails } = useGunContext();
+  const profile = JSON.parse(sessionStorage.getItem("profile"));
+
   const selectedMail = useSelector(selectOpenMail);
-  // const dispatch = useDispatch();
-  // const [message, setMessage] = useState({});
+  const dispatch = useDispatch();
+  const [message, setMessage] = useState([]);
 
   console.log(selectedMail);
 
-  // // async function getCurrentUserAlias(getUser) {
-  // //   let name;
-  // //   await getUser()
-  // //     .get("alias")
-  // //     .once((alias) => {
-  // //       name = alias;
-  // //     });
-  // //   return name;
-  // // }
+  async function getCurrentUserAlias(getUser) {
+    let name;
+    await getUser()
+      .get("alias")
+      .once((alias) => {
+        console.log(alias)
+        name = alias;
+      });
+    return name;
+  }
 
-  // async function getAllEmails(getGun, getMails, getUser, profile) {
-  //   await getMails()
-  //     .get("conversationId")
-  //     .get("messages")
-  //     .once(async (data) => {
-  //       delete data.label;
-  //       const Array = Object.keys(data).slice(1);
-  //         console.log(Array);
+  async function getAllMessages(getGun, getMails, getUser, profile) {
+    const alias = await getCurrentUserAlias(getUser)
 
-  //         var startTime = performance.now();
-  //         if (Array.length) {
-  //           const yy = [];
-  //           for (let i = 0; i < Array.length; i++) {
-  //             const conversation = await decryption(
-  //               Array[i],
-  //               getGun,
-  //               getUser,
-  //               profile.email
-  //             );
-  //             console.log(conversation)
-  //             conversation.id = Array[i];
-  //             yy.push(conversation);
-  //           }
-  //           setMessage(yy);
-  //           var endTime = performance.now();
-  //           console.log(
-  //             `Call to doSomething took ${endTime - startTime} milliseconds`
-  //           );
-  //         }
-  //     });
-  // }
+    await getMails()
+      .get(selectedMail.id.split("/")[1])
+      .get("messages")
+      .once(async (data) => {
+        delete data.label;
+        const Array = Object.keys(data).slice(1);
+        console.log(Array);
 
-  // useEffect(async () => {
-  //   // dispatch(resetEmailActions());
-  //   getAllEmails(getGun, getMails, getUser, profile);
-  // }, []);
+        var startTime = performance.now();
+        if (Array.length) {
+          const yy = [];
+          for (let i = 0; i < Array.length; i++) {
+            const msg = await decryptionMessage(
+              Array[i],
+              getGun,
+              getUser,
+              alias,
+              selectedMail.keys,
+              selectedMail.senderEpub
+            );
+            console.log(msg)
+            msg.id = Array[i];
+            yy.push(msg);
+          }
+          setMessage(yy);
+          var endTime = performance.now();
+          console.log(
+            `Call to doSomething took ${endTime - startTime} milliseconds`
+          );
+        }
+      });
+  }
+
+  useEffect(async () => {
+    dispatch(resetEmailActions());
+    getAllMessages(getGun, getMails, getUser, profile);
+  }, []);
 
   return (
     <div className={styles["mail-body"]}>

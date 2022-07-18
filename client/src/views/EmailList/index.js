@@ -51,6 +51,7 @@ function EmailList() {
       .get("inbox")
       .once(async (data) => {
         delete data.label;
+        console.log(data)
         if (data) {
           const Array = Object.keys(data).slice(1);
           console.log(Array);
@@ -66,6 +67,7 @@ function EmailList() {
                 profile.email
               );
               conversation.id = Array[i];
+              conversation.recipient = alias
               yy.push(conversation);
             }
             setEmails(yy);
@@ -134,7 +136,7 @@ function EmailList() {
       }}>TEST</button> */}
 
       <div className={styles["emailList-list"]}>
-        {emails?.map(({ subject, sender, recipient, body, id }, reactKey) => (
+        {emails?.map(({ subject, sender, recipient, body, id, senderEpub, keys }, reactKey) => (
           <EmailRow
             key={`email-row-${reactKey}`}
             sender={sender}
@@ -142,6 +144,8 @@ function EmailList() {
             subject={subject}
             body={body}
             id={id}
+            senderEpub={senderEpub}
+            keys={keys}
             // time={new Date(timestamp?.seconds * 1000).toUTCString()}
           />
         ))}

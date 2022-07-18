@@ -98,6 +98,7 @@ export async function decryption(
 ) {
   const conversation = await getByReference(refConversation, getGun);
   const keysObject = JSON.parse(conversation?.keys);
+  console.log(conversation)
 
   if (typeof keysObject.encryptedKeysByUsers[currentAlias] === "undefined") {
     let carbonCopyUsers
@@ -150,13 +151,63 @@ async function decryptFunction(getUser, key, conversation) {
 
   return {
     sender: conversation?.sender,
+    senderEpub: conversation?.senderEpub,
+    keys: conversation?.keys,
     subject: decryptedSubject,
     body: decryptedBody,
   };
 }
 
+export async function decryptionMessage(
+  refMessage,
+  getGun,
+  getUser,
+  alias,
+  keys,
+  senderEpub
+) {
+  const message = await getMessageByReference(refMessage, getGun);
+  const keysObject = JSON.stringify(keys)
+  return decryptMessage(getUser, message, keysObject.encryptedKeysByUsers[alias], senderEpub)
+}
+
+async function decryptMessage(getUser, message, key, senderEpub) {
+  const myPair = await getUser()._.sea;
+  const decryptedKey = await SEA.decrypt(
+    key,
+    await SEA.secret(senderEpub, myPair)
+  );
+
+  const decryptedSubject = await SEA.decrypt(
+    message?.subject,
+    decryptedKey
+  );
+
+  const decryptedBody = await SEA.decrypt(
+    message?.recentBody,
+    decryptedKey
+  );
+
+  console.log(message)
+
+  return {
+    subject: decryptedSubject,
+    body: decryptedBody,
+  };
+}
+
+async function getMessageByReference(path, getGun) {
+  let result;
+  await getGun()
+    .path(path)
+    .once((obj) => {
+      result = obj;
+    });
+  console.log(result)
+  return result;
+}
+
 async function getByReference(path, getGun) {
-  console.log(path)
   let result;
   await getGun()
     .path(path)
