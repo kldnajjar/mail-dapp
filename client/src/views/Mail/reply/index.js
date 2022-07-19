@@ -9,6 +9,7 @@ import { encryption } from "../../../util/privacy";
 
 import styles from "../Mail.module.css";
 import { v4 as uuid } from "uuid";
+import Gun from "gun/gun";
 
 function ReplyEmail() {
   const profile = JSON.parse(sessionStorage.getItem("profile"));
@@ -35,26 +36,7 @@ function ReplyEmail() {
   };
 
   const createMails = async (emailObject) => {
-    // const recipientsArray = emailObject.recipient.split(";");
-
-    // let carbonCopyArray;
-    // let blindCarbonCopyArray;
-
-    // if (emailObject.cc.length) {
-    //   carbonCopyArray = emailObject.cc.split(";");
-    // }
-
-    // if (emailObject.bcc.length) {
-    //   blindCarbonCopyArray = emailObject.bcc.split(";");
-    // }
-
-    // const newRecipientArray = recipientsArray.concat(
-    //   carbonCopyArray,
-    //   blindCarbonCopyArray
-    // );
-
     const recipientArray = [emailObject?.recipient]
-    console.log(recipientArray)
 
     const email = await encryption(
       {
@@ -70,10 +52,6 @@ function ReplyEmail() {
     const conversationId = selectedMail.id.split("/")[1];
     const messageId = uuid();
 
-    // const jsonObj = JSON.stringify(email?.encryptedUsersKeys);
-
-    console.log(email)
-
     await getMails()
       .get(conversationId)
       .put({
@@ -88,33 +66,32 @@ function ReplyEmail() {
         recipients: emailObject?.recipient,
         carbonCopy: "",
         blindCarbonCopy: "",
-        type: "reply"
+        type: "reply",
+        timestamp: Gun.state()
       });
 
-    // const conversation = getMails().get(conversationId);
+    const conversation = getMails().get(conversationId);
 
-    // getGun()
-    //   .get("profiles")
-    //   .get(emailObject.sender)
-    //   .get("folders")
-    //   .get("sent")
-    //   .set(conversation);
+    getGun()
+      .get("profiles")
+      .get(emailObject?.sender)
+      .get("folders")
+      .get("sent")
+      .set(conversation);
 
-    // for (let i = 0; i < 1; i++) {
-    //   getGun()
-    //     .get("profiles")
-    //     .get(emailObject?.recipient)
-    //     .get("folders")
-    //     .get("inbox")
-    //     .set(conversation);
-    // }
+    getGun()
+      .get("profiles")
+      .get(emailObject?.recipient)
+      .get("folders")
+      .get("inbox")
+      .set(conversation);
 
     dispatch(closeSendMessage());
     toast.success("Email sent");
   };
 
   useEffect(() => {
-    setBody(`\n\n\n${selectedMail.body}`);
+    // setBody(`\n\n\n${selectedMail.body}`);
     // setSubject(`fwd: ${selectedMail.subject}`);
   }, []);
 

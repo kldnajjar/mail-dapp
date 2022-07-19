@@ -26,7 +26,7 @@ function ReadEmail() {
 
   const selectedMail = useSelector(selectOpenMail);
   const dispatch = useDispatch();
-  const [message, setMessage] = useState([]);
+  const [messages, setMessages] = useState([]);
 
   console.log(selectedMail);
 
@@ -50,25 +50,30 @@ function ReadEmail() {
       .once(async (data) => {
         delete data.label;
         const Array = Object.keys(data).slice(1);
-        console.log(Array);
 
         var startTime = performance.now();
         if (Array.length) {
           const yy = [];
           for (let i = 0; i < Array.length; i++) {
+            const refMessage = `${selectedMail.id}/messages/${Array[i]}`
             const msg = await decryptionMessage(
-              Array[i],
+              refMessage,
               getGun,
               getUser,
               alias,
               selectedMail.keys,
               selectedMail.senderEpub
             );
-            console.log(msg)
             msg.id = Array[i];
+
+            const date = new Date(msg.timestamp)  // Timestamp to Human readable data
+
             yy.push(msg);
           }
-          setMessage(yy);
+          yy.sort((a, b) => {
+            return a.timestamp - b.timestamp
+          })
+          setMessages(yy);
           var endTime = performance.now();
           console.log(
             `Call to doSomething took ${endTime - startTime} milliseconds`
@@ -82,15 +87,20 @@ function ReadEmail() {
     getAllMessages(getGun, getMails, getUser, profile);
   }, []);
 
+  if (!messages.length) {
+    return null
+  }
+  
   return (
-    <div className={styles["mail-body"]}>
+    messages.map((message, key) => {
+    return <div className={styles["mail-body"]} key={`mail-message-${key}`}>
       <div className={styles["mail-bodyHeader"]}>
         <div className={styles["mail-subject"]}>
           <div>
             <h5>{selectedMail.subject}</h5>
             <br />
             <h6>
-              From: <b>{`<${selectedMail.sender}>`}</b>
+              From: <b>{`<${message.sender}>`}</b>
             </h6>
           </div>
 
@@ -113,9 +123,10 @@ function ReadEmail() {
       </div>
 
       <div className={styles["mail-message"]}>
-        <p>{selectedMail.body}</p>
+        <p>{message.body}</p>
       </div>
     </div>
+    })
   );
 }
 

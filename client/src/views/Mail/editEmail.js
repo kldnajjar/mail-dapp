@@ -109,6 +109,7 @@ function EditEmail() {
         recipients: emailObject?.recipient,
         carbonCopy: emailObject?.cc,
         blindCarbonCopy: emailObject?.bcc,
+        timestamp: Gun.state(),
         type: "",
       });
 

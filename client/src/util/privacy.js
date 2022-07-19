@@ -36,15 +36,6 @@ export async function encryption(email, getGun, getUser) {
     console.log("BlindCarbonCopy")
     await getRecipientKeys(encryptedKeysBlindCarbonCopy, email.bcc, getGun, encryptionKey, senderPair);
   }
-  
-  // const recipientEpubObj = await getRecipientEpub(email.recipients, getGun);
-  // for (const key in recipientEpubObj) {
-  //   const encryptedEncryptionKeyRecipient = await SEA.encrypt(
-  //     encryptionKey,
-  //     await SEA.secret(recipientEpubObj[key], senderPair)
-  //   );
-  //   encryptedKeysByUsers[key] = encryptedEncryptionKeyRecipient;
-  // }
 
   const encryptedUsersKeys = {
     encryptedKeysByUsers,
@@ -166,8 +157,10 @@ export async function decryptionMessage(
   keys,
   senderEpub
 ) {
+  console.log(refMessage)
   const message = await getMessageByReference(refMessage, getGun);
-  const keysObject = JSON.stringify(keys)
+  const keysObject = JSON.parse(keys)
+  console.log(keysObject)
   return decryptMessage(getUser, message, keysObject.encryptedKeysByUsers[alias], senderEpub)
 }
 
@@ -178,26 +171,23 @@ async function decryptMessage(getUser, message, key, senderEpub) {
     await SEA.secret(senderEpub, myPair)
   );
 
-  const decryptedSubject = await SEA.decrypt(
-    message?.subject,
-    decryptedKey
-  );
+  console.log(decryptedKey)
 
   const decryptedBody = await SEA.decrypt(
-    message?.recentBody,
+    message?.body,
     decryptedKey
   );
 
-  console.log(message)
-
   return {
-    subject: decryptedSubject,
+    timestamp: message.timestamp,
+    sender: message.sender,
     body: decryptedBody,
   };
 }
 
 async function getMessageByReference(path, getGun) {
   let result;
+  console.log(path)
   await getGun()
     .path(path)
     .once((obj) => {

@@ -54,7 +54,6 @@ function EmailList() {
         console.log(data)
         if (data) {
           const Array = Object.keys(data).slice(1);
-          console.log(Array);
 
           var startTime = performance.now();
           if (Array.length) {
