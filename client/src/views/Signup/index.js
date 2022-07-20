@@ -1,15 +1,15 @@
 import React, { useState } from "react";
-
 import { useNavigate } from "react-router-dom";
-import useGunContext from "../../context/useGunContext";
 import { toast } from "react-toastify";
 
-import styles from "./Signup.module.css";
 import Input from "../../components/input";
+import useGunContext from "../../context/useGunContext";
+
+import styles from "./Signup.module.css";
 
 const SignUp = () => {
   let navigate = useNavigate();
-  const { getGun, getUser, getMail } = useGunContext();
+  const { getGun, getUser } = useGunContext();
 
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
@@ -22,8 +22,6 @@ const SignUp = () => {
 
   const handleSubmit = (event) => {
     event.preventDefault();
-
-    // check if user with email already exists
 
     getGun()
       .get(`~@${email}`)

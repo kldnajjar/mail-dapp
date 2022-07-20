@@ -2,10 +2,10 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 
+import Input from "../../components/input";
 import useGunContext from "../../context/useGunContext";
 import useSessionChannel from "../../hooks/useSessionChannel";
 
-import Input from "../../components/input";
 import styles from "./Signin.module.css";
 
 const SignIn = () => {

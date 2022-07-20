@@ -1,5 +1,8 @@
-import { Button, IconButton } from "@material-ui/core";
 import React from "react";
+import { useDispatch } from "react-redux";
+import { Link } from "react-router-dom";
+
+import { Button, IconButton } from "@material-ui/core";
 import AddIcon from "@material-ui/icons/Add";
 import InboxIcon from "@material-ui/icons/Inbox";
 import StarIcon from "@material-ui/icons/Star";
@@ -11,10 +14,14 @@ import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import PersonIcon from "@material-ui/icons/Person";
 import DuoIcon from "@material-ui/icons/Duo";
 import PhoneIcon from "@material-ui/icons/Phone";
+
+import {
+  openSendMessage,
+  selectMail,
+  setFolder,
+} from "../../features/mailSlice";
 import SidebarOption from "./Option";
-import { Link } from "react-router-dom";
-import { useDispatch } from "react-redux";
-import { openSendMessage, selectMail , setFolder } from "../../features/mailSlice";
+
 import styles from "./Sidebar.module.css";
 
 function Sidebar() {
@@ -48,9 +55,14 @@ function Sidebar() {
       <SidebarOption Icon={AccessTimeIcon} title="Snoozed" number={9} />
       <SidebarOption Icon={LabelImportantIcon} title="Important" number={12} />
 
-      
-      <SidebarOption Icon={NearMeIcon} title="Sent" number={81}  onClick={()=>{dispatch(setFolder({value : "sent"}))}}/>
-      
+      <SidebarOption
+        Icon={NearMeIcon}
+        title="Sent"
+        number={81}
+        onClick={() => {
+          dispatch(setFolder({ value: "sent" }));
+        }}
+      />
 
       <SidebarOption Icon={NoteIcon} title="Drafts" number={5} />
       <SidebarOption Icon={ExpandMoreIcon} title="More" />
