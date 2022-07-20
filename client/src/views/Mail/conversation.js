@@ -45,9 +45,7 @@ function Conversation() {
       .get("messages");
     let emailsNum = 0;
     await conversationNode.once(async (data) => {
-      console.log(data);
-      emailsNum = Object.keys(data).slice(1).length;
-      console.log(emailsNum);
+      emailsNum = Object.keys(data).filter((elem)=> elem !="_").length;
     });
     var startTime = performance.now();
     const array = [];
