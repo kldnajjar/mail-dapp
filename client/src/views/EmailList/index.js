@@ -21,8 +21,6 @@ import { resetEmailActions } from "../../features/mailSlice";
 import "gun/sea";
 import "gun/lib/path.js";
 
-// import { db } from "../../firebase";
-
 function EmailList() {
   const dispatch = useDispatch();
   const [emails, setEmails] = useState([]);
@@ -40,32 +38,42 @@ function EmailList() {
     return name;
   }
 
-
   async function getAllEmails(getGun, getUser, profile) {
     const alias = await getCurrentUserAlias(getUser);
     let emailsNum = 0;
-    const inboxNode = getGun().get("profiles").get(alias).get("folders").get("inbox") ; 
-    await inboxNode.once( async (data)=>{
+    const inboxNode = getGun()
+      .get("profiles")
+      .get(alias)
+      .get("folders")
+      .get("inbox");
+    await inboxNode.once(async (data) => {
       delete data.label;
       emailsNum = Object.keys(data).slice(1).length;
-    })
+    });
     var startTime = performance.now();
     const array = [];
-    let counter = 0 ;
-    await inboxNode.map().once(async (data)=>{
-      const conversation = await decryption(data, getGun, getUser, profile.email);
-      array.push(conversation)
-      counter++ 
-      if( counter > emailsNum){
-        setEmails( prev => [...prev , conversation])
+    let counter = 0;
+    await inboxNode.map().once(async (data) => {
+      const conversation = await decryption(
+        data,
+        getGun,
+        getUser,
+        profile.email
+      );
+      array.push(conversation);
+      counter++;
+      if (counter > emailsNum) {
+        setEmails((prev) => [...prev, conversation]);
       }
-      var endTime = performance.now()
-      if(counter == emailsNum){
-        var endTime = performance.now()
-        console.log(`Call to doSomething took ${endTime - startTime} milliseconds`)
-        setEmails([...array])
+      var endTime = performance.now();
+      if (counter == emailsNum) {
+        var endTime = performance.now();
+        console.log(
+          `Call to doSomething took ${endTime - startTime} milliseconds`
+        );
+        setEmails([...array]);
       }
-    })
+    });
   }
 
   useEffect(async () => {
@@ -103,38 +111,25 @@ function EmailList() {
           </IconButton>
         </div>
       </div>
-      {/* <div className={styles["emailList-sections"]}>
-        <Section Icon={InboxIcon} title="Primary" color="red" selected />
-        <Section Icon={PeopleIcon} title="Social" color="#1A73E8" />
-        <Section Icon={LocalOfferIcon} title="Promotions" color="green" />
-      </div> */}
-
-      {/* <div>
-        {emailsList.map((elem)=>{
-          return <p>{elem}</p>
-        })}
-      </div>
-
-      <button onClick={()=>{
-        getGun().get("profiles").get("omar@mykloud.io").get("folders").get("inbox").put({
-          test : "1"
-        })
-      }}>TEST</button> */}
-
       <div className={styles["emailList-list"]}>
-        {emails?.map(({ subject, sender, recipient, body, id, senderEpub, keys }, reactKey) => (
-          <EmailRow
-            key={`email-row-${reactKey}`}
-            sender={sender}
-            // recipient={recipient}
-            subject={subject}
-            body={body}
-            id={id}
-            senderEpub={senderEpub}
-            keys={keys}
-            // time={new Date(timestamp?.seconds * 1000).toUTCString()}
-          />
-        ))}
+        {emails?.map(
+          (
+            { subject, sender, recipient, body, id, senderEpub, keys },
+            reactKey
+          ) => (
+            <EmailRow
+              key={`email-row-${reactKey}`}
+              sender={sender}
+              // recipient={recipient}
+              subject={subject}
+              body={body}
+              id={id}
+              senderEpub={senderEpub}
+              keys={keys}
+              // time={new Date(timestamp?.seconds * 1000).toUTCString()}
+            />
+          )
+        )}
       </div>
     </div>
   );
