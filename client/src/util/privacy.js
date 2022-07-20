@@ -7,12 +7,7 @@ import "gun/lib/path.js";
 // ENCRYPTION
 export async function encryption(email, getGun, getUser) {
   const encryptionKey = "mykloud-key"; // <-- This key is just an example. Ideally I think we should generate it every time sender sends an email.
-  
-  let encryptedSubject
-  if (typeof email.subject !== "undefined") {
-    encryptedSubject = await SEA.encrypt(email.subject, encryptionKey);
-  }
-  
+  const encryptedSubject = await SEA.encrypt(email.subject, encryptionKey);
   const encryptedMessage = await SEA.encrypt(email.body, encryptionKey);
 
   const senderEpub = await getUser()._.sea.epub;
@@ -77,11 +72,12 @@ async function getRecipientEpub(emails, getGun) {
       .get(`~@${emails[i]}`)
       .map()
       .once((user) => {
+        console.log(user)
         epubObj[`${emails[j]}`] = user.epub;
       });
     getGun().get(`~@${emails[i]}`).off();
   }
-  console.log(epubObj);
+  console.log("epubObj", epubObj);
   return epubObj;
 }
 

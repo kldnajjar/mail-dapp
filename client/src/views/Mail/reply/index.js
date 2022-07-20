@@ -9,7 +9,7 @@ import { encryption } from "../../../util/privacy";
 
 import styles from "../Mail.module.css";
 import { v4 as uuid } from "uuid";
-import { createMails } from "../createEmail";
+// import { createMails } from "../createEmail";
 import Gun from "gun/gun";
 
 function ReplyEmail() {
@@ -26,7 +26,7 @@ function ReplyEmail() {
   const [body, setBody] = useState("");
 
   const reply = () => {
-    const recipient = `${selectedMail.sender};`
+    const recipient = selectedMail.sender
 
     const emailObject = {
       sender: profile.email,
@@ -40,63 +40,63 @@ function ReplyEmail() {
     const conversationObj = { id: conversationId }
     const messageObj = { type: "reply", id: messageId }
 
-    createMails(emailObject, conversationObj, messageObj, dispatch, getGun, getUser, getMails);
+    createMails(emailObject);
   };
 
-  // const createMails = async (emailObject) => {
-  //   const recipientArray = [emailObject?.recipient]
+  const createMails = async (emailObject) => {
+    const recipientArray = [emailObject?.recipient]
 
-  //   const email = await encryption(
-  //     {
-  //       subject: emailObject.subject,
-  //       sender: emailObject.sender,
-  //       recipients: recipientArray,
-  //       body: emailObject.body,
-  //     },
-  //     getGun,
-  //     getUser
-  //   );
+    const email = await encryption(
+      {
+        subject: emailObject.subject,
+        sender: emailObject.sender,
+        recipients: recipientArray,
+        body: emailObject.body,
+      },
+      getGun,
+      getUser
+    );
 
-  //   const conversationId = selectedMail.id.split("/")[1];
-  //   const messageId = uuid();
+    const conversationId = selectedMail.id.split("/")[1];
+    const messageId = uuid();
 
-  //   await getMails()
-  //     .get(conversationId)
-  //     .put({
-  //       recentBody: email?.encryptedMessage,
-  //     })
-  //     .get("messages")
-  //     .get(messageId)
-  //     .put({
-  //       id: messageId,
-  //       body: email?.encryptedMessage,
-  //       sender: emailObject?.sender,
-  //       recipients: emailObject?.recipient,
-  //       carbonCopy: "",
-  //       blindCarbonCopy: "",
-  //       type: "reply",
-  //       timestamp: Gun.state()
-  //     });
+    await getMails()
+      .get(conversationId)
+      .put({
+        recentBody: email?.encryptedMessage,
+      })
+      .get("messages")
+      .get(messageId)
+      .put({
+        id: messageId,
+        body: email?.encryptedMessage,
+        sender: emailObject?.sender,
+        recipients: emailObject?.recipient,
+        carbonCopy: "",
+        blindCarbonCopy: "",
+        type: "reply",
+        timestamp: Gun.state()
+      });
 
-  //   const conversation = getMails().get(conversationId);
+    const conversation = getMails().get(conversationId);
 
-  //   getGun()
-  //     .get("profiles")
-  //     .get(emailObject?.sender)
-  //     .get("folders")
-  //     .get("sent")
-  //     .set(conversation);
+    getGun()
+      .get("profiles")
+      .get(emailObject?.sender)
+      .get("folders")
+      .get("sent")
+      .set(conversation);
 
-  //   getGun()
-  //     .get("profiles")
-  //     .get(emailObject?.recipient)
-  //     .get("folders")
-  //     .get("inbox")
-  //     .set(conversation);
+    getGun()
+      .get("profiles")
+      .get(emailObject?.recipient)
+      .get("folders")
+      .get("inbox")
+      .set(conversation);
 
-  //   dispatch(closeSendMessage());
-  //   toast.success("Email sent");
-  // };
+    dispatch(closeSendMessage());
+    toast.success("Email sent");
+  };
 
   useEffect(() => {
     // setBody(`\n\n\n${selectedMail.body}`);

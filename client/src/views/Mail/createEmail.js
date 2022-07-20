@@ -55,14 +55,16 @@ export const createMails = async (emailObject, conversationObj, messageObj, disp
   const newRecipientArray = recipientsArray.concat(carbonCopyArray, blindCarbonCopyArray)
 
   await getMails()
-    .get(conversationId)
+    .get(conversationObj.id)
     .put(conversationObj)
     .get("messages")
-    .get(messageId)
+    .get(messageObj.id)
     .put(messageObj);
 
   const conversation = getMails().get(conversationObj.id);
 
+  console.log(emailObject.sender)
+  console.log(newRecipientArray)
   getGun()
     .get("profiles")
     .get(emailObject.sender)
@@ -71,7 +73,9 @@ export const createMails = async (emailObject, conversationObj, messageObj, disp
     .set(conversation);
 
   for (let i = 0; i < newRecipientArray.length; i++) {
-    if (newRecipientArray[i] !== "" || typeof newRecipientArray[i] !== "undefined") {
+    console.log("before if statement", newRecipientArray[i])
+    if (typeof newRecipientArray[i] !== "undefined") {
+      console.log("after if statement", newRecipientArray[i])
       getGun()
         .get("profiles")
         .get(newRecipientArray[i])

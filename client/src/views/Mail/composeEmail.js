@@ -10,7 +10,7 @@ import { encryption } from "../../util/privacy";
 
 import styles from "./Mail.module.css";
 import { v4 as uuid } from "uuid";
-import { createMails } from "./createEmail";
+// import { createMails } from "./createEmail";
 
 function EditEmail() {
   const profile = JSON.parse(sessionStorage.getItem("profile"));
@@ -39,7 +39,7 @@ function EditEmail() {
     const conversationObj = { id: conversationId }
     const messageObj = { type: "reply", id: messageId }
 
-    createMails(emailObject, conversationObj, messageObj, dispatch, getGun, getUser, getMails);
+    createMails(emailObject, conversationId, messageId);
   };
 
   const generateEmails =()=>{
@@ -58,84 +58,84 @@ function EditEmail() {
     }
   }
 
-  // const createMails = async (emailObject, conversationId, messageId) => {
-  //   const recipientsArray = emailObject.recipient.split(";");
-  //   let carbonCopyArray;
-  //   let blindCarbonCopyArray;
+  const createMails = async (emailObject, conversationId, messageId) => {
+    const recipientsArray = emailObject.recipient.split(";");
+    let carbonCopyArray;
+    let blindCarbonCopyArray;
 
-  //   if (emailObject.cc.length) {
-  //     carbonCopyArray = emailObject.cc.split(";");
-  //   }
+    if (emailObject.cc.length) {
+      carbonCopyArray = emailObject.cc.split(";");
+    }
 
-  //   if (emailObject.bcc.length) {
-  //     blindCarbonCopyArray = emailObject.bcc.split(";");
-  //   }
+    if (emailObject.bcc.length) {
+      blindCarbonCopyArray = emailObject.bcc.split(";");
+    }
 
-  //   const newRecipientArray = recipientsArray.concat(carbonCopyArray, blindCarbonCopyArray)
+    const newRecipientArray = recipientsArray.concat(carbonCopyArray, blindCarbonCopyArray)
 
-  //   const email = await encryption({
-  //       subject: emailObject.subject,
-  //       sender: emailObject.sender,
-  //       recipients: recipientsArray,
-  //       body: emailObject.body,
-  //       cc: carbonCopyArray,
-  //       bcc: blindCarbonCopyArray
-  //     },
-  //     getGun,
-  //     getUser
-  //   );
+    const email = await encryption({
+        subject: emailObject.subject,
+        sender: emailObject.sender,
+        recipients: recipientsArray,
+        body: emailObject.body,
+        cc: carbonCopyArray,
+        bcc: blindCarbonCopyArray
+      },
+      getGun,
+      getUser
+    );
 
-  //   // const recipientJsonObj = JSON.stringify(email?.recipient);
-  //   const jsonObj = JSON.stringify(email?.encryptedUsersKeys);
-  //   const carbonCopyJsonObj = JSON.stringify(carbonCopyArray);
-  //   const blindCarbonCopyJsonObj = JSON.stringify(blindCarbonCopyArray);
+    // const recipientJsonObj = JSON.stringify(email?.recipient);
+    const jsonObj = JSON.stringify(email?.encryptedUsersKeys);
+    const carbonCopyJsonObj = JSON.stringify(carbonCopyArray);
+    const blindCarbonCopyJsonObj = JSON.stringify(blindCarbonCopyArray);
 
-  //   await getMails()
-  //     .get(conversationId)
-  //     .put({
-  //       id: conversationId,
-  //       subject: email?.encryptedSubject,
-  //       recentBody: email?.encryptedMessage,
-  //       keys: jsonObj,
-  //       sender: emailObject?.sender,
-  //       senderEpub: email?.senderEpub,
-  //       cc: typeof carbonCopyJsonObj === "undefined" ? "" : carbonCopyJsonObj,
-  //       bcc: typeof blindCarbonCopyJsonObj === "undefined" ? "" : blindCarbonCopyJsonObj
-  //     })
-  //     .get("messages")
-  //     .get(messageId)
-  //     .put({
-  //       id: messageId,
-  //       body: email?.encryptedMessage,
-  //       sender: emailObject?.sender,
-  //       recipients: emailObject?.recipient,
-  //       carbonCopy: emailObject?.cc,
-  //       blindCarbonCopy: emailObject?.bcc,
-  //       timestamp: Gun.state(),
-  //       type: "",
-  //     });
+    await getMails()
+      .get(conversationId)
+      .put({
+        id: conversationId,
+        subject: email?.encryptedSubject,
+        recentBody: email?.encryptedMessage,
+        keys: jsonObj,
+        sender: emailObject?.sender,
+        senderEpub: email?.senderEpub,
+        cc: typeof carbonCopyJsonObj === "undefined" ? "" : carbonCopyJsonObj,
+        bcc: typeof blindCarbonCopyJsonObj === "undefined" ? "" : blindCarbonCopyJsonObj
+      })
+      .get("messages")
+      .get(messageId)
+      .put({
+        id: messageId,
+        body: email?.encryptedMessage,
+        sender: emailObject?.sender,
+        recipients: emailObject?.recipient,
+        carbonCopy: emailObject?.cc,
+        blindCarbonCopy: emailObject?.bcc,
+        timestamp: Gun.state(),
+        type: "",
+      });
 
-  //   const conversation = getMails().get(conversationId);
+    const conversation = getMails().get(conversationId);
 
-  //   getGun()
-  //     .get("profiles")
-  //     .get(emailObject.sender)
-  //     .get("folders")
-  //     .get("sent")
-  //     .set(conversation);
+    getGun()
+      .get("profiles")
+      .get(emailObject.sender)
+      .get("folders")
+      .get("sent")
+      .set(conversation);
 
-  //   for (let i = 0; i < newRecipientArray.length; i++) {
-  //     getGun()
-  //       .get("profiles")
-  //       .get(newRecipientArray[i])
-  //       .get("folders")
-  //       .get("inbox")
-  //       .set(conversation);
-  //   }
+    for (let i = 0; i < newRecipientArray.length; i++) {
+      getGun()
+        .get("profiles")
+        .get(newRecipientArray[i])
+        .get("folders")
+        .get("inbox")
+        .set(conversation);
+    }
 
-  //   dispatch(closeSendMessage());
-  //   toast.success("Email sent");
-  // };
+    dispatch(closeSendMessage());
+    toast.success("Email sent");
+  };
 
   return (
     <div className={styles["mail-body"]}>
