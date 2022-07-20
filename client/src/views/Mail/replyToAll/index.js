@@ -9,10 +9,9 @@ import { encryption } from "../../../util/privacy";
 
 import styles from "../Mail.module.css";
 import { v4 as uuid } from "uuid";
-import { createMails } from "../createEmail";
 import Gun from "gun/gun";
 
-function ReplyEmail() {
+function ReplyToAllEmail() {
   const profile = JSON.parse(sessionStorage.getItem("profile"));
   const dispatch = useDispatch();
   const { getGun, getUser, getMails } = useGunContext();
@@ -25,78 +24,71 @@ function ReplyEmail() {
   const [subject, setSubject] = useState("");
   const [body, setBody] = useState("");
 
-  const reply = () => {
-    const recipient = `${selectedMail.sender};`
+  const replyToAll = () => {
+    const recipient = selectedMail.sender
 
     const emailObject = {
       sender: profile.email,
       recipient,
       body,
     };
+    createMails(emailObject);
+  };
+
+  const createMails = async (emailObject) => {
+    const recipientArray = [emailObject?.recipient]
+
+    const email = await encryption(
+      {
+        subject: emailObject.subject,
+        sender: emailObject.sender,
+        recipients: recipientArray,
+        body: emailObject.body,
+      },
+      getGun,
+      getUser
+    );
 
     const conversationId = selectedMail.id.split("/")[1];
     const messageId = uuid();
 
-    const conversationObj = { id: conversationId }
-    const messageObj = { type: "reply", id: messageId }
+    await getMails()
+      .get(conversationId)
+      .put({
+        recentBody: email?.encryptedMessage,
+      })
+      .get("messages")
+      .get(messageId)
+      .put({
+        id: messageId,
+        body: email?.encryptedMessage,
+        sender: emailObject?.sender,
+        recipients: emailObject?.recipient,
+        carbonCopy: "",
+        blindCarbonCopy: "",
+        type: "reply",
+        timestamp: Gun.state()
+      });
 
-    createMails(emailObject, conversationObj, messageObj, dispatch, getGun, getUser, getMails);
+    const conversation = getMails().get(conversationId);
+
+    getGun()
+      .get("profiles")
+      .get(emailObject?.sender)
+      .get("folders")
+      .get("sent")
+      .set(conversation);
+
+    getGun()
+      .get("profiles")
+      .get(emailObject?.recipient)
+      .get("folders")
+      .get("inbox")
+      .set(conversation);
+
+    dispatch(closeSendMessage());
+    toast.success("Email sent");
   };
-
-  // const createMails = async (emailObject) => {
-  //   const recipientArray = [emailObject?.recipient]
-
-  //   const email = await encryption(
-  //     {
-  //       subject: emailObject.subject,
-  //       sender: emailObject.sender,
-  //       recipients: recipientArray,
-  //       body: emailObject.body,
-  //     },
-  //     getGun,
-  //     getUser
-  //   );
-
-  //   const conversationId = selectedMail.id.split("/")[1];
-  //   const messageId = uuid();
-
-  //   await getMails()
-  //     .get(conversationId)
-  //     .put({
-  //       recentBody: email?.encryptedMessage,
-  //     })
-  //     .get("messages")
-  //     .get(messageId)
-  //     .put({
-  //       id: messageId,
-  //       body: email?.encryptedMessage,
-  //       sender: emailObject?.sender,
-  //       recipients: emailObject?.recipient,
-  //       carbonCopy: "",
-  //       blindCarbonCopy: "",
-  //       type: "reply",
-  //       timestamp: Gun.state()
-  //     });
-
-  //   const conversation = getMails().get(conversationId);
-
-  //   getGun()
-  //     .get("profiles")
-  //     .get(emailObject?.sender)
-  //     .get("folders")
-  //     .get("sent")
-  //     .set(conversation);
-
-  //   getGun()
-  //     .get("profiles")
-  //     .get(emailObject?.recipient)
-  //     .get("folders")
-  //     .get("inbox")
-  //     .set(conversation);
-
-  //   dispatch(closeSendMessage());
-  //   toast.success("Email sent");
-  // };
 
   useEffect(() => {
     // setBody(`\n\n\n${selectedMail.body}`);
@@ -131,7 +123,7 @@ function ReplyEmail() {
         </div>
       </div>
       <div className="d-grid">
-        <button type="button" className="btn btn-primary" onClick={reply}>
+        <button type="button" className="btn btn-primary" onClick={replyToAll}>
           Reply
         </button>
       </div>
@@ -139,4 +131,4 @@ function ReplyEmail() {
   );
 }
 
-export default ReplyEmail;
+export default ReplyToAllEmail;

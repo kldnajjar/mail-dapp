@@ -1,26 +1,13 @@
+import React, { useState, useEffect } from "react";
 import { encryption } from "../../util/privacy";
 import { closeSendMessage } from "../../features/mailSlice";
 import { toast } from "react-toastify";
-import useGunContext from "../../context/useGunContext";
-// import { useDispatch } from "react-redux";
+import Gun from "gun/gun";
 
-// const dispatch = useDispatch();
-const { getGun, getUser, getMails } = useGunContext();
-
-export const createMails = async (emailObject, conversationId, messageId) => {
+export const createMails = async (emailObject, conversationObj, messageObj, dispatch, getGun, getUser, getMails) => {
   const recipientsArray = emailObject.recipient.split(";");
   let carbonCopyArray;
   let blindCarbonCopyArray;
-
-  if (emailObject.cc.length) {
-    carbonCopyArray = emailObject.cc.split(";");
-  }
-
-  if (emailObject.bcc.length) {
-    blindCarbonCopyArray = emailObject.bcc.split(";");
-  }
-
-  const newRecipientArray = recipientsArray.concat(carbonCopyArray, blindCarbonCopyArray)
 
   const email = await encryption({
       subject: emailObject.subject,
@@ -33,35 +20,48 @@ export const createMails = async (emailObject, conversationId, messageId) => {
     getGun,
     getUser
   );
-
+  
   const jsonObj = JSON.stringify(email?.encryptedUsersKeys);
   const carbonCopyJsonObj = JSON.stringify(carbonCopyArray);
   const blindCarbonCopyJsonObj = JSON.stringify(blindCarbonCopyArray);
 
+  conversationObj = { recentBody: email?.encryptedMessage }
+
+  messageObj.body = email?.encryptedMessage
+  messageObj.sender = emailObject?.sender
+  messageObj.recipients = emailObject?.recipient
+  messageObj.timestamp = Gun.state()
+    
+  if (messageObj.type !== "reply")  {
+    if (emailObject.cc.length) {
+      carbonCopyArray = emailObject.cc.split(";");
+    }
+  
+    if (emailObject.bcc.length) {
+      blindCarbonCopyArray = emailObject.bcc.split(";");
+    }
+
+    conversationObj.subject = email?.encryptedSubject;
+    conversationObj.keys = jsonObj;
+    conversationObj.sender = emailObject?.sender;
+    conversationObj.senderEpub = email?.senderEpub;
+    conversationObj.cc = typeof carbonCopyJsonObj === "undefined" ? "" : carbonCopyJsonObj;
+    conversationObj.bcc = typeof blindCarbonCopyJsonObj === "undefined" ? "" : blindCarbonCopyJsonObj;
+
+    messageObj.carbonCopy = emailObject?.cc
+    messageObj.blindCarbonCopy = emailObject?.bcc
+  }
+
+  const newRecipientArray = recipientsArray.concat(carbonCopyArray, blindCarbonCopyArray)
+
   await getMails()
     .get(conversationId)
-    .put({
-      id: conversationId,
-      subject: email?.encryptedSubject,
-      recentBody: email?.encryptedMessage,
-      keys: jsonObj,
-      sender: emailObject?.sender,
-      senderEpub: email?.senderEpub,
-      cc: typeof carbonCopyJsonObj === "undefined" ? "" : carbonCopyJsonObj,
-      bcc: typeof blindCarbonCopyJsonObj === "undefined" ? "" : blindCarbonCopyJsonObj
-    })
+    .put(conversationObj)
     .get("messages")
     .get(messageId)
-    .put({
-      id: messageId,
-      body: email?.encryptedMessage,
-      sender: emailObject?.sender,
-      recipients: emailObject?.recipient,
-      carbonCopy: emailObject?.cc,
-      blindCarbonCopy: emailObject?.bcc
-    });
+    .put(messageObj);
 
-  const conversation = getMails().get(conversationId);
+  const conversation = getMails().get(conversationObj.id);
 
   getGun()
     .get("profiles")
@@ -71,12 +71,14 @@ export const createMails = async (emailObject, conversationId, messageId) => {
     .set(conversation);
 
   for (let i = 0; i < newRecipientArray.length; i++) {
-    getGun()
-      .get("profiles")
-      .get(newRecipientArray[i])
-      .get("folders")
-      .get("inbox")
-      .set(conversation);
+    if (newRecipientArray[i] !== "" || typeof newRecipientArray[i] !== "undefined") {
+      getGun()
+        .get("profiles")
+        .get(newRecipientArray[i])
+        .get("folders")
+        .get("inbox")
+        .set(conversation);
+    }
   }
 
   dispatch(closeSendMessage());

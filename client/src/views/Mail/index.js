@@ -9,7 +9,7 @@ import { useSelector } from "react-redux";
 import MailTool from "./mailTool";
 import ReplyEmail from "./reply";
 import ForwardEmail from "./forward";
-import EditEmail from "./editEmail";
+import EditEmail from "./composeEmail";
 import ReadEmail from "./readEmail";
 
 import styles from "./Mail.module.css";
