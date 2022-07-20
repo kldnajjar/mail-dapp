@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { toast } from "react-toastify";
 
 import { useSelector, useDispatch } from "react-redux";
-import { closeSendMessage, selectOpenMail } from "../../../features/mailSlice";
+import { closeSendMessage, selectOpenMail , selectedMessage} from "../../../features/mailSlice";
 
 import useGunContext from "../../../context/useGunContext";
 import { encryption } from "../../../util/privacy";
@@ -18,6 +18,8 @@ function ReplyEmail() {
   const { getGun, getUser, getMails } = useGunContext();
 
   const selectedMail = useSelector(selectOpenMail);
+  const messageToReply = useSelector(selectedMessage)
+  console.log(messageToReply)
 
   const [recipient, setRecipient] = useState("");
   const [emailCC, setEmailCC] = useState("");
@@ -25,9 +27,10 @@ function ReplyEmail() {
   const [subject, setSubject] = useState("");
   const [body, setBody] = useState("");
 
+ 
+
   const reply = () => {
     const recipient = selectedMail.sender
-
     const emailObject = {
       sender: profile.email,
       recipient,
@@ -115,7 +118,7 @@ function ReplyEmail() {
         <div className="form-group mb-3">
           <label>Recipient</label>
           <div className="mb-3">
-            <b>{selectedMail.sender}</b>
+            <b>{messageToReply.sender}</b>
           </div>
         </div>
       </div>

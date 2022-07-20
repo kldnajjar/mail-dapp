@@ -6,7 +6,8 @@ import "gun/lib/path.js";
 
 // ENCRYPTION
 export async function encryption(email, getGun, getUser) {
-  const encryptionKey = "mykloud-key"; // <-- This key is just an example. Ideally I think we should generate it every time sender sends an email.
+  // TODO
+  const encryptionKey = process.env.APP_MAIL_ENCRYPTION_KEY; // <-- This key is just an example. Ideally I think we should generate it every time sender sends an email.
   const encryptedSubject = await SEA.encrypt(email.subject, encryptionKey);
   const encryptedMessage = await SEA.encrypt(email.body, encryptionKey);
 
@@ -17,7 +18,6 @@ export async function encryption(email, getGun, getUser) {
     encryptionKey,
     await SEA.secret(senderEpub, senderPair)
   );
-
   const encryptedKeysByUsers = {};
   const encryptedKeysCarbonCopy = {};
   const encryptedKeysBlindCarbonCopy = {};
@@ -25,24 +25,19 @@ export async function encryption(email, getGun, getUser) {
   encryptedKeysByUsers[email["sender"]] = encryptedEncryptionKeySender;
 
   await getRecipientKeys(encryptedKeysByUsers, email.recipients, getGun, encryptionKey, senderPair);
-  console.log("tsar & plotnik", email)
-
   if (email?.cc) {
-    console.log("CarbonCopy")
     await getRecipientKeys(encryptedKeysCarbonCopy, email.cc, getGun, encryptionKey, senderPair);
   }
-
   if (email?.bcc) {
-    console.log("BlindCarbonCopy")
     await getRecipientKeys(encryptedKeysBlindCarbonCopy, email.bcc, getGun, encryptionKey, senderPair);
   }
-
+  
   const encryptedUsersKeys = {
     encryptedKeysByUsers,
     encryptedKeysCarbonCopy,
     encryptedKeysBlindCarbonCopy
   };
-
+  
   return {
     encryptedSubject,
     encryptedMessage,
@@ -54,14 +49,12 @@ export async function encryption(email, getGun, getUser) {
 async function getRecipientKeys(encryptedKeysObj, recipients, getGun, encryptionKey, senderPair) {
   const recipientEpubObj = await getRecipientEpub(recipients, getGun);
   for (const key in recipientEpubObj) {
-    console.log(recipientEpubObj[key])
     const encryptedEncryptionKeyRecipient = await SEA.encrypt(
       encryptionKey,
       await SEA.secret(recipientEpubObj[key], senderPair)
     );
     encryptedKeysObj[key] = encryptedEncryptionKeyRecipient;
   }
-  console.log(encryptedKeysObj)
 }
 
 async function getRecipientEpub(emails, getGun) {
@@ -77,49 +70,68 @@ async function getRecipientEpub(emails, getGun) {
       });
     getGun().get(`~@${emails[i]}`).off();
   }
-  console.log("epubObj", epubObj);
   return epubObj;
 }
 
 // DECRYPTION
 export async function decryption(
-  refConversation,
+  conversation,
   getGun,
   getUser,
   currentAlias
 ) {
-  const conversation = await getByReference(refConversation, getGun);
-  const keysObject = JSON.parse(conversation?.keys);
-  console.log(conversation)
+  const keysObjectJson = JSON.parse(conversation?.keys);
+  const keysObject = Object.assign({}, ...function _flatten(o) { return [].concat(...Object.keys(o).map(k => typeof o[k] === 'object' ? _flatten(o[k]) : ({[k]: o[k]})))}(keysObjectJson))
+  const myPair = await getUser()._.sea;
+  const decryptedEncryptionKeyForUser = await SEA.decrypt(
+    keysObject[currentAlias],
+    await SEA.secret(conversation?.senderEpub, myPair)
+  );
+  const decryptedSubject = await SEA.decrypt(
+    conversation?.subject,
+    decryptedEncryptionKeyForUser
+  );
+  const decryptedBody = await SEA.decrypt(
+    conversation?.recentBody,
+    decryptedEncryptionKeyForUser
+  );
+  return {
+    sender: conversation?.sender,
+    subject: decryptedSubject,
+    body: decryptedBody,
+    senderEpub: conversation?.senderEpub,
+    id : `conversations/${conversation?.id}`,
+    keys : keysObject , 
+  };
 
-  if (typeof keysObject.encryptedKeysByUsers[currentAlias] === "undefined") {
-    let carbonCopyUsers
-    let blindCarbonCopyUsers
+  // if (typeof keysObject.encryptedKeysByUsers[currentAlias] === "undefined") {
+  //   let carbonCopyUsers
+  //   let blindCarbonCopyUsers
 
-    if (conversation?.cc.length > 3) {
-      carbonCopyUsers = JSON.parse(conversation?.cc)
-    }
+  //   if (conversation?.cc.length > 3) {
+  //     carbonCopyUsers = JSON.parse(conversation?.cc)
+  //   }
     
-    if (conversation?.bcc.length > 3) {
-      blindCarbonCopyUsers = JSON.parse(conversation?.bcc)
-    }
+  //   if (conversation?.bcc.length > 3) {
+  //     blindCarbonCopyUsers = JSON.parse(conversation?.bcc)
+  //   }
     
-    if (keysObject.encryptedKeysCarbonCopy[currentAlias]) {
-      for (let i = 0; i < carbonCopyUsers.length; i++) {
-        if (carbonCopyUsers[i] === currentAlias) {
-          return decryptFunction(getUser, keysObject.encryptedKeysCarbonCopy[currentAlias], conversation)
-        }
-      }
-    } else if (keysObject.encryptedKeysBlindCarbonCopy[currentAlias]) {
-      for (let i = 0; i < blindCarbonCopyUsers.length; i++) {
-        if (blindCarbonCopyUsers[i] === currentAlias) {
-          return decryptFunction(getUser, keysObject.encryptedKeysBlindCarbonCopy[currentAlias], conversation)
-        }
-      }
-    }
-  } else {
-    return decryptFunction(getUser, keysObject.encryptedKeysByUsers[currentAlias], conversation)
-  }
+  //   if (keysObject.encryptedKeysCarbonCopy[currentAlias]) {
+  //     for (let i = 0; i < carbonCopyUsers.length; i++) {
+  //       if (carbonCopyUsers[i] === currentAlias) {
+  //         return decryptFunction(getUser, keysObject.encryptedKeysCarbonCopy[currentAlias], conversation)
+  //       }
+  //     }
+  //   } else if (keysObject.encryptedKeysBlindCarbonCopy[currentAlias]) {
+  //     for (let i = 0; i < blindCarbonCopyUsers.length; i++) {
+  //       if (blindCarbonCopyUsers[i] === currentAlias) {
+  //         return decryptFunction(getUser, keysObject.encryptedKeysBlindCarbonCopy[currentAlias], conversation)
+  //       }
+  //     }
+  //   }
+  // } else {
+  //   return decryptFunction(getUser, keysObject.encryptedKeysByUsers[currentAlias], conversation)
+  // }
 }
 
 async function decryptFunction(getUser, key, conversation) {
@@ -139,7 +151,6 @@ async function decryptFunction(getUser, key, conversation) {
     decryptedKey
   );
 
-  console.log(conversation)
 
   return {
     sender: conversation?.sender,
@@ -151,18 +162,30 @@ async function decryptFunction(getUser, key, conversation) {
 }
 
 export async function decryptionMessage(
-  refMessage,
+  message,
   getGun,
   getUser,
   alias,
   keys,
   senderEpub
 ) {
-  console.log(refMessage)
-  const message = await getMessageByReference(refMessage, getGun);
-  const keysObject = JSON.parse(keys)
-  console.log(keysObject)
-  return decryptMessage(getUser, message, keysObject.encryptedKeysByUsers[alias], senderEpub)
+  const myPair = await getUser()._.sea;
+  const decryptedEncryptionKeyForUser = await SEA.decrypt(
+    keys[alias],
+    await SEA.secret(senderEpub, myPair)
+  );
+  const decryptedBody = await SEA.decrypt(
+    message?.body,
+    decryptedEncryptionKeyForUser
+  );
+  return {
+    timestamp: message.timestamp,
+    body: decryptedBody,
+    sender : message?.sender,
+  };
+  // const keysObject = JSON.parse(keys)
+  // console.log(keysObject)
+  // return decryptMessage(getUser, message, keysObject.encryptedKeysByUsers[alias], senderEpub)
 }
 
 async function decryptMessage(getUser, message, key, senderEpub) {
@@ -171,13 +194,11 @@ async function decryptMessage(getUser, message, key, senderEpub) {
     key,
     await SEA.secret(senderEpub, myPair)
   );
-
-  console.log(decryptedKey)
-
   const decryptedBody = await SEA.decrypt(
     message?.body,
     decryptedKey
   );
+  console.log(message.timestamp)
 
   return {
     timestamp: message.timestamp,
@@ -188,23 +209,23 @@ async function decryptMessage(getUser, message, key, senderEpub) {
 
 async function getMessageByReference(path, getGun) {
   let result;
-  console.log(path)
   await getGun()
     .path(path)
     .once((obj) => {
       result = obj;
     });
-  console.log(result)
   return result;
 }
 
 async function getByReference(path, getGun) {
+  
   let result;
+  
   await getGun()
     .path(path)
     .once((obj) => {
       result = obj;
     });
-  console.log(result)
+  
   return result;
 }

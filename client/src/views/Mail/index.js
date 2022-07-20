@@ -9,8 +9,8 @@ import { useSelector } from "react-redux";
 import MailTool from "./mailTool";
 import ReplyEmail from "./reply";
 import ForwardEmail from "./forward";
-import EditEmail from "./composeEmail";
-import ReadEmail from "./readEmail";
+import Compose from "./compose";
+import Conversation from "./conversation";
 
 import styles from "./Mail.module.css";
 
@@ -18,16 +18,16 @@ function renderPage() {
   const selectedMail = useSelector(selectOpenMail);
   const isReply = useSelector(selectedMailToReply);
   const isForward = useSelector(selectedMailToForward);
-  console.log("khaled", isReply, isForward);
+  
   if (selectedMail) {
     if (isReply) {
       return <ReplyEmail />;
     } else if (isForward) {
       return <ForwardEmail />;
     }
-    return <ReadEmail />;
+    return <Conversation />;
   } else {
-    return <EditEmail />;
+    return <Compose />;
   }
 }
 

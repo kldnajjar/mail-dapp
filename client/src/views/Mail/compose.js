@@ -12,7 +12,7 @@ import styles from "./Mail.module.css";
 import { v4 as uuid } from "uuid";
 // import { createMails } from "./createEmail";
 
-function EditEmail() {
+function Compose() {
   const profile = JSON.parse(sessionStorage.getItem("profile"));
   const dispatch = useDispatch();
   const { getGun, getUser, getMails } = useGunContext();
@@ -197,4 +197,4 @@ function EditEmail() {
   );
 }
 
-export default EditEmail;
+export default Compose;

@@ -30,7 +30,6 @@ function EmailList() {
   const folder = useSelector((state) => state?.mail?.folderOpened);
   const emailsList = useSelector((state) => state?.mail?.emailsList);
   const profile = JSON.parse(sessionStorage.getItem("profile"));
-
   async function getCurrentUserAlias(getUser) {
     let name;
     await getUser()
@@ -41,49 +40,37 @@ function EmailList() {
     return name;
   }
 
+
   async function getAllEmails(getGun, getUser, profile) {
     const alias = await getCurrentUserAlias(getUser);
-
-    await getGun()
-      .get("profiles")
-      .get(alias)
-      .get("folders")
-      .get("inbox")
-      .once(async (data) => {
-        delete data.label;
-        console.log(data)
-        if (data) {
-          const Array = Object.keys(data).slice(1);
-
-          var startTime = performance.now();
-          if (Array.length) {
-            const yy = [];
-            for (let i = 0; i < Array.length; i++) {
-              const conversation = await decryption(
-                Array[i],
-                getGun,
-                getUser,
-                profile.email
-              );
-              conversation.id = Array[i];
-              conversation.recipient = alias
-              yy.push(conversation);
-            }
-            setEmails(yy);
-            var endTime = performance.now();
-            console.log(
-              `Call to doSomething took ${endTime - startTime} milliseconds`
-            );
-          }
-        } else {
-          // TODO: Show new UI when there is no emails
-        }
-      });
+    let emailsNum = 0;
+    const inboxNode = getGun().get("profiles").get(alias).get("folders").get("inbox") ; 
+    await inboxNode.once( async (data)=>{
+      delete data.label;
+      emailsNum = Object.keys(data).slice(1).length;
+    })
+    var startTime = performance.now();
+    const array = [];
+    let counter = 0 ;
+    await inboxNode.map().once(async (data)=>{
+      const conversation = await decryption(data, getGun, getUser, profile.email);
+      array.push(conversation)
+      counter++ 
+      if( counter > emailsNum){
+        setEmails( prev => [...prev , conversation])
+      }
+      var endTime = performance.now()
+      if(counter == emailsNum){
+        var endTime = performance.now()
+        console.log(`Call to doSomething took ${endTime - startTime} milliseconds`)
+        setEmails([...array])
+      }
+    })
   }
 
   useEffect(async () => {
     dispatch(resetEmailActions());
-    getAllEmails(getGun, getUser, profile);
+    await getAllEmails(getGun, getUser, profile);
   }, []);
 
   return (
@@ -139,7 +126,7 @@ function EmailList() {
           <EmailRow
             key={`email-row-${reactKey}`}
             sender={sender}
-            recipient={recipient}
+            // recipient={recipient}
             subject={subject}
             body={body}
             id={id}
