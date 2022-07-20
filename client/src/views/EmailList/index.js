@@ -56,24 +56,26 @@ function EmailList() {
     const array = [];
     let counter = 0;
     await inboxNode.map().once(async (data) => {
-      const conversation = await decryption(
-        data,
-        getGun,
-        getUser,
-        account.email
-      );
-      array.push(conversation);
-      counter++;
-      if (counter > emailsNum) {
-        setEmails((prev) => [...prev, conversation]);
-      }
-      var endTime = performance.now();
-      if (counter == emailsNum) {
-        var endTime = performance.now();
-        console.log(
-          `Call to doSomething took ${endTime - startTime} milliseconds`
+      if (data !== "inbox") {
+        const conversation = await decryption(
+          data,
+          getGun,
+          getUser,
+          profile.email
         );
-        setEmails([...array]);
+        array.push(conversation);
+        counter++;
+        if (counter > emailsNum) {
+          setEmails((prev) => [...prev, conversation]);
+        }
+        var endTime = performance.now();
+        if (counter == emailsNum) {
+          var endTime = performance.now();
+          console.log(
+            `Call to doSomething took ${endTime - startTime} milliseconds`
+          );
+          setEmails([...array]);
+        }
       }
     });
   };
