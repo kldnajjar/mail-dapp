@@ -1,6 +1,5 @@
-import React, { useState, useEffect } from "react";
 import { encryption } from "../../../util/privacy";
-import { closeSendMessage } from "../../../features/mailSlice";
+import { closeSendMessage } from "../../../slices/mailSlice";
 import { toast } from "react-toastify";
 import Gun from "gun/gun";
 

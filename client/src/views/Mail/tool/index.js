@@ -15,7 +15,7 @@ import ArrowBackIcon from "@material-ui/icons/ArrowBack";
 // import PrintIcon from "@material-ui/icons/Print";
 // import ExitToAppIcon from "@material-ui/icons/ExitToApp";
 
-import { closeSendMessage } from "../../../features/mailSlice";
+import { closeSendMessage } from "../../../slices/mailSlice";
 
 import styles from "../Mail.module.css";
 

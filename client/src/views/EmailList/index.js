@@ -12,7 +12,7 @@ import ChevronRightIcon from "@material-ui/icons/ChevronRight";
 import KeyboardHideIcon from "@material-ui/icons/KeyboardHide";
 import SettingsIcon from "@material-ui/icons/Settings";
 
-import { resetEmailActions } from "../../features/mailSlice";
+import { resetEmailActions } from "../../slices/mailSlice";
 import useGunContext from "../../context/useGunContext";
 import { decryption } from "../../util/privacy";
 import EmailRow from "../EmailRow";
@@ -56,7 +56,7 @@ function EmailList() {
     const array = [];
     let counter = 0;
     await inboxNode.map().once(async (data) => {
-      console.log(data)
+      console.log(data);
       if (data !== "inbox") {
         const conversation = await decryption(
           data,
@@ -64,9 +64,6 @@ function EmailList() {
           getUser,
           profile.email
         );
-
-       
-
 
         array.push(conversation);
         counter++;

@@ -15,11 +15,7 @@ import PersonIcon from "@material-ui/icons/Person";
 import DuoIcon from "@material-ui/icons/Duo";
 import PhoneIcon from "@material-ui/icons/Phone";
 
-import {
-  openSendMessage,
-  selectMail,
-  setFolder,
-} from "../../features/mailSlice";
+import { openSendMessage, selectMail, setFolder } from "../../slices/mailSlice";
 import SidebarOption from "./Option";
 
 import styles from "./Sidebar.module.css";

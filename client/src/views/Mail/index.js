@@ -5,7 +5,7 @@ import {
   selectedMailToForward,
   selectedMailToReply,
   selectOpenMail,
-} from "../../features/mailSlice";
+} from "../../slices/mailSlice";
 import Tool from "./tool";
 import Reply from "./reply";
 import Forward from "./forward";

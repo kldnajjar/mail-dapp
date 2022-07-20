@@ -13,9 +13,9 @@ import {
   setReply,
   setReplyToAll,
   setForward,
-} from "../../../features/mailSlice";
+} from "../../../slices/mailSlice";
 
-import { resetEmailActions, setMessage } from "../../../features/mailSlice";
+import { resetEmailActions, setMessage } from "../../../slices/mailSlice";
 
 import useGunContext from "../../../context/useGunContext";
 import { decryptionMessage } from "../../../util/privacy";

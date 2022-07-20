@@ -5,7 +5,7 @@ import { Checkbox, IconButton } from "@material-ui/core";
 import StarBorderOutlinedIcon from "@material-ui/icons/StarBorderOutlined";
 import LabelImportantOutlinedIcon from "@material-ui/icons/LabelImportantOutlined";
 
-import { selectMail, openSendMessage } from "../../features/mailSlice";
+import { selectMail, openSendMessage } from "../../slices/mailSlice";
 
 import styles from "./EmailRow.module.css";
 

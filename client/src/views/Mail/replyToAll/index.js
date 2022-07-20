@@ -4,7 +4,7 @@ import { toast } from "react-toastify";
 import Gun from "gun/gun";
 import { v4 as uuid } from "uuid";
 
-import { closeSendMessage, selectOpenMail } from "../../../features/mailSlice";
+import { closeSendMessage, selectOpenMail } from "../../../slices/mailSlice";
 import useGunContext from "../../../context/useGunContext";
 import { encryption } from "../../../util/privacy";
 

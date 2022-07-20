@@ -8,7 +8,7 @@ import {
   closeSendMessage,
   selectOpenMail,
   selectedMessage,
-} from "../../../features/mailSlice";
+} from "../../../slices/mailSlice";
 import useGunContext from "../../../context/useGunContext";
 import { encryption } from "../../../util/privacy";
 
