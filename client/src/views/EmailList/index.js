@@ -62,7 +62,7 @@ function EmailList() {
           data,
           getGun,
           getUser,
-          profile.email
+          account.email
         );
 
         array.push(conversation);
