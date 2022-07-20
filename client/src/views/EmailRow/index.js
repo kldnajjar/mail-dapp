@@ -12,7 +12,13 @@ function EmailRow({ subject, sender, recipient, body, id, senderEpub, keys }) {
   const openMail = () => {
     dispatch(
       selectMail({
-        subject, sender, recipient, body, id, senderEpub, keys
+        subject,
+        sender,
+        recipient,
+        body,
+        id,
+        senderEpub,
+        keys,
       })
     );
     dispatch(openSendMessage());
@@ -32,13 +38,9 @@ function EmailRow({ subject, sender, recipient, body, id, senderEpub, keys }) {
       <div className={styles["emailRow-message"]}>
         <h4>
           {subject}{" "}
-          <span className={styles["emailRow-description"]}>
-            {" "}
-            - {body}
-          </span>
+          <span className={styles["emailRow-description"]}> - {body}</span>
         </h4>
       </div>
-      {/* <p className={`${styles["emailRow-time"]} mb-0`}>{time}</p> */}
     </div>
   );
 }

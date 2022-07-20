@@ -21,8 +21,6 @@ import { resetEmailActions } from "../../features/mailSlice";
 import "gun/sea";
 import "gun/lib/path.js";
 
-// import { db } from "../../firebase";
-
 function EmailList() {
   const dispatch = useDispatch();
   const [emails, setEmails] = useState([]);
@@ -115,24 +113,6 @@ function EmailList() {
           </IconButton>
         </div>
       </div>
-      {/* <div className={styles["emailList-sections"]}>
-        <Section Icon={InboxIcon} title="Primary" color="red" selected />
-        <Section Icon={PeopleIcon} title="Social" color="#1A73E8" />
-        <Section Icon={LocalOfferIcon} title="Promotions" color="green" />
-      </div> */}
-
-      {/* <div>
-        {emailsList.map((elem)=>{
-          return <p>{elem}</p>
-        })}
-      </div>
-
-      <button onClick={()=>{
-        getGun().get("profiles").get("omar@mykloud.io").get("folders").get("inbox").put({
-          test : "1"
-        })
-      }}>TEST</button> */}
-
       <div className={styles["emailList-list"]}>
         {emails[0] &&
           emails?.map(
