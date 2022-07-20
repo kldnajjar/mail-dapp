@@ -12,7 +12,7 @@ import { v4 as uuid } from "uuid";
 import Gun from "gun/gun";
 
 function ReplyToAllEmail() {
-  const profile = JSON.parse(sessionStorage.getItem("profile"));
+  const account = JSON.parse(sessionStorage.getItem("account"));
   const dispatch = useDispatch();
   const { getGun, getUser, getMails } = useGunContext();
 
@@ -25,10 +25,10 @@ function ReplyToAllEmail() {
   const [body, setBody] = useState("");
 
   const replyToAll = () => {
-    const recipient = selectedMail.sender
+    const recipient = selectedMail.sender;
 
     const emailObject = {
-      sender: profile.email,
+      sender: account.email,
       recipient,
       body,
     };
@@ -36,7 +36,7 @@ function ReplyToAllEmail() {
   };
 
   const createMails = async (emailObject) => {
-    const recipientArray = [emailObject?.recipient]
+    const recipientArray = [emailObject?.recipient];
 
     const email = await encryption(
       {
@@ -67,20 +67,20 @@ function ReplyToAllEmail() {
         carbonCopy: "",
         blindCarbonCopy: "",
         type: "reply",
-        timestamp: Gun.state()
+        timestamp: Gun.state(),
       });
 
     const conversation = getMails().get(conversationId);
 
     getGun()
-      .get("profiles")
+      .get("accounts")
       .get(emailObject?.sender)
       .get("folders")
       .get("sent")
       .set(conversation);
 
     getGun()
-      .get("profiles")
+      .get("accounts")
       .get(emailObject?.recipient)
       .get("folders")
       .get("inbox")
@@ -101,7 +101,7 @@ function ReplyToAllEmail() {
         <div className="form-group mb-3">
           <label>From</label>
           <div className="mb-3">
-            <b>{profile.email}</b>
+            <b>{account.email}</b>
           </div>
         </div>
         <div className="form-group mb-3">

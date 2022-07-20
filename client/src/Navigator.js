@@ -3,7 +3,7 @@ import { Routes, Route } from "react-router-dom";
 
 const SignIn = lazy(() => import("./views/Signin"));
 const SignUp = lazy(() => import("./views/Signup"));
-const Profile = lazy(() => import("./views/Profile"));
+const Account = lazy(() => import("./views/Account"));
 
 const Navigator = () => {
   const loading = <div className="loading-content">Loading...</div>;
@@ -11,10 +11,10 @@ const Navigator = () => {
     <div>
       <Routes>
         <Route
-          path="/profile"
+          path="/account"
           element={
             <Suspense fallback={loading}>
-              <Profile />
+              <Account />
             </Suspense>
           }
         />

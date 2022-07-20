@@ -44,21 +44,18 @@ const SignUp = () => {
   };
 
   const registerNewUser = (email) => {
-    // add user to user/profile list
-    // getGun().get("profiles").get(pub).put({ email, firstName, lastName });
-    
-    getGun().get("profiles").get(email).put({
+    getGun().get("accounts").get(email).put({
       email,
       firstName,
       lastName,
     });
 
-    getGun().get("profiles").get(email).get("folders").get("inbox").put({
-      label: "inbox"
+    getGun().get("accounts").get(email).get("folders").get("inbox").put({
+      label: "inbox",
     });
 
-    getGun().get("profiles").get(email).get("folders").get("sent").put({
-      label: "sent"
+    getGun().get("accounts").get(email).get("folders").get("sent").put({
+      label: "sent",
     });
 
     toast.success("User created");

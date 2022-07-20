@@ -2,7 +2,11 @@ import React, { useState, useEffect } from "react";
 import { toast } from "react-toastify";
 
 import { useSelector, useDispatch } from "react-redux";
-import { closeSendMessage, selectOpenMail , selectedMessage} from "../../../features/mailSlice";
+import {
+  closeSendMessage,
+  selectOpenMail,
+  selectedMessage,
+} from "../../../features/mailSlice";
 
 import useGunContext from "../../../context/useGunContext";
 import { encryption } from "../../../util/privacy";
@@ -13,13 +17,13 @@ import { v4 as uuid } from "uuid";
 import Gun from "gun/gun";
 
 function ReplyEmail() {
-  const profile = JSON.parse(sessionStorage.getItem("profile"));
+  const account = JSON.parse(sessionStorage.getItem("account"));
   const dispatch = useDispatch();
   const { getGun, getUser, getMails } = useGunContext();
 
   const selectedMail = useSelector(selectOpenMail);
-  const messageToReply = useSelector(selectedMessage)
-  console.log(messageToReply)
+  const messageToReply = useSelector(selectedMessage);
+  console.log(messageToReply);
 
   const [recipient, setRecipient] = useState("");
   const [emailCC, setEmailCC] = useState("");
@@ -27,12 +31,10 @@ function ReplyEmail() {
   const [subject, setSubject] = useState("");
   const [body, setBody] = useState("");
 
- 
-
   const reply = () => {
-    const recipient = selectedMail.sender
+    const recipient = selectedMail.sender;
     const emailObject = {
-      sender: profile.email,
+      sender: account.email,
       recipient,
       body,
     };
@@ -40,14 +42,14 @@ function ReplyEmail() {
     const conversationId = selectedMail.id.split("/")[1];
     const messageId = uuid();
 
-    const conversationObj = { id: conversationId }
-    const messageObj = { type: "reply", id: messageId }
+    const conversationObj = { id: conversationId };
+    const messageObj = { type: "reply", id: messageId };
 
     createMails(emailObject);
   };
 
   const createMails = async (emailObject) => {
-    const recipientArray = [emailObject?.recipient]
+    const recipientArray = [emailObject?.recipient];
 
     const email = await encryption(
       {
@@ -78,20 +80,20 @@ function ReplyEmail() {
         carbonCopy: "",
         blindCarbonCopy: "",
         type: "reply",
-        timestamp: Gun.state()
+        timestamp: Gun.state(),
       });
 
     const conversation = getMails().get(conversationId);
 
     getGun()
-      .get("profiles")
+      .get("accounts")
       .get(emailObject?.sender)
       .get("folders")
       .get("sent")
       .set(conversation);
 
     getGun()
-      .get("profiles")
+      .get("accounts")
       .get(emailObject?.recipient)
       .get("folders")
       .get("inbox")
@@ -112,7 +114,7 @@ function ReplyEmail() {
         <div className="form-group mb-3">
           <label>From</label>
           <div className="mb-3">
-            <b>{profile.email}</b>
+            <b>{account.email}</b>
           </div>
         </div>
         <div className="form-group mb-3">

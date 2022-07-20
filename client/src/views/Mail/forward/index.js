@@ -14,7 +14,7 @@ import { v4 as uuid } from "uuid";
 // import { createMails } from "./createEmail";
 
 function ForwardEmail() {
-  const profile = JSON.parse(sessionStorage.getItem("profile"));
+  const account = JSON.parse(sessionStorage.getItem("account"));
   const dispatch = useDispatch();
   const { getGun, getUser, getMails } = useGunContext();
 
@@ -29,7 +29,7 @@ function ForwardEmail() {
   const sendEmail = () => {
     const emailObject = {
       subject,
-      sender: profile.email,
+      sender: account.email,
       recipient,
       cc: emailCC,
       bcc: emailBCC,
@@ -48,7 +48,7 @@ function ForwardEmail() {
     for (let i = 0; i < 100; i++) {
       const emailObject = {
         subject: `${subject} ${i}`,
-        sender: profile.email,
+        sender: account.email,
         recipient: "tsar@mykloud.io",
         cc: "",
         bcc: "",
@@ -124,7 +124,7 @@ function ForwardEmail() {
     const conversation = getMails().get(conversationId);
 
     getGun()
-      .get("profiles")
+      .get("accounts")
       .get(emailObject.sender)
       .get("folders")
       .get("sent")
@@ -132,7 +132,7 @@ function ForwardEmail() {
 
     for (let i = 0; i < newRecipientArray.length; i++) {
       getGun()
-        .get("profiles")
+        .get("accounts")
         .get(newRecipientArray[i])
         .get("folders")
         .get("inbox")
@@ -148,7 +148,7 @@ function ForwardEmail() {
    */
   async function reply(conversationId, recipient) {
     const emailObject = {
-      sender: profile.email,
+      sender: account.email,
       body,
     };
 
@@ -168,7 +168,7 @@ function ForwardEmail() {
         <div className="form-group mb-3">
           <label>From</label>
           <div className="mb-3">
-            <b>{profile.email}</b>
+            <b>{account.email}</b>
           </div>
         </div>
         <Input

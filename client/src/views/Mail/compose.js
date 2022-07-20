@@ -13,7 +13,7 @@ import { v4 as uuid } from "uuid";
 // import { createMails } from "./createEmail";
 
 function Compose() {
-  const profile = JSON.parse(sessionStorage.getItem("profile"));
+  const account = JSON.parse(sessionStorage.getItem("account"));
   const dispatch = useDispatch();
   const { getGun, getUser, getMails } = useGunContext();
 
@@ -26,7 +26,7 @@ function Compose() {
   const sendEmail = () => {
     const emailObject = {
       subject,
-      sender: profile.email,
+      sender: account.email,
       recipient,
       cc: emailCC,
       bcc: emailBCC,
@@ -35,28 +35,28 @@ function Compose() {
 
     const conversationId = uuid();
     const messageId = uuid();
-    
-    const conversationObj = { id: conversationId }
-    const messageObj = { type: "reply", id: messageId }
+
+    const conversationObj = { id: conversationId };
+    const messageObj = { type: "reply", id: messageId };
 
     createMails(emailObject, conversationId, messageId);
   };
 
-  const generateEmails =()=>{
+  const generateEmails = () => {
     let subject = "subject";
     let body = "body";
-    for(let i  = 0 ; i < 100 ; i++) {
+    for (let i = 0; i < 100; i++) {
       const emailObject = {
-        subject : `${subject} ${i}`,
-        sender: profile.email,
-        recipient : "tsar@mykloud.io",
+        subject: `${subject} ${i}`,
+        sender: account.email,
+        recipient: "tsar@mykloud.io",
         cc: "",
         bcc: "",
-        body : `${body} ${i}`,
+        body: `${body} ${i}`,
       };
       createMails(emailObject);
     }
-  }
+  };
 
   const createMails = async (emailObject, conversationId, messageId) => {
     const recipientsArray = emailObject.recipient.split(";");
@@ -71,15 +71,19 @@ function Compose() {
       blindCarbonCopyArray = emailObject.bcc.split(";");
     }
 
-    const newRecipientArray = recipientsArray.concat(carbonCopyArray, blindCarbonCopyArray)
+    const newRecipientArray = recipientsArray.concat(
+      carbonCopyArray,
+      blindCarbonCopyArray
+    );
 
-    const email = await encryption({
+    const email = await encryption(
+      {
         subject: emailObject.subject,
         sender: emailObject.sender,
         recipients: recipientsArray,
         body: emailObject.body,
         cc: carbonCopyArray,
-        bcc: blindCarbonCopyArray
+        bcc: blindCarbonCopyArray,
       },
       getGun,
       getUser
@@ -100,7 +104,10 @@ function Compose() {
         sender: emailObject?.sender,
         senderEpub: email?.senderEpub,
         cc: typeof carbonCopyJsonObj === "undefined" ? "" : carbonCopyJsonObj,
-        bcc: typeof blindCarbonCopyJsonObj === "undefined" ? "" : blindCarbonCopyJsonObj
+        bcc:
+          typeof blindCarbonCopyJsonObj === "undefined"
+            ? ""
+            : blindCarbonCopyJsonObj,
       })
       .get("messages")
       .get(messageId)
@@ -118,7 +125,7 @@ function Compose() {
     const conversation = getMails().get(conversationId);
 
     getGun()
-      .get("profiles")
+      .get("accounts")
       .get(emailObject.sender)
       .get("folders")
       .get("sent")
@@ -126,7 +133,7 @@ function Compose() {
 
     for (let i = 0; i < newRecipientArray.length; i++) {
       getGun()
-        .get("profiles")
+        .get("accounts")
         .get(newRecipientArray[i])
         .get("folders")
         .get("inbox")
@@ -143,7 +150,7 @@ function Compose() {
         <div className="form-group mb-3">
           <label>From</label>
           <div className="mb-3">
-            <b>{profile.email}</b>
+            <b>{account.email}</b>
           </div>
         </div>
         <Input

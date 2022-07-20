@@ -1,6 +1,9 @@
-import { Checkbox, IconButton } from "@material-ui/core";
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState } from "react";
+import { useSelector, useDispatch } from "react-redux";
+import "gun/sea";
+import "gun/lib/path.js";
 
+import { Checkbox, IconButton } from "@material-ui/core";
 import ArrowDropDownIcon from "@material-ui/icons/ArrowDropDown";
 import MoreVertIcon from "@material-ui/icons/MoreVert";
 import RedoIcon from "@material-ui/icons/Redo";
@@ -8,26 +11,19 @@ import ChevronLeftIcon from "@material-ui/icons/ChevronLeft";
 import ChevronRightIcon from "@material-ui/icons/ChevronRight";
 import KeyboardHideIcon from "@material-ui/icons/KeyboardHide";
 import SettingsIcon from "@material-ui/icons/Settings";
-// import InboxIcon from "@material-ui/icons/Inbox";
-// import PeopleIcon from "@material-ui/icons/People";
-// import LocalOfferIcon from "@material-ui/icons/LocalOffer";
-// import Section from "../Section";
-import EmailRow from "../EmailRow";
-import styles from "./EmailList.module.css";
+
+import { resetEmailActions } from "../../features/mailSlice";
 import useGunContext from "../../context/useGunContext";
 import { decryption } from "../../util/privacy";
-import { useSelector, useDispatch } from "react-redux";
-import { resetEmailActions } from "../../features/mailSlice";
-import "gun/sea";
-import "gun/lib/path.js";
+import EmailRow from "../EmailRow";
+
+import styles from "./EmailList.module.css";
 
 function EmailList() {
   const dispatch = useDispatch();
   const [emails, setEmails] = useState([]);
   const { getGun, getUser } = useGunContext();
-  const folder = useSelector((state) => state?.mail?.folderOpened);
-  const emailsList = useSelector((state) => state?.mail?.emailsList);
-  const profile = JSON.parse(sessionStorage.getItem("profile"));
+  const account = JSON.parse(sessionStorage.getItem("account"));
   async function getCurrentUserAlias(getUser) {
     let name;
     await getUser()
@@ -38,11 +34,11 @@ function EmailList() {
     return name;
   }
 
-  async function getAllEmails(getGun, getUser, profile) {
+  async function getAllEmails(getGun, getUser, account) {
     const alias = await getCurrentUserAlias(getUser);
     let emailsNum = 0;
     const inboxNode = getGun()
-      .get("profiles")
+      .get("accounts")
       .get(alias)
       .get("folders")
       .get("inbox");
@@ -58,7 +54,7 @@ function EmailList() {
         data,
         getGun,
         getUser,
-        profile.email
+        account.email
       );
       array.push(conversation);
       counter++;
@@ -107,7 +103,7 @@ function EmailList() {
 
   useEffect(async () => {
     dispatch(resetEmailActions());
-    await getAllEmails(getGun, getUser, profile);
+    await getAllEmails(getGun, getUser, account);
   }, []);
 
   if (!emails.length) {

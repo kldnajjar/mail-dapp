@@ -22,7 +22,7 @@ import styles from "./Mail.module.css";
 
 function Conversation() {
   const { getGun, getUser, getMails } = useGunContext();
-  const profile = JSON.parse(sessionStorage.getItem("profile"));
+  const account = JSON.parse(sessionStorage.getItem("account"));
 
   const selectedMail = useSelector(selectOpenMail);
   const dispatch = useDispatch();
@@ -38,7 +38,7 @@ function Conversation() {
     return name;
   }
 
-  async function getAllMessages(getGun, getMails, getUser, profile) {
+  async function getAllMessages(getGun, getMails, getUser, account) {
     const alias = await getCurrentUserAlias(getUser);
     const conversationNode = getMails()
       .get(selectedMail.id.split("/")[1])
@@ -77,7 +77,7 @@ function Conversation() {
           return a.timestamp - b.timestamp;
         });
 
-        console.log(array)
+        console.log(array);
         setMessages([...array]);
       }
     });
@@ -120,7 +120,7 @@ function Conversation() {
 
   useEffect(async () => {
     dispatch(resetEmailActions());
-    getAllMessages(getGun, getMails, getUser, profile);
+    getAllMessages(getGun, getMails, getUser, account);
   }, []);
 
   if (!messages.length) {

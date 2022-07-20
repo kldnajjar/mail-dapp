@@ -8,20 +8,20 @@ import Mail from "../Mail";
 import EmailList from "../EmailList";
 import { selectSendMessageIsOpen } from "../../features/mailSlice";
 
-// import styles from './Profile.module.css';
+// import styles from './Account.module.css';
 
-const Profile = () => {
+const Account = () => {
   const navigate = useNavigate();
   const sendMessageIsOpen = useSelector(selectSendMessageIsOpen);
-  const profile = JSON.parse(sessionStorage.getItem("profile"));
+  const account = JSON.parse(sessionStorage.getItem("account"));
 
   useEffect(() => {
-    if (!profile) {
+    if (!account) {
       return navigate("/sign-in");
     }
   }, []);
 
-  const renderProfile = () => {
+  const renderAccount = () => {
     return (
       <div className="app">
         <Header />
@@ -33,7 +33,7 @@ const Profile = () => {
     );
   };
 
-  return <>{profile ? renderProfile() : null}</>;
+  return <>{account ? renderAccount() : null}</>;
 };
 
-export default Profile;
+export default Account;

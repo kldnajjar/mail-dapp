@@ -23,7 +23,7 @@ function Header() {
   const dispatch = useDispatch();
 
   const signOut = (evt) => {
-    sessionStorage.removeItem("profile");
+    sessionStorage.removeItem("account");
 
     const current_user = getUser();
     current_user.leave();
