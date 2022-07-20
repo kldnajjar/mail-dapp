@@ -56,6 +56,7 @@ function EmailList() {
     const array = [];
     let counter = 0;
     await inboxNode.map().once(async (data) => {
+      console.log(data)
       if (data !== "inbox") {
         const conversation = await decryption(
           data,
@@ -63,6 +64,10 @@ function EmailList() {
           getUser,
           profile.email
         );
+
+       
+
+
         array.push(conversation);
         counter++;
         if (counter > emailsNum) {
