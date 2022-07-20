@@ -76,10 +76,47 @@ function EmailList() {
     });
   }
 
+  const renderEmails = () => {
+    return emails.map(
+      (
+        { subject, sender, recipient, body, id, senderEpub, keys },
+        reactKey
+      ) => (
+        <EmailRow
+          key={`email-row-${reactKey}`}
+          sender={sender}
+          // recipient={recipient}
+          subject={subject}
+          body={body}
+          id={id}
+          senderEpub={senderEpub}
+          keys={keys}
+          // time={new Date(timestamp?.seconds * 1000).toUTCString()}
+        />
+      )
+    );
+  };
+
+  const renderEmptyList = () => {
+    return (
+      <div className={`${styles.emptyList}`}>
+        <h4>There are no conversations</h4>
+      </div>
+    );
+  };
+
   useEffect(async () => {
     dispatch(resetEmailActions());
     await getAllEmails(getGun, getUser, profile);
   }, []);
+
+  if (!emails.length) {
+    return (
+      <div className={styles.emailList}>
+        <div className={styles["emailList-list"]}>{renderEmptyList()}</div>
+      </div>
+    );
+  }
 
   return (
     <div className={styles.emailList}>
@@ -111,26 +148,7 @@ function EmailList() {
           </IconButton>
         </div>
       </div>
-      <div className={styles["emailList-list"]}>
-        {emails?.map(
-          (
-            { subject, sender, recipient, body, id, senderEpub, keys },
-            reactKey
-          ) => (
-            <EmailRow
-              key={`email-row-${reactKey}`}
-              sender={sender}
-              // recipient={recipient}
-              subject={subject}
-              body={body}
-              id={id}
-              senderEpub={senderEpub}
-              keys={keys}
-              // time={new Date(timestamp?.seconds * 1000).toUTCString()}
-            />
-          )
-        )}
-      </div>
+      <div className={styles["emailList-list"]}>{renderEmails()}</div>
     </div>
   );
 }
