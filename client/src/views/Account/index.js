@@ -1,12 +1,12 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 
+import { selectSendMessageIsOpen } from "../../features/mailSlice";
 import Header from "../Header";
 import Sidebar from "../Sidebar";
 import Mail from "../Mail";
 import EmailList from "../EmailList";
-import { selectSendMessageIsOpen } from "../../features/mailSlice";
 
 // import styles from './Account.module.css';
 
