@@ -1,9 +1,12 @@
-import { Checkbox, IconButton } from "@material-ui/core";
 import React from "react";
+import { useDispatch } from "react-redux";
+
+import { Checkbox, IconButton } from "@material-ui/core";
 import StarBorderOutlinedIcon from "@material-ui/icons/StarBorderOutlined";
 import LabelImportantOutlinedIcon from "@material-ui/icons/LabelImportantOutlined";
+
 import { selectMail, openSendMessage } from "../../features/mailSlice";
-import { useDispatch } from "react-redux";
+
 import styles from "./EmailRow.module.css";
 
 function EmailRow({ subject, sender, recipient, body, id, senderEpub, keys }) {
