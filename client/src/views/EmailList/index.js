@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useSelector, useDispatch } from "react-redux";
+import { useDispatch } from "react-redux";
 import "gun/sea";
 import "gun/lib/path.js";
 
@@ -24,7 +24,13 @@ function EmailList() {
   const [emails, setEmails] = useState([]);
   const { getGun, getUser } = useGunContext();
   const account = JSON.parse(sessionStorage.getItem("account"));
-  async function getCurrentUserAlias(getUser) {
+
+  useEffect(async () => {
+    dispatch(resetEmailActions());
+    await getAllEmails(getGun, getUser, account);
+  }, []);
+
+  const getCurrentUserAlias = async (getUser) => {
     let name;
     await getUser()
       .get("alias")
@@ -32,9 +38,9 @@ function EmailList() {
         name = alias;
       });
     return name;
-  }
+  };
 
-  async function getAllEmails(getGun, getUser, account) {
+  const getAllEmails = async (getGun, getUser, account) => {
     const alias = await getCurrentUserAlias(getUser);
     let emailsNum = 0;
     const inboxNode = getGun()
@@ -70,7 +76,7 @@ function EmailList() {
         setEmails([...array]);
       }
     });
-  }
+  };
 
   const renderEmails = () => {
     return emails.map(
@@ -100,11 +106,6 @@ function EmailList() {
       </div>
     );
   };
-
-  useEffect(async () => {
-    dispatch(resetEmailActions());
-    await getAllEmails(getGun, getUser, account);
-  }, []);
 
   if (!emails.length) {
     return (
