@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react";
-import { encryption } from "../../util/privacy";
-import { closeSendMessage } from "../../features/mailSlice";
+import { encryption } from "../../../util/privacy";
+import { closeSendMessage } from "../../../features/mailSlice";
 import { toast } from "react-toastify";
 import Gun from "gun/gun";
 
-export const createMails = async (
+export const createEmail = async (
   emailObject,
   conversationObj,
   messageObj,

@@ -1,34 +1,41 @@
 import React, { useEffect, useState } from "react";
-import {
-  selectOpenMail,
-  setReply,
-  setReplyToAll,
-  setForward,
-} from "../../features/mailSlice";
 import { useSelector, useDispatch } from "react-redux";
+import "gun/sea";
+import "gun/lib/path.js";
 
 import { IconButton } from "@material-ui/core";
 import ReplyIcon from "@material-ui/icons/Reply";
 import ReplyAllIcon from "@material-ui/icons/ReplyAll";
 import ForwardIcon from "@material-ui/icons/Forward";
-import { resetEmailActions, setMessage } from "../../features/mailSlice";
 
-import useGunContext from "../../context/useGunContext";
-import { decryptionMessage } from "../../util/privacy";
-import "gun/sea";
-import "gun/lib/path.js";
+import {
+  selectOpenMail,
+  setReply,
+  setReplyToAll,
+  setForward,
+} from "../../../features/mailSlice";
 
-import styles from "./Mail.module.css";
+import { resetEmailActions, setMessage } from "../../../features/mailSlice";
+
+import useGunContext from "../../../context/useGunContext";
+import { decryptionMessage } from "../../../util/privacy";
+
+import styles from "../Mail.module.css";
 
 function Conversation() {
+  const dispatch = useDispatch();
   const { getGun, getUser, getMails } = useGunContext();
   const account = JSON.parse(sessionStorage.getItem("account"));
-
   const selectedMail = useSelector(selectOpenMail);
-  const dispatch = useDispatch();
+
   const [messages, setMessages] = useState([]);
 
-  async function getCurrentUserAlias(getUser) {
+  useEffect(async () => {
+    dispatch(resetEmailActions());
+    getAllMessages(getGun, getMails, getUser, account);
+  }, []);
+
+  const getCurrentUserAlias = async (getUser) => {
     let name;
     await getUser()
       .get("alias")
@@ -36,16 +43,16 @@ function Conversation() {
         name = alias;
       });
     return name;
-  }
+  };
 
-  async function getAllMessages(getGun, getMails, getUser, account) {
+  const getAllMessages = async (getGun, getMails, getUser, account) => {
     const alias = await getCurrentUserAlias(getUser);
     const conversationNode = getMails()
       .get(selectedMail.id.split("/")[1])
       .get("messages");
     let emailsNum = 0;
     await conversationNode.once(async (data) => {
-      emailsNum = Object.keys(data).filter((elem)=> elem !="_").length;
+      emailsNum = Object.keys(data).filter((elem) => elem != "_").length;
     });
     var startTime = performance.now();
     const array = [];
@@ -79,50 +86,9 @@ function Conversation() {
         setMessages([...array]);
       }
     });
-
-    // const alias = await getCurrentUserAlias(getUser);
-    // await getMails()
-    //   .get(selectedMail.id.split("/")[1])
-    //   .get("messages")
-    //   .once(async (data) => {
-    //     delete data.label;
-    //     const Array = Object.keys(data).slice(1);
-    //     var startTime = performance.now();
-    //     if (Array.length) {
-    //       const yy = [];
-    //       for (let i = 0; i < Array.length; i++) {
-    //         const refMessage = `${selectedMail.id}/messages/${Array[i]}`;
-    //         const msg = await decryptionMessage(
-    //           refMessage,
-    //           getGun,
-    //           getUser,
-    //           alias,
-    //           selectedMail.keys,
-    //           selectedMail.senderEpub
-    //         );
-    //         msg.id = Array[i];
-    //         const date = new Date(msg.timestamp); // Timestamp to Human readable data
-    //         yy.push(msg);
-    //       }
-    //       yy.sort((a, b) => {
-    //         return a.timestamp - b.timestamp;
-    //       });
-    //       setMessages(yy);
-    //       var endTime = performance.now();
-    //       console.log(
-    //         `Call to doSomething took ${endTime - startTime} milliseconds`
-    //       );
-    //     }
-    //   });
-  }
-
-  useEffect(async () => {
-    dispatch(resetEmailActions());
-    getAllMessages(getGun, getMails, getUser, account);
-  }, []);
+  };
 
   if (!messages.length) {
-    console.log("QQQ");
     return null;
   }
 

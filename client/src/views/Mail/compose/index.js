@@ -1,16 +1,14 @@
 import React, { useState } from "react";
-import { toast } from "react-toastify";
-
 import { useDispatch } from "react-redux";
-import { closeSendMessage } from "../../features/mailSlice";
-
-import Input from "../../components/input";
-import useGunContext from "../../context/useGunContext";
-import { encryption } from "../../util/privacy";
-
-import styles from "./Mail.module.css";
+import { toast } from "react-toastify";
 import { v4 as uuid } from "uuid";
-// import { createMails } from "./createEmail";
+
+import Input from "../../../components/input";
+import { closeSendMessage } from "../../../features/mailSlice";
+import useGunContext from "../../../context/useGunContext";
+import { encryption } from "../../../util/privacy";
+
+import styles from "../Mail.module.css";
 
 function Compose() {
   const account = JSON.parse(sessionStorage.getItem("account"));

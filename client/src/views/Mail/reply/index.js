@@ -1,35 +1,36 @@
 import React, { useState, useEffect } from "react";
-import { toast } from "react-toastify";
-
 import { useSelector, useDispatch } from "react-redux";
+import { toast } from "react-toastify";
+import { v4 as uuid } from "uuid";
+import Gun from "gun/gun";
+
 import {
   closeSendMessage,
   selectOpenMail,
   selectedMessage,
 } from "../../../features/mailSlice";
-
 import useGunContext from "../../../context/useGunContext";
 import { encryption } from "../../../util/privacy";
 
 import styles from "../Mail.module.css";
-import { v4 as uuid } from "uuid";
-// import { createMails } from "../createEmail";
-import Gun from "gun/gun";
 
-function ReplyEmail() {
-  const account = JSON.parse(sessionStorage.getItem("account"));
+function Reply() {
   const dispatch = useDispatch();
   const { getGun, getUser, getMails } = useGunContext();
-
+  const account = JSON.parse(sessionStorage.getItem("account"));
   const selectedMail = useSelector(selectOpenMail);
   const messageToReply = useSelector(selectedMessage);
-  console.log(messageToReply);
 
   const [recipient, setRecipient] = useState("");
   const [emailCC, setEmailCC] = useState("");
   const [emailBCC, setEmailBCC] = useState("");
   const [subject, setSubject] = useState("");
   const [body, setBody] = useState("");
+
+  useEffect(() => {
+    // setBody(`\n\n\n${selectedMail.body}`);
+    // setSubject(`fwd: ${selectedMail.subject}`);
+  }, []);
 
   const reply = () => {
     const recipient = selectedMail.sender;
@@ -103,11 +104,6 @@ function ReplyEmail() {
     toast.success("Email sent");
   };
 
-  useEffect(() => {
-    // setBody(`\n\n\n${selectedMail.body}`);
-    // setSubject(`fwd: ${selectedMail.subject}`);
-  }, []);
-
   return (
     <div className={styles["mail-body"]}>
       <div className={`${styles["edit-mail-header"]}`}>
@@ -144,4 +140,4 @@ function ReplyEmail() {
   );
 }
 
-export default ReplyEmail;
+export default Reply;

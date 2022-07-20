@@ -19,7 +19,6 @@
   margin: 30px 0;
   background-color: white;
   padding: 20px;
-  /* min-height: 100vh; */
   box-shadow: none;
 }
 
@@ -27,7 +26,6 @@
   display: flex;
   align-items: center;
   border-bottom: 1px solid whitesmoke;
-  /* padding: 20px; */
   position: relative;
   align-items: center;
   justify-content: space-between;

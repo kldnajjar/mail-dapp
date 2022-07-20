@@ -1,23 +1,19 @@
 import React, { useState, useEffect } from "react";
-import { toast } from "react-toastify";
-
 import { useDispatch, useSelector } from "react-redux";
-import { closeSendMessage, selectOpenMail } from "../../../features/mailSlice";
+import { toast } from "react-toastify";
+import { v4 as uuid } from "uuid";
 
 import Input from "../../../components/input";
+import { closeSendMessage, selectOpenMail } from "../../../features/mailSlice";
 import useGunContext from "../../../context/useGunContext";
 import { encryption } from "../../../util/privacy";
 
 import styles from "../Mail.module.css";
-import { v4 as uuid } from "uuid";
 
-// import { createMails } from "./createEmail";
-
-function ForwardEmail() {
-  const account = JSON.parse(sessionStorage.getItem("account"));
+function Forward() {
   const dispatch = useDispatch();
   const { getGun, getUser, getMails } = useGunContext();
-
+  const account = JSON.parse(sessionStorage.getItem("account"));
   const selectedMail = useSelector(selectOpenMail);
 
   const [recipient, setRecipient] = useState("");
@@ -25,6 +21,11 @@ function ForwardEmail() {
   const [emailBCC, setEmailBCC] = useState("");
   const [subject, setSubject] = useState("");
   const [body, setBody] = useState("");
+
+  useEffect(() => {
+    setBody(`\n\n\n${selectedMail.body}`);
+    setSubject(`fwd: ${selectedMail.subject}`);
+  }, []);
 
   const sendEmail = () => {
     const emailObject = {
@@ -40,22 +41,6 @@ function ForwardEmail() {
     const messageId = uuid();
 
     createMails(emailObject, conversationId, messageId);
-  };
-
-  const generateEmails = () => {
-    let subject = "subject";
-    let body = "body";
-    for (let i = 0; i < 100; i++) {
-      const emailObject = {
-        subject: `${subject} ${i}`,
-        sender: account.email,
-        recipient: "tsar@mykloud.io",
-        cc: "",
-        bcc: "",
-        body: `${body} ${i}`,
-      };
-      createMails(emailObject);
-    }
   };
 
   const createMails = async (emailObject, conversationId, messageId) => {
@@ -157,11 +142,6 @@ function ForwardEmail() {
     createMails(emailObject, conversationId, messageId);
   }
 
-  useEffect(() => {
-    setBody(`\n\n\n${selectedMail.body}`);
-    setSubject(`fwd: ${selectedMail.subject}`);
-  }, []);
-
   return (
     <div className={styles["mail-body"]}>
       <div className={`${styles["edit-mail-header"]}`}>
@@ -220,4 +200,4 @@ function ForwardEmail() {
   );
 }
 
-export default ForwardEmail;
+export default Forward;
