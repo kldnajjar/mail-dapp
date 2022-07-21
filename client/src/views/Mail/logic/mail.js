@@ -6,7 +6,7 @@ import Gun from "gun/gun";
 export const createEmail = async (emailObject, context) => {
   const emailsArray = getMailEmails(emailObject);
 
-  const email = await encryption(
+  const emailEncrypted = await encryption(
     {
       subject: emailObject.subject,
       sender: emailObject.sender,
@@ -21,7 +21,7 @@ export const createEmail = async (emailObject, context) => {
 
   const msgObj = await handleConversationAndMessages(
     emailObject,
-    email,
+    emailEncrypted,
     emailsArray
   );
 
@@ -48,8 +48,12 @@ const getMailEmails = (obj) => {
   };
 };
 
-const handleConversationAndMessages = (emailObject, email, emailsArray) => {
-  const jsonObj = JSON.stringify(email?.encryptedUsersKeys);
+const handleConversationAndMessages = (
+  emailObject,
+  emailEncrypted,
+  emailsArray
+) => {
+  const jsonObj = JSON.stringify(emailEncrypted?.encryptedUsersKeys);
   const carbonCopyJsonObj = JSON.stringify(emailsArray.carbonCopyArray);
   const blindCarbonCopyJsonObj = JSON.stringify(
     emailsArray.blindCarbonCopyArray
@@ -59,20 +63,20 @@ const handleConversationAndMessages = (emailObject, email, emailsArray) => {
   const messageObj = {};
 
   conversationObj.id = emailObject.conversationId;
-  conversationObj.recentBody = email?.encryptedMessage;
+  conversationObj.recentBody = emailEncrypted?.encryptedMessage;
 
   messageObj.id = emailObject.messageId;
   messageObj.type = emailObject.messageType;
-  messageObj.body = email?.encryptedMessage;
+  messageObj.body = emailEncrypted?.encryptedMessage;
   messageObj.sender = emailObject?.sender;
   messageObj.recipients = emailObject?.recipient;
   messageObj.timestamp = Gun.state();
 
   if (messageObj.type !== "reply") {
-    conversationObj.subject = email?.encryptedSubject;
+    conversationObj.subject = emailEncrypted?.encryptedSubject;
     conversationObj.keys = jsonObj;
     conversationObj.sender = emailObject?.sender;
-    conversationObj.senderEpub = email?.senderEpub;
+    conversationObj.senderEpub = emailEncrypted?.senderEpub;
     conversationObj.cc =
       typeof carbonCopyJsonObj === "undefined" ? "" : carbonCopyJsonObj;
     conversationObj.bcc =
