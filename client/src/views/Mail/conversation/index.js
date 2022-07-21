@@ -25,8 +25,9 @@ import styles from "../Mail.module.css";
 
 function Conversation() {
   const dispatch = useDispatch();
-  const { getGun, getUser, getMails } = useGunContext();
+  const user = useSelector(selectUser);
   const selectedMail = useSelector(selectOpenMail);
+  const { getGun, getUser, getMails } = useGunContext();
 
   const [messages, setMessages] = useState([]);
 
@@ -36,7 +37,8 @@ function Conversation() {
   }, []);
 
   const getAllMessages = async (getGun, getMails, getUser) => {
-    const alias = useSelector(selectUser)?.email;
+    const alias = user?.email;
+    console.log("id", selectedMail.id.split("/")[1]);
     const conversationNode = getMails()
       .get(selectedMail.id.split("/")[1])
       .get("messages");

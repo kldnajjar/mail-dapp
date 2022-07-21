@@ -16,10 +16,11 @@ const Account = () => {
   const dispatch = useDispatch();
   const sendMessageIsOpen = useSelector(selectSendMessageIsOpen);
   const account = JSON.parse(sessionStorage.getItem("account"));
-  dispatch(setUser(account));
 
   useEffect(() => {
-    if (!account) {
+    if (account) {
+      dispatch(setUser(account));
+    } else {
       return navigate("/sign-in");
     }
   }, []);
