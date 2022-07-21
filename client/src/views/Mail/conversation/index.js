@@ -16,6 +16,7 @@ import {
 } from "../../../slices/mailSlice";
 
 import { resetEmailActions, setMessage } from "../../../slices/mailSlice";
+import { selectUser } from "../../../slices/userSlice";
 
 import useGunContext from "../../../context/useGunContext";
 import { decryptionMessage } from "../../../util/privacy";
@@ -25,28 +26,17 @@ import styles from "../Mail.module.css";
 function Conversation() {
   const dispatch = useDispatch();
   const { getGun, getUser, getMails } = useGunContext();
-  const account = JSON.parse(sessionStorage.getItem("account"));
   const selectedMail = useSelector(selectOpenMail);
 
   const [messages, setMessages] = useState([]);
 
   useEffect(async () => {
     dispatch(resetEmailActions());
-    getAllMessages(getGun, getMails, getUser, account);
+    getAllMessages(getGun, getMails, getUser);
   }, []);
 
-  const getCurrentUserAlias = async (getUser) => {
-    let name;
-    await getUser()
-      .get("alias")
-      .once((alias) => {
-        name = alias;
-      });
-    return name;
-  };
-
-  const getAllMessages = async (getGun, getMails, getUser, account) => {
-    const alias = await getCurrentUserAlias(getUser);
+  const getAllMessages = async (getGun, getMails, getUser) => {
+    const alias = useSelector(selectUser)?.email;
     const conversationNode = getMails()
       .get(selectedMail.id.split("/")[1])
       .get("messages");

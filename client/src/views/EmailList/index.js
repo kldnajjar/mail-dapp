@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import "gun/sea";
 import "gun/lib/path.js";
 
@@ -12,7 +12,8 @@ import ChevronRightIcon from "@material-ui/icons/ChevronRight";
 import KeyboardHideIcon from "@material-ui/icons/KeyboardHide";
 import SettingsIcon from "@material-ui/icons/Settings";
 
-import { resetEmailActions } from "../../slices/mailSlice";
+import { resetEmailActions, selecteFolder } from "../../slices/mailSlice";
+import { selectUser } from "../../slices/userSlice";
 import useGunContext from "../../context/useGunContext";
 import { decryption } from "../../util/privacy";
 import EmailRow from "../EmailRow";
@@ -21,6 +22,8 @@ import styles from "./EmailList.module.css";
 
 function EmailList() {
   const dispatch = useDispatch();
+  const user = useSelector(selectUser);
+  const folderName = useSelector(selecteFolder);
   const [emails, setEmails] = useState([]);
   const { getGun, getUser } = useGunContext();
   const account = JSON.parse(sessionStorage.getItem("account"));
@@ -28,26 +31,16 @@ function EmailList() {
   useEffect(async () => {
     dispatch(resetEmailActions());
     await getAllEmails(getGun, getUser, account);
-  }, []);
-
-  const getCurrentUserAlias = async (getUser) => {
-    let name;
-    await getUser()
-      .get("alias")
-      .once((alias) => {
-        name = alias;
-      });
-    return name;
-  };
+  }, [folderName]);
 
   const getAllEmails = async (getGun, getUser, account) => {
-    const alias = await getCurrentUserAlias(getUser);
+    const alias = user.email;
     let emailsNum = 0;
     const inboxNode = getGun()
       .get("accounts")
       .get(alias)
       .get("folders")
-      .get("inbox");
+      .get(folderName);
     await inboxNode.once(async (data) => {
       delete data.label;
       emailsNum = Object.keys(data).slice(1).length;

@@ -1,15 +1,18 @@
 import React, { useState, useEffect } from "react";
+import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 
 import Input from "../../components/input";
 import useGunContext from "../../context/useGunContext";
 import useSessionChannel from "../../hooks/useSessionChannel";
+import { setUser } from "../../slices/userSlice";
 
 import styles from "./Signin.module.css";
 
 const SignIn = () => {
   let navigate = useNavigate();
+  const dispatch = useDispatch();
   const sessionChannel = useSessionChannel();
 
   const { getGun, getUser } = useGunContext();
@@ -49,8 +52,8 @@ const SignIn = () => {
       .get("accounts")
       .get(getUser().is.alias)
       .on((account) => {
-        console.log("User account", account);
         sessionStorage.setItem("account", JSON.stringify(account));
+        dispatch(setUser(account));
         pageRedirection("/account");
       });
   };

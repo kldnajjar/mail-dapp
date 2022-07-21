@@ -11,7 +11,7 @@ import NotificationsIcon from "@material-ui/icons/Notifications";
 import HelpOutlineIcon from "@material-ui/icons/HelpOutline";
 import ExitToAppIcon from "@material-ui/icons/ExitToApp";
 
-import { selectUser, logout } from "../../slices/userSlice";
+import { selectUser, resetUser } from "../../slices/userSlice";
 import useGunContext from "../../context/useGunContext";
 import useSessionChannel from "../../hooks/useSessionChannel";
 
@@ -42,7 +42,7 @@ function Header() {
       });
     }
 
-    dispatch(logout());
+    dispatch(resetUser());
     navigate("/");
   };
 
