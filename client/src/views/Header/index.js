@@ -11,7 +11,7 @@ import NotificationsIcon from "@material-ui/icons/Notifications";
 import HelpOutlineIcon from "@material-ui/icons/HelpOutline";
 import ExitToAppIcon from "@material-ui/icons/ExitToApp";
 
-import { selectUser, resetUser } from "../../slices/userSlice";
+import { selectCurrentUser, resetUser } from "../../slices/userSlice";
 import useGunContext from "../../context/useGunContext";
 import useSessionChannel from "../../hooks/useSessionChannel";
 
@@ -21,7 +21,7 @@ import styles from "./Header.module.css";
 function Header() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const user = useSelector(selectUser);
+  const user = useSelector(selectCurrentUser);
   const sessionChannel = useSessionChannel();
   const { getUser } = useGunContext();
 

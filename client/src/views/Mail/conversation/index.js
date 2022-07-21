@@ -16,8 +16,8 @@ import {
 } from "../../../slices/mailSlice";
 
 import { resetEmailActions, setMessage } from "../../../slices/mailSlice";
-import { selectUser } from "../../../slices/userSlice";
-
+import { selectCurrentUser } from "../../../slices/userSlice";
+import { getCurrentUserAlias } from "../../../util/user";
 import useGunContext from "../../../context/useGunContext";
 import { decryptionMessage } from "../../../util/privacy";
 
@@ -25,7 +25,7 @@ import styles from "../Mail.module.css";
 
 function Conversation() {
   const dispatch = useDispatch();
-  const user = useSelector(selectUser);
+  const user = useSelector(selectCurrentUser);
   const selectedMail = useSelector(selectOpenMail);
   const { getGun, getUser, getMails } = useGunContext();
 
@@ -37,11 +37,13 @@ function Conversation() {
   }, []);
 
   const getAllMessages = async (getGun, getMails, getUser) => {
-    const alias = user?.email;
+    const alias = await getCurrentUserAlias(user, getUser);
+
     console.log("id", selectedMail.id.split("/")[1]);
     const conversationNode = getMails()
       .get(selectedMail.id.split("/")[1])
       .get("messages");
+
     let emailsNum = 0;
     await conversationNode.once(async (data) => {
       emailsNum = Object.keys(data).filter((elem) => elem != "_").length;

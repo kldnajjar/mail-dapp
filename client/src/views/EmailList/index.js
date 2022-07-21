@@ -13,7 +13,8 @@ import KeyboardHideIcon from "@material-ui/icons/KeyboardHide";
 import SettingsIcon from "@material-ui/icons/Settings";
 
 import { resetEmailActions, selecteFolder } from "../../slices/mailSlice";
-import { selectUser } from "../../slices/userSlice";
+import { selectCurrentUser } from "../../slices/userSlice";
+import { getCurrentUserAlias } from "../../util/user";
 import useGunContext from "../../context/useGunContext";
 import { decryption } from "../../util/privacy";
 import EmailRow from "../EmailRow";
@@ -22,7 +23,7 @@ import styles from "./EmailList.module.css";
 
 function EmailList() {
   const dispatch = useDispatch();
-  const user = useSelector(selectUser);
+  const user = useSelector(selectCurrentUser);
   const folderName = useSelector(selecteFolder);
   const [emails, setEmails] = useState([]);
   const { getGun, getUser } = useGunContext();
@@ -34,7 +35,8 @@ function EmailList() {
   }, [folderName]);
 
   const getAllEmails = async (getGun, getUser, account) => {
-    const alias = user.email;
+    const alias = await getCurrentUserAlias(user, getUser);
+
     let emailsNum = 0;
     const inboxNode = getGun()
       .get("accounts")
