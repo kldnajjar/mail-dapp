@@ -1,12 +1,10 @@
 import React, { useState } from "react";
 import { useDispatch } from "react-redux";
-import { toast } from "react-toastify";
 import { v4 as uuid } from "uuid";
 
 import Input from "../../../components/input";
-import { closeSendMessage } from "../../../slices/mailSlice";
 import useGunContext from "../../../context/useGunContext";
-import { encryption } from "../../../util/privacy";
+import { createEmail } from "../logic/mail";
 
 import styles from "../Mail.module.css";
 
@@ -29,15 +27,19 @@ function Compose() {
       cc: emailCC,
       bcc: emailBCC,
       body,
+      conversationId: uuid(),
+      messageId: uuid(),
+      messageType: "",
     };
 
-    const conversationId = uuid();
-    const messageId = uuid();
+    const context = {
+      dispatch,
+      getGun,
+      getUser,
+      getMails,
+    };
 
-    const conversationObj = { id: conversationId };
-    const messageObj = { type: "reply", id: messageId };
-
-    createMails(emailObject, conversationId, messageId);
+    createEmail(emailObject, context);
   };
 
   const generateEmails = () => {
@@ -51,95 +53,20 @@ function Compose() {
         cc: "",
         bcc: "",
         body: `${body} ${i}`,
+        conversationId: uuid(),
+        messageId: uuid(),
+        messageType: "",
       };
-      createMails(emailObject);
+
+      const context = {
+        dispatch,
+        getGun,
+        getUser,
+        getMails,
+      };
+
+      createEmail(emailObject, context);
     }
-  };
-
-  const createMails = async (emailObject, conversationId, messageId) => {
-    const recipientsArray = emailObject.recipient.split(";");
-    let carbonCopyArray;
-    let blindCarbonCopyArray;
-
-    if (emailObject.cc.length) {
-      carbonCopyArray = emailObject.cc.split(";");
-    }
-
-    if (emailObject.bcc.length) {
-      blindCarbonCopyArray = emailObject.bcc.split(";");
-    }
-
-    const newRecipientArray = recipientsArray.concat(
-      carbonCopyArray,
-      blindCarbonCopyArray
-    );
-
-    const email = await encryption(
-      {
-        subject: emailObject.subject,
-        sender: emailObject.sender,
-        recipients: recipientsArray,
-        body: emailObject.body,
-        cc: carbonCopyArray,
-        bcc: blindCarbonCopyArray,
-      },
-      getGun,
-      getUser
-    );
-
-    // const recipientJsonObj = JSON.stringify(email?.recipient);
-    const jsonObj = JSON.stringify(email?.encryptedUsersKeys);
-    const carbonCopyJsonObj = JSON.stringify(carbonCopyArray);
-    const blindCarbonCopyJsonObj = JSON.stringify(blindCarbonCopyArray);
-
-    await getMails()
-      .get(conversationId)
-      .put({
-        id: conversationId,
-        subject: email?.encryptedSubject,
-        recentBody: email?.encryptedMessage,
-        keys: jsonObj,
-        sender: emailObject?.sender,
-        senderEpub: email?.senderEpub,
-        cc: typeof carbonCopyJsonObj === "undefined" ? "" : carbonCopyJsonObj,
-        bcc:
-          typeof blindCarbonCopyJsonObj === "undefined"
-            ? ""
-            : blindCarbonCopyJsonObj,
-      })
-      .get("messages")
-      .get(messageId)
-      .put({
-        id: messageId,
-        body: email?.encryptedMessage,
-        sender: emailObject?.sender,
-        recipients: emailObject?.recipient,
-        carbonCopy: emailObject?.cc,
-        blindCarbonCopy: emailObject?.bcc,
-        timestamp: Gun.state(),
-        type: "",
-      });
-
-    const conversation = getMails().get(conversationId);
-
-    getGun()
-      .get("accounts")
-      .get(emailObject.sender)
-      .get("folders")
-      .get("sent")
-      .set(conversation);
-
-    for (let i = 0; i < newRecipientArray.length; i++) {
-      getGun()
-        .get("accounts")
-        .get(newRecipientArray[i])
-        .get("folders")
-        .get("inbox")
-        .set(conversation);
-    }
-
-    dispatch(closeSendMessage());
-    toast.success("Email sent");
   };
 
   return (

@@ -57,5 +57,6 @@ module.exports = {
   devServer: {
     static: "./public",
     historyApiFallback: true,
+    // port: 9999,
   },
 };
