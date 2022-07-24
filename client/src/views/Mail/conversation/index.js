@@ -30,6 +30,7 @@ function Conversation() {
   const { getGun, getUser, getMails } = useGunContext();
 
   const [messages, setMessages] = useState([]);
+  const [syncing, setSyncing] = useState(false);
 
   useEffect(async () => {
     dispatch(resetEmailActions());
@@ -51,7 +52,11 @@ function Conversation() {
     //   subject = data.subject
     // })
     await conversationNode.once(async (data) => {
-      emailsNum = Object.keys(data).filter((elem) => elem != "_").length;
+      if (data) {
+        emailsNum = Object.keys(data).filter((elem) => elem != "_").length;
+      } else {
+        return setSyncing(true);
+      }
     });
     var startTime = performance.now();
     const array = [];
@@ -83,8 +88,16 @@ function Conversation() {
     });
   };
 
-  if (!messages.length) {
-    return null;
+  const renderEmptyRow = () => {
+    return (
+      <div className={`${styles["mail-subject"]}`}>
+        <h4>We still syncing data, please retry again</h4>
+      </div>
+    );
+  };
+
+  if (!messages.length && syncing) {
+    return <div className={styles["mail-body"]}>{renderEmptyRow()}</div>;
   }
 
   return messages.map((message, key) => {
