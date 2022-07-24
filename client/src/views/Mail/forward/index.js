@@ -62,7 +62,7 @@ function Forward() {
       getMails,
     };
 
-    createEmail(emailObject, context);
+    // createEmail(emailObject, context);
   };
 
   if (!currentUserEmail) return null;
