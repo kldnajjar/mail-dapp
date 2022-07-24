@@ -57,7 +57,6 @@ function Conversation() {
     const array = [];
     let counter = 0;
     await conversationNode.map().once(async (data) => {
-      console.log(data)
       const message = await decryptionMessage(
         data,
         getUser,
@@ -121,9 +120,10 @@ function Conversation() {
 
             <IconButton
               onClick={() => {
-                dispatch(setReplyToAll(true))
+                dispatch(setReplyToAll(true));
                 dispatch(setMessage(message));
-              }}>
+              }}
+            >
               <ReplyAllIcon />
             </IconButton>
 

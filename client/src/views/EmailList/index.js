@@ -51,13 +51,8 @@ function EmailList() {
     const array = [];
     let counter = 0;
     await inboxNode.map().once(async (data) => {
-      console.log(data);
       if (data !== "inbox") {
-        const conversation = await decryption(
-          data,
-          getUser,
-          alias
-        );
+        const conversation = await decryption(data, getUser, alias);
 
         array.push(conversation);
         counter++;

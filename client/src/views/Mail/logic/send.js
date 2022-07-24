@@ -4,7 +4,6 @@ import Gun from "gun/gun";
 
 const getMailEmails = (obj) => {
   const recipientsArray = obj.recipient.split(";");
-  console.log(recipientsArray)
 
   let carbonCopyArray = [];
   if (obj.cc?.length) {
@@ -16,7 +15,7 @@ const getMailEmails = (obj) => {
     blindCarbonCopyArray = obj.bcc.split(";");
   }
 
-  const newRecipientArray = recipientsArray.concat(
+  const allEmails = recipientsArray.concat(
     carbonCopyArray,
     blindCarbonCopyArray
   );
@@ -25,7 +24,7 @@ const getMailEmails = (obj) => {
     recipientsArray,
     carbonCopyArray,
     blindCarbonCopyArray,
-    newRecipientArray,
+    allEmails,
   };
 };
 
@@ -57,7 +56,6 @@ const handleConversationAndMessages = (
   messageObj.recipients = recipient || "";
   messageObj.timestamp = Gun.state();
 
-  console.log()
   if (messageObj.type === "reply") {
     return {
       conversationObj,
@@ -87,12 +85,12 @@ const createMessagesWithRelatedConversation = async (
   emailsArray
 ) => {
   const { sender } = emailObject;
-  const { newRecipientArray } = emailsArray;
+  const { allEmails } = emailsArray;
   const { conversationObj, messageObj } = mailObj;
   const { getGun, getMails, dispatch } = context;
 
   const conversation = getMails().get(conversationObj.id);
-  
+
   await getMails()
     .get(conversationObj.id)
     .put(conversationObj)
@@ -107,17 +105,16 @@ const createMessagesWithRelatedConversation = async (
     .get("sent")
     .set(conversation);
 
-
-    newRecipientArray.map(recipient=> {
-      if (recipient) {
-        getGun()
-          .get("accounts")
-          .get(recipient)
-          .get("folders")
-          .get("inbox")
-          .set(conversation);
-      }
-    });
+  allEmails.map((recipient) => {
+    if (recipient) {
+      getGun()
+        .get("accounts")
+        .get(recipient)
+        .get("folders")
+        .get("inbox")
+        .set(conversation);
+    }
+  });
 
   dispatch(closeSendMessage());
   toast.success("Email sent");

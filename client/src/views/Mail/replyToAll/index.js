@@ -27,9 +27,6 @@ function ReplyToAll() {
     setFrom(alias);
   }, []);
 
-  console.log("recipients", messageToReply.recipients);
-  console.log("cc", messageToReply.cc);
-
   const replyToAll = async () => {
     const context = {
       dispatch,

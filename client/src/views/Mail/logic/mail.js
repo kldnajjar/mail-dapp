@@ -4,13 +4,16 @@ import {
   handleConversationAndMessages,
   createMessagesWithRelatedConversation,
 } from "./send";
+import { isValidEmail } from "./validation";
 
 export const createEmail = async (emailObject, context) => {
   const { getGun, getUser } = context;
   const isReply = emailObject.messageType === "reply" ? true : false;
 
   const emailsArray = getMailEmails(emailObject);
-  console.log("emailsArray", emailsArray)
+  const isValid = isValidEmail(emailsArray);
+
+  if (!isValid) return;
 
   const obj = {
     subject: emailObject.subject,
@@ -27,8 +30,6 @@ export const createEmail = async (emailObject, context) => {
     emailEncrypted,
     emailsArray
   );
-
-  console.log("msgObj", msgObj)
 
   createMessagesWithRelatedConversation(
     context,
