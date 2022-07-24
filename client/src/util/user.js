@@ -16,4 +16,12 @@ const getCurrentUserAlias = async (user, getUser) => {
   return alias;
 };
 
-export { getCurrentUserAlias };
+const getCurrentUser = (user) => {
+  let current_user = user;
+  if (!current_user) {
+    current_user = JSON.parse(sessionStorage.getItem("account"));
+  }
+  return current_user;
+};
+
+export { getCurrentUserAlias, getCurrentUser };

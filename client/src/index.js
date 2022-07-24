@@ -10,6 +10,7 @@ import App from "./App";
 import "broadcastchannel-polyfill";
 import "bootstrap/dist/css/bootstrap.css";
 import "react-toastify/dist/ReactToastify.css";
+import "reactjs-popup/dist/index.css";
 import "./styles/general.css";
 
 ReactDOM.render(

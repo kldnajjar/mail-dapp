@@ -1,4 +1,5 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
+import Popup from "reactjs-popup";
 import { useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 
@@ -12,6 +13,7 @@ import HelpOutlineIcon from "@material-ui/icons/HelpOutline";
 import ExitToAppIcon from "@material-ui/icons/ExitToApp";
 
 import { selectCurrentUser, resetUser } from "../../slices/userSlice";
+import { getCurrentUser } from "../../util/user";
 import useGunContext from "../../context/useGunContext";
 import useSessionChannel from "../../hooks/useSessionChannel";
 
@@ -25,13 +27,20 @@ function Header() {
   const sessionChannel = useSessionChannel();
   const { getUser } = useGunContext();
 
+  const [currentUser, setCurrentUser] = useState(null);
+
+  useEffect(async () => {
+    const current_user = await getCurrentUser(user);
+    setCurrentUser(current_user);
+  }, []);
+
   const signOut = (evt) => {
     sessionStorage.removeItem("account");
 
-    const current_user = getUser();
-    current_user.leave();
+    const current_gun_user = getUser();
+    current_gun_user.leave();
 
-    if (current_user._.sea) {
+    if (current_gun_user._.sea) {
       window.sessionStorage.removeItem("pair");
     }
 
@@ -45,6 +54,8 @@ function Header() {
     dispatch(resetUser());
     navigate("/");
   };
+
+  if (!currentUser) return null;
 
   return (
     <div className={styles.header}>
@@ -60,9 +71,6 @@ function Header() {
         <ArrowDropDownIcon className={styles["header-inputCaret"]} />
       </div>
       <div className={styles["header-right"]}>
-        <IconButton onClick={signOut}>
-          <ExitToAppIcon />
-        </IconButton>
         <IconButton>
           <HelpOutlineIcon />
         </IconButton>
@@ -72,7 +80,26 @@ function Header() {
         <IconButton>
           <AppsIcon />
         </IconButton>
-        <Avatar onClick={signOut} src={user?.photoUrl} />
+
+        <Popup
+          trigger={<Avatar src={currentUser?.photoUrl} className="pointer" />}
+          position="bottom right"
+          className="pointer"
+        >
+          <div className={styles["popup-container"]}>
+            <div className="top-content">
+              <Avatar src={currentUser?.photoUrl} className="margin-auto" />
+              <b>{`${currentUser.firstName} ${currentUser.lastName}`}</b>
+              <p>{currentUser.email}</p>
+            </div>
+            <hr />
+            <div className="bottom-content">
+              <button className="btn btn-primary" onClick={signOut}>
+                Logout
+              </button>
+            </div>
+          </div>
+        </Popup>
       </div>
     </div>
   );
