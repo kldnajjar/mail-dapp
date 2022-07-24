@@ -4,7 +4,10 @@ import { v4 as uuid } from "uuid";
 
 import Input from "../../../components/input";
 import useGunContext from "../../../context/useGunContext";
-import { selectOpenMail, selectedMessageForward } from "../../../slices/mailSlice";
+import {
+  selectOpenMail,
+  selectedMessageForward,
+} from "../../../slices/mailSlice";
 import { selectCurrentUser } from "../../../slices/userSlice";
 import { getCurrentUserAlias } from "../../../util/user";
 import { createEmail } from "../logic/mail";
@@ -28,7 +31,7 @@ function Forward() {
   useEffect(() => {
     let message = `\n\n\n---------- Forwarded message ---------\n${selectedMail.subject}\n\n\n`;
     for (let i = 0; i < selectedMailToForward.length; i++) {
-      message += `${selectedMailToForward[i].body}\n\n`
+      message += `${selectedMailToForward[i].body}\n\n`;
     }
     setBody(message);
     // setSubject(selectedMail.subject);
@@ -52,8 +55,8 @@ function Forward() {
       messageType: "forward",
     };
 
-    console.log("emailObject", emailObject)
-    console.log("MessegeToForward", selectedMailToForward)
+    console.log("emailObject", emailObject);
+    console.log("MessegeToForward", selectedMailToForward);
 
     const context = {
       dispatch,

@@ -78,22 +78,22 @@ function Conversation() {
         array.sort((a, b) => {
           return a.timestamp - b.timestamp;
         });
-        console.log(array)
-
         setMessages([...array]);
       }
     });
   };
 
   const getMessagesToForward = (message) => {
-    const messageArray = []
-    messages.forEach(msg => {
-      if (msg.timestamp <= message.timestamp) { messageArray.push(msg) }
+    const messageArray = [];
+    messages.forEach((msg) => {
+      if (msg.timestamp <= message.timestamp) {
+        messageArray.push(msg);
+      }
     });
     return messageArray.sort((a, b) => {
       return b.timestamp - a.timestamp;
     });
-  }
+  };
 
   const renderEmptyRow = () => {
     return (
@@ -156,7 +156,7 @@ function Conversation() {
             <IconButton
               onClick={() => {
                 dispatch(setForward(true));
-                const messageArray = getMessagesToForward(message)
+                const messageArray = getMessagesToForward(message);
                 dispatch(setForwardMessage(messageArray));
               }}
             >
