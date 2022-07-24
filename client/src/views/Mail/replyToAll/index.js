@@ -57,7 +57,6 @@ function ReplyToAll() {
         };
   
         createEmail(emailObject, context);
-        // createMails(emailObject);
         return
       }
     });
@@ -73,96 +72,7 @@ function ReplyToAll() {
     };
     console.log("emailObject", emailObject)
     createEmail(emailObject, context);
-    // createMails(emailObject);
   };
-
-  const createMails = async (emailObject) => {
-    const recipientsArray = emailObject?.recipient.split(";");
-    for (let i = 0; i < recipientsArray.length; i++) {
-      if (recipientsArray[i] === account.email) {
-        recipientsArray.splice(i, 1)
-      }
-    }
-    let carbonCopyArray;
-
-    console.log(emailObject.cc)
-
-    if (emailObject.cc) {
-      carbonCopyArray = emailObject.cc.split(";");
-    }
-
-    const newRecipientArray = recipientsArray.concat(
-      carbonCopyArray
-    );
-
-    const email = await encryption(
-      {
-        subject: emailObject.subject,
-        sender: emailObject.sender,
-        recipients: recipientsArray,
-        body: emailObject.body,
-        cc: carbonCopyArray,
-      },
-      getGun,
-      getUser
-    );
-
-    const conversationId = selectedMail.id.split("/")[1];
-    const messageId = uuid();
-
-    await getGun()
-      .get("conversations")
-      .get(conversationId)
-      .put({
-        recentBody: email?.encryptedMessage,
-      })
-      .get("messages")
-      .get(messageId)
-      .put({
-        id: messageId,
-        body: email?.encryptedMessage,
-        sender: emailObject?.sender,
-        recipients: emailObject?.recipient,
-        carbonCopy: emailObject?.cc,
-        blindCarbonCopy: emailObject?.bcc,
-        type: "replyToAll",
-        timestamp: Gun.state(),
-      });
-
-    const conversation = getMails().get(conversationId);
-
-    getGun()
-      .get("accounts")
-      .get(emailObject?.sender)
-      .get("folders")
-      .get("sent")
-      .set(conversation);
-
-      console.log(newRecipientArray)
-      for (let i = 0; i < newRecipientArray.length; i++) {
-        if (newRecipientArray[i]) {
-          getGun()
-            .get("accounts")
-            .get(newRecipientArray[i])
-            .get("folders")
-            .get("inbox")
-            .set(conversation);
-        }
-      }
-
-    dispatch(closeSendMessage());
-    toast.success("Email sent");
-  };
-
-  const getCurrentAlias = async (getUser) => {
-    let user
-    await getUser()
-      .get("alias")
-      .once((data) => {
-        user = data
-      })
-    return user
-  }
 
   return (
     <div className={styles["mail-body"]}>

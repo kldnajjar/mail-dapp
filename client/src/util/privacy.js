@@ -34,11 +34,6 @@ export async function encryption(email, getGun, getUser, isReply) {
     encryptionKey,
     senderPair
   );
-<<<<<<< Updated upstream
-=======
-  console.log(email)
-
->>>>>>> Stashed changes
   if (email?.cc) {
     await getRecipientKeys(
       encryptedKeysCarbonCopy,
@@ -63,11 +58,6 @@ export async function encryption(email, getGun, getUser, isReply) {
     encryptedKeysCarbonCopy,
     encryptedKeysBlindCarbonCopy,
   };
-<<<<<<< Updated upstream
-=======
-  
-  console.log("encryptedUsersKeys", encryptedUsersKeys)
->>>>>>> Stashed changes
 
   return {
     encryptedSubject,
