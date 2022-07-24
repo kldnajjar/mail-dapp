@@ -22,7 +22,7 @@ function ReplyToAll() {
 
   useEffect(async () => {
     // setBody(`\n\n\n${selectedMail.body}`);
-    // setSubject(`fwd: ${selectedMail.subject}`);
+    // setSubject(selectedMail.subject);
     const alias = await getCurrentUserAlias(user, getUser);
     setFrom(alias);
   }, []);
@@ -60,7 +60,7 @@ function ReplyToAll() {
   };
 
   const handleRecipientEmails = (context) => {
-    const recipient = `${messageToReply.recipients};${messageToReply.sender};`;
+    const recipient = `${messageToReply.sender}`;
     const emailObject = {
       recipient,
       body,
