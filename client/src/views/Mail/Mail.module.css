@@ -56,9 +56,6 @@
 }
 
 .mail-time {
-  position: absolute;
-  top: 24px;
-  right: 0;
   font-size: 12px;
   color: grey;
 }

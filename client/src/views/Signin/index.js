@@ -51,7 +51,7 @@ const SignIn = () => {
     getGun()
       .get("accounts")
       .get(getUser().is.alias)
-      .on((account) => {
+      .once((account) => {
         sessionStorage.setItem("account", JSON.stringify(account));
         dispatch(setUser(account));
         pageRedirection("/account");

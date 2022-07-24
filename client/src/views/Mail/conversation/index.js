@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
+import moment from "moment";
 import "gun/sea";
 import "gun/lib/path.js";
 
@@ -44,13 +45,7 @@ function Conversation() {
       .get(selectedMail.id.split("/")[1])
       .get("messages");
 
-    // const conversationProps = getMails()
-    //   .get(selectedMail.id.split("/")[1])
-
     let emailsNum = 0;
-    // await conversationProps.once(async (data) => {
-    //   subject = data.subject
-    // })
     await conversationNode.once(async (data) => {
       if (data) {
         emailsNum = Object.keys(data).filter((elem) => elem != "_").length;
@@ -119,6 +114,10 @@ function Conversation() {
                   cc: <b>{`<${message.cc}>`}</b>
                 </h6>
               )}
+              <p className={styles["mail-time"]}>
+                {message.timestamp &&
+                  moment(message.timestamp).format("MMMM Do YYYY, h:mm:ss a")}
+              </p>
             </div>
 
             {/* <LabelImportantIcon className={styles["mail-important"]} /> */}
@@ -146,7 +145,6 @@ function Conversation() {
               <ForwardIcon />
             </IconButton>
           </div>
-          {/* <p className={styles["mail-time"]}>{selectedMail.time}</p> */}
         </div>
 
         <div className={styles["mail-message"]}>

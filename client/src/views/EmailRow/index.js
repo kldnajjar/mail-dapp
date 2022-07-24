@@ -10,17 +10,11 @@ import { selectMail, openSendMessage } from "../../slices/mailSlice";
 
 import styles from "./EmailRow.module.css";
 
-function EmailRow({
-  subject,
-  sender,
-  recipient,
-  body,
-  id,
-  senderEpub,
-  keys,
-  time,
-}) {
+function EmailRow(props) {
   const dispatch = useDispatch();
+  const { subject, sender, recipient, body, id, senderEpub, keys, time } =
+    props;
+
   const openMail = () => {
     dispatch(
       selectMail({
