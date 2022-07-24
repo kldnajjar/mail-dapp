@@ -15,11 +15,11 @@ const Account = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const sendMessageIsOpen = useSelector(selectSendMessageIsOpen);
-  const account = JSON.parse(sessionStorage.getItem("account"));
+  const user = JSON.parse(sessionStorage.getItem("account"));
 
   useEffect(() => {
-    if (account) {
-      dispatch(setUser(account));
+    if (user) {
+      dispatch(setUser(user));
     } else {
       return navigate("/sign-in");
     }
@@ -37,7 +37,7 @@ const Account = () => {
     );
   };
 
-  return <>{account ? renderAccount() : null}</>;
+  return <>{user ? renderAccount() : null}</>;
 };
 
 export default Account;

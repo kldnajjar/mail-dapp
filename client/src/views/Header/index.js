@@ -10,7 +10,6 @@ import ArrowDropDownIcon from "@material-ui/icons/ArrowDropDown";
 import AppsIcon from "@material-ui/icons/Apps";
 import NotificationsIcon from "@material-ui/icons/Notifications";
 import HelpOutlineIcon from "@material-ui/icons/HelpOutline";
-import ExitToAppIcon from "@material-ui/icons/ExitToApp";
 
 import { selectCurrentUser, resetUser } from "../../slices/userSlice";
 import { getCurrentUser } from "../../util/user";

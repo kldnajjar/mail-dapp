@@ -1,28 +1,36 @@
-import React, { useState } from "react";
-import { useDispatch } from "react-redux";
+import React, { useState, useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { v4 as uuid } from "uuid";
 
 import Input from "../../../components/input";
 import useGunContext from "../../../context/useGunContext";
 import { createEmail } from "../logic/mail";
+import { selectCurrentUser } from "../../../slices/userSlice";
+import { getCurrentUserAlias } from "../../../util/user";
 
 import styles from "../Mail.module.css";
 
 function Compose() {
-  const account = JSON.parse(sessionStorage.getItem("account"));
   const dispatch = useDispatch();
+  const user = useSelector(selectCurrentUser);
   const { getGun, getUser, getMails } = useGunContext();
 
+  const [currentUserEmail, setCurrentUserEmail] = useState(null);
   const [recipient, setRecipient] = useState("");
   const [emailCC, setEmailCC] = useState("");
   const [emailBCC, setEmailBCC] = useState("");
   const [subject, setSubject] = useState("");
   const [body, setBody] = useState("");
 
+  useEffect(async () => {
+    const current_user_email = await getCurrentUserAlias(user, getUser);
+    setCurrentUserEmail(current_user_email);
+  }, []);
+
   const sendEmail = () => {
     const emailObject = {
       subject,
-      sender: account.email,
+      sender: currentUserEmail,
       recipient,
       cc: emailCC,
       bcc: emailBCC,
@@ -48,7 +56,7 @@ function Compose() {
     for (let i = 0; i < 100; i++) {
       const emailObject = {
         subject: `${subject} ${i}`,
-        sender: account.email,
+        sender: currentUserEmail,
         recipient: "tsar@mykloud.io",
         cc: "",
         bcc: "",
@@ -69,13 +77,15 @@ function Compose() {
     }
   };
 
+  if (!currentUserEmail) return null;
+
   return (
     <div className={styles["mail-body"]}>
       <div className={`${styles["edit-mail-header"]}`}>
         <div className="form-group mb-3">
           <label>From</label>
           <div className="mb-3">
-            <b>{account.email}</b>
+            <b>{currentUserEmail}</b>
           </div>
         </div>
         <Input

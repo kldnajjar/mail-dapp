@@ -16,13 +16,13 @@ const SignIn = () => {
   const sessionChannel = useSessionChannel();
 
   const { getGun, getUser } = useGunContext();
-  const account = JSON.parse(sessionStorage.getItem("account"));
+  const user = JSON.parse(sessionStorage.getItem("account"));
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
   useEffect(() => {
-    if (account) {
+    if (user) {
       pageRedirection("/account");
     }
   }, []);
@@ -51,9 +51,9 @@ const SignIn = () => {
     getGun()
       .get("accounts")
       .get(getUser().is.alias)
-      .once((account) => {
-        sessionStorage.setItem("account", JSON.stringify(account));
-        dispatch(setUser(account));
+      .once((user) => {
+        sessionStorage.setItem("account", JSON.stringify(user));
+        dispatch(setUser(user));
         pageRedirection("/account");
       });
   };

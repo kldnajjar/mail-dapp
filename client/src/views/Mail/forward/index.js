@@ -3,17 +3,20 @@ import { useDispatch, useSelector } from "react-redux";
 import { v4 as uuid } from "uuid";
 
 import Input from "../../../components/input";
-import { selectOpenMail } from "../../../slices/mailSlice";
 import useGunContext from "../../../context/useGunContext";
+import { selectOpenMail } from "../../../slices/mailSlice";
+import { selectCurrentUser } from "../../../slices/userSlice";
+import { getCurrentUserAlias } from "../../../util/user";
 
 import styles from "../Mail.module.css";
 
 function Forward() {
   const dispatch = useDispatch();
   const { getGun, getUser, getMails } = useGunContext();
-  const account = JSON.parse(sessionStorage.getItem("account"));
   const selectedMail = useSelector(selectOpenMail);
+  const user = useSelector(selectCurrentUser);
 
+  const [currentUserEmail, setCurrentUserEmail] = useState(null);
   const [recipient, setRecipient] = useState("");
   const [emailCC, setEmailCC] = useState("");
   const [emailBCC, setEmailBCC] = useState("");
@@ -25,10 +28,15 @@ function Forward() {
     setSubject(`fwd: ${selectedMail.subject}`);
   }, []);
 
+  useEffect(async () => {
+    const current_user_email = await getCurrentUserAlias(user, getUser);
+    setCurrentUserEmail(current_user_email);
+  }, []);
+
   const sendEmail = () => {
     const emailObject = {
       subject,
-      sender: account.email,
+      sender: currentUserEmail,
       recipient,
       cc: emailCC,
       bcc: emailBCC,
@@ -48,13 +56,15 @@ function Forward() {
     createEmail(emailObject, context);
   };
 
+  if (!currentUserEmail) return null;
+
   return (
     <div className={styles["mail-body"]}>
       <div className={`${styles["edit-mail-header"]}`}>
         <div className="form-group mb-3">
           <label>From</label>
           <div className="mb-3">
-            <b>{account.email}</b>
+            <b>{currentUserEmail}</b>
           </div>
         </div>
         <Input
