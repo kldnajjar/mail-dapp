@@ -156,17 +156,7 @@ function Conversation() {
             <IconButton
               onClick={() => {
                 dispatch(setForward(true));
-<<<<<<< Updated upstream
                 const messageArray = getMessagesToForward(message)
-=======
-                const messageArray = []
-                messages.forEach(msg => {
-                  if (msg.timestamp <= message.timestamp) { messageArray.push(msg) }
-                });
-                messageArray.sort((a, b) => {
-                  return b.timestamp - a.timestamp;
-                });
->>>>>>> Stashed changes
                 dispatch(setForwardMessage(messageArray));
               }}
             >
