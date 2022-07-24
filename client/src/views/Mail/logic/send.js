@@ -34,6 +34,7 @@ const handleConversationAndMessages = (
 ) => {
   const { conversationId, messageId, messageType, sender, recipient, cc, bcc } =
     emailObject;
+  let updatedRecipient = recipient
   const { encryptedUsersKeys, encryptedMessage, encryptedSubject, senderEpub } =
     emailEncrypted;
   const { carbonCopyArray, blindCarbonCopyArray } = emailsArray;
@@ -44,6 +45,8 @@ const handleConversationAndMessages = (
 
   const conversationObj = {};
   const messageObj = {};
+
+  if (recipient.includes(";")) { updatedRecipient = recipient.replace(";", "") }
 
   conversationObj.id = conversationId;
   conversationObj.recentBody = encryptedMessage || "";

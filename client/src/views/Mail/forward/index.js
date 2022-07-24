@@ -4,9 +4,10 @@ import { v4 as uuid } from "uuid";
 
 import Input from "../../../components/input";
 import useGunContext from "../../../context/useGunContext";
-import { selectOpenMail } from "../../../slices/mailSlice";
+import { selectOpenMail, selectedMessageForward } from "../../../slices/mailSlice";
 import { selectCurrentUser } from "../../../slices/userSlice";
 import { getCurrentUserAlias } from "../../../util/user";
+import { createEmail } from "../logic/mail";
 
 import styles from "../Mail.module.css";
 
@@ -15,6 +16,7 @@ function Forward() {
   const { getGun, getUser, getMails } = useGunContext();
   const selectedMail = useSelector(selectOpenMail);
   const user = useSelector(selectCurrentUser);
+  const selectedMailToForward = useSelector(selectedMessageForward);
 
   const [currentUserEmail, setCurrentUserEmail] = useState(null);
   const [recipient, setRecipient] = useState("");
@@ -24,8 +26,12 @@ function Forward() {
   const [body, setBody] = useState("");
 
   useEffect(() => {
-    setBody(`\n\n\n${selectedMail.body}`);
-    setSubject(`fwd: ${selectedMail.subject}`);
+    let message = `\n\n\n---------- Forwarded message ---------\n${selectedMail.subject}\n\n\n`;
+    for (let i = 0; i < selectedMailToForward.length; i++) {
+      message += `${selectedMailToForward[i].body}\n\n`
+    }
+    setBody(message);
+    // setSubject(selectedMail.subject);
   }, []);
 
   useEffect(async () => {
@@ -43,8 +49,11 @@ function Forward() {
       body,
       conversationId: uuid(),
       messageId: uuid(),
-      messageType: "",
+      messageType: "forward",
     };
+
+    console.log("emailObject", emailObject)
+    console.log("MessegeToForward", selectedMailToForward)
 
     const context = {
       dispatch,
@@ -53,7 +62,7 @@ function Forward() {
       getMails,
     };
 
-    createEmail(emailObject, context);
+    // createEmail(emailObject, context);
   };
 
   if (!currentUserEmail) return null;
@@ -88,13 +97,13 @@ function Forward() {
           value={emailBCC}
           onChange={(event) => setEmailBCC(event.target.value)}
         />
-        <Input
+        {/* <Input
           type="text"
           label="Subject"
           placeholder="Subject"
           value={subject}
           onChange={(event) => setSubject(event.target.value)}
-        />
+        /> */}
       </div>
 
       <div className={styles["mail-message"]}>

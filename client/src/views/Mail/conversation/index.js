@@ -14,6 +14,7 @@ import {
   setReply,
   setReplyToAll,
   setForward,
+  setForwardMessage,
 } from "../../../slices/mailSlice";
 
 import { resetEmailActions, setMessage } from "../../../slices/mailSlice";
@@ -77,11 +78,22 @@ function Conversation() {
         array.sort((a, b) => {
           return a.timestamp - b.timestamp;
         });
+        console.log(array)
 
         setMessages([...array]);
       }
     });
   };
+
+  const getMessagesToForward = (message) => {
+    const messageArray = []
+    messages.forEach(msg => {
+      if (msg.timestamp <= message.timestamp) { messageArray.push(msg) }
+    });
+    return messageArray.sort((a, b) => {
+      return b.timestamp - a.timestamp;
+    });
+  }
 
   const renderEmptyRow = () => {
     return (
@@ -141,7 +153,13 @@ function Conversation() {
               <ReplyAllIcon />
             </IconButton>
 
-            <IconButton onClick={() => dispatch(setForward(true))}>
+            <IconButton
+              onClick={() => {
+                dispatch(setForward(true));
+                const messageArray = getMessagesToForward(message)
+                dispatch(setForwardMessage(messageArray));
+              }}
+            >
               <ForwardIcon />
             </IconButton>
           </div>
