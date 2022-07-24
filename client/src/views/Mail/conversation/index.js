@@ -114,9 +114,11 @@ function Conversation() {
               <h6>
                 To: <b>{`<${message.recipients}>`}</b>
               </h6>
-              <h6>
-                cc: <b>{`<${message.cc}>`}</b>
-              </h6>
+              {message.cc && (
+                <h6>
+                  cc: <b>{`<${message.cc}>`}</b>
+                </h6>
+              )}
             </div>
 
             {/* <LabelImportantIcon className={styles["mail-important"]} /> */}
