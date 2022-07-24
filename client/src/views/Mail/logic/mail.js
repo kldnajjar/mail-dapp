@@ -10,6 +10,7 @@ export const createEmail = async (emailObject, context) => {
   const isReply = emailObject.messageType === "reply" ? true : false;
 
   const emailsArray = getMailEmails(emailObject);
+  console.log("emailsArray", emailsArray)
 
   const obj = {
     subject: emailObject.subject,
@@ -26,6 +27,8 @@ export const createEmail = async (emailObject, context) => {
     emailEncrypted,
     emailsArray
   );
+
+  console.log("msgObj", msgObj)
 
   createMessagesWithRelatedConversation(
     context,

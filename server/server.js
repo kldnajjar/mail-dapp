@@ -8,7 +8,7 @@ let Gun = require("gun");
 require("dotenv").config();
 
 const app = express();
-const port = process.env.PORT || 8765;
+const port = process.env.PORT || 9765;
 
 app.use(Gun.serve);
 
@@ -16,7 +16,7 @@ const server = app.listen(port, () => {
   console.log(`App listening at http://localhost:${port}`);
 });
 
-const gun = Gun({
+Gun({
   web: server,
   // peers: [
   //   "https://mykmail-server-usa.herokuapp.com/gun",

@@ -55,9 +55,8 @@ function EmailList() {
       if (data !== "inbox") {
         const conversation = await decryption(
           data,
-          getGun,
           getUser,
-          account.email
+          alias
         );
 
         array.push(conversation);

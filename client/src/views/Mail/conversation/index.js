@@ -43,7 +43,13 @@ function Conversation() {
       .get(selectedMail.id.split("/")[1])
       .get("messages");
 
+    // const conversationProps = getMails()
+    //   .get(selectedMail.id.split("/")[1])
+
     let emailsNum = 0;
+    // await conversationProps.once(async (data) => {
+    //   subject = data.subject
+    // })
     await conversationNode.once(async (data) => {
       emailsNum = Object.keys(data).filter((elem) => elem != "_").length;
     });
@@ -51,9 +57,9 @@ function Conversation() {
     const array = [];
     let counter = 0;
     await conversationNode.map().once(async (data) => {
+      console.log(data)
       const message = await decryptionMessage(
         data,
-        getGun,
         getUser,
         alias,
         selectedMail?.keys,
@@ -93,6 +99,12 @@ function Conversation() {
               <h6>
                 From: <b>{`<${message.sender}>`}</b>
               </h6>
+              <h6>
+                To: <b>{`<${message.recipients}>`}</b>
+              </h6>
+              <h6>
+                cc: <b>{`<${message.cc}>`}</b>
+              </h6>
             </div>
 
             {/* <LabelImportantIcon className={styles["mail-important"]} /> */}
@@ -107,7 +119,11 @@ function Conversation() {
               <ReplyIcon />
             </IconButton>
 
-            <IconButton onClick={() => dispatch(setReplyToAll(true))}>
+            <IconButton
+              onClick={() => {
+                dispatch(setReplyToAll(true))
+                dispatch(setMessage(message));
+              }}>
               <ReplyAllIcon />
             </IconButton>
 

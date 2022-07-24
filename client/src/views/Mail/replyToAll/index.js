@@ -4,9 +4,10 @@ import { toast } from "react-toastify";
 import Gun from "gun/gun";
 import { v4 as uuid } from "uuid";
 
-import { closeSendMessage, selectOpenMail } from "../../../slices/mailSlice";
+import { closeSendMessage, selectOpenMail, selectedMessage } from "../../../slices/mailSlice";
 import useGunContext from "../../../context/useGunContext";
 import { encryption } from "../../../util/privacy";
+import { createEmail } from "../logic/mail";
 
 import styles from "../Mail.module.css";
 
@@ -15,6 +16,7 @@ function ReplyToAll() {
   const account = JSON.parse(sessionStorage.getItem("account"));
   const { getGun, getUser, getMails } = useGunContext();
   const selectedMail = useSelector(selectOpenMail);
+  const messageToReply = useSelector(selectedMessage);
 
   const [recipient, setRecipient] = useState("");
   const [emailCC, setEmailCC] = useState("");
@@ -27,26 +29,79 @@ function ReplyToAll() {
     // setSubject(`fwd: ${selectedMail.subject}`);
   }, []);
 
-  const replyToAll = () => {
-    const recipient = selectedMail.sender;
+  console.log("recipients", messageToReply.recipients)
+  console.log("cc", messageToReply.cc)
 
+  const replyToAll = async () => {
+    const context = {
+      dispatch,
+      getGun,
+      getUser,
+      getMails,
+    };
+    // const myAlias = await getCurrentAlias(getUser)
+    const ccArray = messageToReply.cc.split(";")
+    ccArray.forEach(email => {
+      if (email === account.email) {
+        console.log("recipient", messageToReply.sender)
+        console.log("cc", messageToReply.recipients)
+        const recipient = `${messageToReply.sender};`
+        const emailObject = {
+          sender: account.email,
+          recipient,
+          body,
+          cc: messageToReply.recipients,
+          conversationId: selectedMail.id.split("/")[1],
+          messageId: uuid(),
+          messageType: "replyToAll",
+        };
+  
+        createEmail(emailObject, context);
+        // createMails(emailObject);
+        return
+      }
+    });
+    const recipient = `${messageToReply.recipients};${messageToReply.sender};`;
     const emailObject = {
       sender: account.email,
       recipient,
       body,
+      cc: messageToReply.cc,
+      conversationId: selectedMail.id.split("/")[1],
+      messageId: uuid(),
+      messageType: "replyToAll",
     };
-    createMails(emailObject);
+    console.log("emailObject", emailObject)
+    createEmail(emailObject, context);
+    // createMails(emailObject);
   };
 
   const createMails = async (emailObject) => {
-    const recipientArray = [emailObject?.recipient];
+    const recipientsArray = emailObject?.recipient.split(";");
+    for (let i = 0; i < recipientsArray.length; i++) {
+      if (recipientsArray[i] === account.email) {
+        recipientsArray.splice(i, 1)
+      }
+    }
+    let carbonCopyArray;
+
+    console.log(emailObject.cc)
+
+    if (emailObject.cc) {
+      carbonCopyArray = emailObject.cc.split(";");
+    }
+
+    const newRecipientArray = recipientsArray.concat(
+      carbonCopyArray
+    );
 
     const email = await encryption(
       {
         subject: emailObject.subject,
         sender: emailObject.sender,
-        recipients: recipientArray,
+        recipients: recipientsArray,
         body: emailObject.body,
+        cc: carbonCopyArray,
       },
       getGun,
       getUser
@@ -55,7 +110,8 @@ function ReplyToAll() {
     const conversationId = selectedMail.id.split("/")[1];
     const messageId = uuid();
 
-    await getMails()
+    await getGun()
+      .get("conversations")
       .get(conversationId)
       .put({
         recentBody: email?.encryptedMessage,
@@ -67,9 +123,9 @@ function ReplyToAll() {
         body: email?.encryptedMessage,
         sender: emailObject?.sender,
         recipients: emailObject?.recipient,
-        carbonCopy: "",
-        blindCarbonCopy: "",
-        type: "reply",
+        carbonCopy: emailObject?.cc,
+        blindCarbonCopy: emailObject?.bcc,
+        type: "replyToAll",
         timestamp: Gun.state(),
       });
 
@@ -82,16 +138,31 @@ function ReplyToAll() {
       .get("sent")
       .set(conversation);
 
-    getGun()
-      .get("accounts")
-      .get(emailObject?.recipient)
-      .get("folders")
-      .get("inbox")
-      .set(conversation);
+      console.log(newRecipientArray)
+      for (let i = 0; i < newRecipientArray.length; i++) {
+        if (newRecipientArray[i]) {
+          getGun()
+            .get("accounts")
+            .get(newRecipientArray[i])
+            .get("folders")
+            .get("inbox")
+            .set(conversation);
+        }
+      }
 
     dispatch(closeSendMessage());
     toast.success("Email sent");
   };
+
+  const getCurrentAlias = async (getUser) => {
+    let user
+    await getUser()
+      .get("alias")
+      .once((data) => {
+        user = data
+      })
+    return user
+  }
 
   return (
     <div className={styles["mail-body"]}>

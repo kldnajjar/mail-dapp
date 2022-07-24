@@ -34,6 +34,11 @@ export async function encryption(email, getGun, getUser, isReply) {
     encryptionKey,
     senderPair
   );
+<<<<<<< Updated upstream
+=======
+  console.log(email)
+
+>>>>>>> Stashed changes
   if (email?.cc) {
     await getRecipientKeys(
       encryptedKeysCarbonCopy,
@@ -58,6 +63,11 @@ export async function encryption(email, getGun, getUser, isReply) {
     encryptedKeysCarbonCopy,
     encryptedKeysBlindCarbonCopy,
   };
+<<<<<<< Updated upstream
+=======
+  
+  console.log("encryptedUsersKeys", encryptedUsersKeys)
+>>>>>>> Stashed changes
 
   return {
     encryptedSubject,
@@ -76,8 +86,10 @@ async function getRecipientKeys(
   senderPair
 ) {
   const recipientEpubObj = await getRecipientEpub(recipients, getGun);
-
+  console.log("YES")
+  console.log("recipientEpubObj", recipientEpubObj)
   for (const key in recipientEpubObj) {
+    console.log("key", key)
     const encryptedEncryptionKeyRecipient = await SEA.encrypt(
       encryptionKey,
       await SEA.secret(recipientEpubObj[key], senderPair)
@@ -96,15 +108,16 @@ async function getRecipientEpub(emails, getGun) {
       .get(`~@${emails[i]}`)
       .map()
       .once(async (user) => {
-        console.log(user);
+        console.log("user", user);
         epubObj[`${emails[j]}`] = await user.epub;
       });
-  }
-  return epubObj;
+      console.log("epubObj", epubObj)
+      return epubObj;
+  }  
 }
 
 // DECRYPTION
-export async function decryption(conversation, getGun, getUser, currentAlias) {
+export async function decryption(conversation, getUser, currentAlias) {
   const keysObjectJson = JSON.parse(conversation?.keys);
   const keysObject = Object.assign(
     {},
@@ -142,66 +155,10 @@ export async function decryption(conversation, getGun, getUser, currentAlias) {
     id: `conversations/${conversation?.id}`,
     keys: keysObject,
   };
-
-  // if (typeof keysObject.encryptedKeysByUsers[currentAlias] === "undefined") {
-  //   let carbonCopyUsers
-  //   let blindCarbonCopyUsers
-
-  //   if (conversation?.cc.length > 3) {
-  //     carbonCopyUsers = JSON.parse(conversation?.cc)
-  //   }
-
-  //   if (conversation?.bcc.length > 3) {
-  //     blindCarbonCopyUsers = JSON.parse(conversation?.bcc)
-  //   }
-
-  //   if (keysObject.encryptedKeysCarbonCopy[currentAlias]) {
-  //     for (let i = 0; i < carbonCopyUsers.length; i++) {
-  //       if (carbonCopyUsers[i] === currentAlias) {
-  //         return decryptFunction(getUser, keysObject.encryptedKeysCarbonCopy[currentAlias], conversation)
-  //       }
-  //     }
-  //   } else if (keysObject.encryptedKeysBlindCarbonCopy[currentAlias]) {
-  //     for (let i = 0; i < blindCarbonCopyUsers.length; i++) {
-  //       if (blindCarbonCopyUsers[i] === currentAlias) {
-  //         return decryptFunction(getUser, keysObject.encryptedKeysBlindCarbonCopy[currentAlias], conversation)
-  //       }
-  //     }
-  //   }
-  // } else {
-  //   return decryptFunction(getUser, keysObject.encryptedKeysByUsers[currentAlias], conversation)
-  // }
-}
-
-async function decryptFunction(getUser, key, conversation) {
-  const myPair = await getUser()._.sea;
-  const decryptedKey = await SEA.decrypt(
-    key,
-    await SEA.secret(conversation?.senderEpub, myPair)
-  );
-
-  const decryptedSubject = await SEA.decrypt(
-    conversation?.subject,
-    decryptedKey
-  );
-
-  const decryptedBody = await SEA.decrypt(
-    conversation?.recentBody,
-    decryptedKey
-  );
-
-  return {
-    sender: conversation?.sender,
-    senderEpub: conversation?.senderEpub,
-    keys: conversation?.keys,
-    subject: decryptedSubject,
-    body: decryptedBody,
-  };
 }
 
 export async function decryptionMessage(
   message,
-  getGun,
   getUser,
   alias,
   keys,
@@ -216,50 +173,12 @@ export async function decryptionMessage(
     message?.body,
     decryptedEncryptionKeyForUser
   );
+
   return {
     timestamp: message.timestamp,
     body: decryptedBody,
     sender: message?.sender,
+    recipients: `${message?.recipients}`,
+    cc: `${message?.carbonCopy}`,
   };
-  // const keysObject = JSON.parse(keys)
-  // console.log(keysObject)
-  // return decryptMessage(getUser, message, keysObject.encryptedKeysByUsers[alias], senderEpub)
-}
-
-async function decryptMessage(getUser, message, key, senderEpub) {
-  const myPair = await getUser()._.sea;
-  const decryptedKey = await SEA.decrypt(
-    key,
-    await SEA.secret(senderEpub, myPair)
-  );
-  const decryptedBody = await SEA.decrypt(message?.body, decryptedKey);
-  console.log(message.timestamp);
-
-  return {
-    timestamp: message.timestamp,
-    sender: message.sender,
-    body: decryptedBody,
-  };
-}
-
-async function getMessageByReference(path, getGun) {
-  let result;
-  await getGun()
-    .path(path)
-    .once((obj) => {
-      result = obj;
-    });
-  return result;
-}
-
-async function getByReference(path, getGun) {
-  let result;
-
-  await getGun()
-    .path(path)
-    .once((obj) => {
-      result = obj;
-    });
-
-  return result;
 }
