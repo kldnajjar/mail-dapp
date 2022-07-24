@@ -7,6 +7,7 @@ import {
 
 export const createEmail = async (emailObject, context) => {
   const { getGun, getUser } = context;
+  const isReply = emailObject.messageType === "reply" ? true : false;
 
   const emailsArray = getMailEmails(emailObject);
 
@@ -18,7 +19,7 @@ export const createEmail = async (emailObject, context) => {
     cc: emailsArray.carbonCopyArray,
     bcc: emailsArray.blindCarbonCopyArray,
   };
-  const emailEncrypted = await encryption(obj, getGun, getUser);
+  const emailEncrypted = await encryption(obj, getGun, getUser, isReply);
 
   const msgObj = await handleConversationAndMessages(
     emailObject,

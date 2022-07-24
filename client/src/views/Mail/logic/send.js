@@ -5,13 +5,13 @@ import Gun from "gun/gun";
 const getMailEmails = (obj) => {
   const recipientsArray = obj.recipient.split(";");
 
-  let carbonCopyArray;
-  if (obj.cc.length) {
+  let carbonCopyArray = [];
+  if (obj.cc?.length) {
     carbonCopyArray = obj.cc.split(";");
   }
 
-  let blindCarbonCopyArray;
-  if (obj.bcc.length) {
+  let blindCarbonCopyArray = [];
+  if (obj.bcc?.length) {
     blindCarbonCopyArray = obj.bcc.split(";");
   }
 

@@ -86,7 +86,7 @@ function EmailList() {
         <EmailRow
           key={`email-row-${reactKey}`}
           sender={sender}
-          // recipient={recipient}
+          recipient={recipient}
           subject={subject}
           body={body}
           id={id}

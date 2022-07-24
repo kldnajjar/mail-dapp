@@ -39,7 +39,6 @@ function Conversation() {
   const getAllMessages = async (getGun, getMails, getUser) => {
     const alias = await getCurrentUserAlias(user, getUser);
 
-    console.log("id", selectedMail.id.split("/")[1]);
     const conversationNode = getMails()
       .get(selectedMail.id.split("/")[1])
       .get("messages");
@@ -60,14 +59,12 @@ function Conversation() {
         selectedMail?.keys,
         selectedMail?.senderEpub
       );
-      console.log(message);
       array.push(message);
       counter++;
       if (counter > emailsNum) {
       }
       var endTime = performance.now();
       if (counter == emailsNum) {
-        console.log("WWW");
         var endTime = performance.now();
         console.log(
           `Call to doSomething took ${endTime - startTime} milliseconds`
@@ -76,7 +73,6 @@ function Conversation() {
           return a.timestamp - b.timestamp;
         });
 
-        console.log(array);
         setMessages([...array]);
       }
     });

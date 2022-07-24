@@ -11,7 +11,6 @@ import styles from "./EmailRow.module.css";
 
 function EmailRow({ subject, sender, recipient, body, id, senderEpub, keys }) {
   const dispatch = useDispatch();
-
   const openMail = () => {
     dispatch(
       selectMail({

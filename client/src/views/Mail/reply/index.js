@@ -3,29 +3,34 @@ import { useSelector, useDispatch } from "react-redux";
 import { v4 as uuid } from "uuid";
 
 import { selectOpenMail, selectedMessage } from "../../../slices/mailSlice";
+import { selectCurrentUser } from "../../../slices/userSlice";
+import { getCurrentUserAlias } from "../../../util/user";
 import useGunContext from "../../../context/useGunContext";
+import { createEmail } from "../logic/mail";
 
 import styles from "../Mail.module.css";
 
 function Reply() {
   const dispatch = useDispatch();
   const { getGun, getUser, getMails } = useGunContext();
-  const account = JSON.parse(sessionStorage.getItem("account"));
+  const user = useSelector(selectCurrentUser);
   const selectedMail = useSelector(selectOpenMail);
   const messageToReply = useSelector(selectedMessage);
 
+  const [from, setFrom] = useState("");
   const [body, setBody] = useState("");
 
-  useEffect(() => {
+  useEffect(async () => {
     // setBody(`\n\n\n${selectedMail.body}`);
     // setSubject(`fwd: ${selectedMail.subject}`);
+    const alias = await getCurrentUserAlias(user, getUser);
+    setFrom(alias);
   }, []);
 
-  const reply = () => {
-    const recipient = selectedMail.sender;
-
+  const sendEmail = () => {
+    const recipient = messageToReply.sender;
     const emailObject = {
-      sender: account.email,
+      sender: from,
       recipient,
       body,
       conversationId: selectedMail.id.split("/")[1],
@@ -43,13 +48,15 @@ function Reply() {
     createEmail(emailObject, context);
   };
 
+  // if (!alias) return null;
+
   return (
     <div className={styles["mail-body"]}>
       <div className={`${styles["edit-mail-header"]}`}>
         <div className="form-group mb-3">
           <label>From</label>
           <div className="mb-3">
-            <b>{account.email}</b>
+            <b>{from}</b>
           </div>
         </div>
         <div className="form-group mb-3">
@@ -71,7 +78,7 @@ function Reply() {
         </div>
       </div>
       <div className="d-grid">
-        <button type="button" className="btn btn-primary" onClick={reply}>
+        <button type="button" className="btn btn-primary" onClick={sendEmail}>
           Reply
         </button>
       </div>

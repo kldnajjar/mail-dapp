@@ -5,17 +5,17 @@ import "gun/lib/path.js";
 // import regeneratorRuntime from "regenerator-runtime";
 
 // ENCRYPTION
-export async function encryption(email, getGun, getUser) {
+export async function encryption(email, getGun, getUser, isReply) {
   // TODO
   const encryptionKey = process.env.APP_MAIL_ENCRYPTION_KEY;
   // <-- This key is just an example. Ideally I think we should generate it every time sender sends an email.
-  const encryptedSubject = await SEA.encrypt(email.subject, encryptionKey);
-
+  const encryptedSubject = isReply
+    ? ""
+    : await SEA.encrypt(email.subject, encryptionKey);
   const encryptedMessage = await SEA.encrypt(email.body, encryptionKey);
-
   const senderEpub = await getUser()._.sea.epub;
-
   const senderPair = await getUser()._.sea;
+  const sender = email.sender;
 
   const encryptedEncryptionKeySender = await SEA.encrypt(
     encryptionKey,
@@ -26,8 +26,7 @@ export async function encryption(email, getGun, getUser) {
   const encryptedKeysCarbonCopy = {};
   const encryptedKeysBlindCarbonCopy = {};
 
-  encryptedKeysByUsers[email["sender"]] = encryptedEncryptionKeySender;
-
+  encryptedKeysByUsers[sender] = encryptedEncryptionKeySender;
   await getRecipientKeys(
     encryptedKeysByUsers,
     email.recipients,
@@ -35,7 +34,6 @@ export async function encryption(email, getGun, getUser) {
     encryptionKey,
     senderPair
   );
-
   if (email?.cc) {
     await getRecipientKeys(
       encryptedKeysCarbonCopy,
@@ -45,7 +43,6 @@ export async function encryption(email, getGun, getUser) {
       senderPair
     );
   }
-
   if (email?.bcc) {
     await getRecipientKeys(
       encryptedKeysBlindCarbonCopy,
@@ -61,13 +58,13 @@ export async function encryption(email, getGun, getUser) {
     encryptedKeysCarbonCopy,
     encryptedKeysBlindCarbonCopy,
   };
-  console.log(encryptedUsersKeys)
 
   return {
     encryptedSubject,
     encryptedMessage,
     encryptedUsersKeys,
     senderEpub,
+    sender,
   };
 }
 
@@ -94,6 +91,7 @@ async function getRecipientEpub(emails, getGun) {
   const epubObj = {};
   for (let i = 0; i < emails.length; i++) {
     let j = i;
+    //TODO: If user wasn't found we need an Toast Msg
     await getGun()
       .get(`~@${emails[i]}`)
       .map()
