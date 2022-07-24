@@ -1,8 +1,5 @@
-import gun from "gun/gun";
-import "gun/sea";
 import SEA from "gun/sea";
-import "gun/lib/path.js";
-// import regeneratorRuntime from "regenerator-runtime";
+import { toast } from "react-toastify";
 
 // ENCRYPTION
 export async function encryption(email, getGun, getUser, isReply) {
@@ -76,10 +73,7 @@ async function getRecipientKeys(
   senderPair
 ) {
   const recipientEpubObj = await getRecipientEpub(recipients, getGun);
-  console.log("YES")
-  console.log("recipientEpubObj", recipientEpubObj)
   for (const key in recipientEpubObj) {
-    console.log("key", key)
     const encryptedEncryptionKeyRecipient = await SEA.encrypt(
       encryptionKey,
       await SEA.secret(recipientEpubObj[key], senderPair)
@@ -93,17 +87,22 @@ async function getRecipientEpub(emails, getGun) {
   const epubObj = {};
   for (let i = 0; i < emails.length; i++) {
     let j = i;
-    //TODO: If user wasn't found we need an Toast Msg
     await getGun()
       .get(`~@${emails[i]}`)
+      .once((data) => {
+        if (!data) {
+          return toast.error(`${emails[i]} not exist`);
+        }
+      })
       .map()
       .once(async (user) => {
-        console.log("user", user);
+        if (!user) {
+          return toast.error(`${emails[i]} not exist`);
+        }
         epubObj[`${emails[j]}`] = await user.epub;
       });
-      console.log("epubObj", epubObj)
-      return epubObj;
-  }  
+    return epubObj;
+  }
 }
 
 // DECRYPTION
