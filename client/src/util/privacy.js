@@ -31,6 +31,7 @@ export async function encryption(email, getGun, getUser, isReply) {
     encryptionKey,
     senderPair
   );
+
   if (email?.cc) {
     await getRecipientKeys(
       encryptedKeysCarbonCopy,
@@ -40,6 +41,7 @@ export async function encryption(email, getGun, getUser, isReply) {
       senderPair
     );
   }
+
   if (email?.bcc) {
     await getRecipientKeys(
       encryptedKeysBlindCarbonCopy,
@@ -96,9 +98,6 @@ async function getRecipientEpub(emails, getGun) {
       })
       .map()
       .once(async (user) => {
-        if (!user) {
-          return toast.error(`${emails[i]} not exist`);
-        }
         epubObj[`${emails[j]}`] = await user.epub;
       });
     return epubObj;
