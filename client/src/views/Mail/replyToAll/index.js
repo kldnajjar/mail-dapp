@@ -20,7 +20,7 @@ function ReplyToAll() {
   const [from, setFrom] = useState("");
   const [body, setBody] = useState("");
 
-  useEffect(() => {
+  useEffect(async () => {
     // setBody(`\n\n\n${selectedMail.body}`);
     // setSubject(`fwd: ${selectedMail.subject}`);
     const alias = await getCurrentUserAlias(user, getUser);
@@ -60,7 +60,7 @@ function ReplyToAll() {
         return createEmail(emailObject, context);
       }
     });
-  }
+  };
 
   const handleRecipientEmails = (context) => {
     const recipient = `${messageToReply.recipients};${messageToReply.sender};`;
@@ -74,7 +74,7 @@ function ReplyToAll() {
       messageType: "replyToAll",
     };
     createEmail(emailObject, context);
-  }
+  };
 
   return (
     <div className={styles["mail-body"]}>
