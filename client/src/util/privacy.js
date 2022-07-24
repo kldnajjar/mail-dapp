@@ -143,6 +143,7 @@ export async function decryption(conversation, getUser, currentAlias) {
     senderEpub: conversation?.senderEpub,
     id: `conversations/${conversation?.id}`,
     keys: keysObject,
+    time: conversation.timestamp,
   };
 }
 

@@ -23,18 +23,18 @@ import styles from "./EmailList.module.css";
 
 function EmailList() {
   const dispatch = useDispatch();
+  const { getGun, getUser } = useGunContext();
   const user = useSelector(selectCurrentUser);
   const folderName = useSelector(selecteFolder);
+
   const [emails, setEmails] = useState([]);
-  const { getGun, getUser } = useGunContext();
-  const account = JSON.parse(sessionStorage.getItem("account"));
 
   useEffect(async () => {
     dispatch(resetEmailActions());
-    await getAllEmails(getGun, getUser, account);
+    await getAllEmails(getGun, getUser);
   }, [folderName]);
 
-  const getAllEmails = async (getGun, getUser, account) => {
+  const getAllEmails = async (getGun, getUser) => {
     const alias = await getCurrentUserAlias(user, getUser);
 
     let emailsNum = 0;
@@ -57,7 +57,7 @@ function EmailList() {
         array.push(conversation);
         counter++;
         if (counter > emailsNum) {
-          setEmails((prev) => [...prev, conversation]);
+          setEmails((prev) => [conversation, ...prev]);
         }
         var endTime = performance.now();
         if (counter == emailsNum) {
@@ -65,6 +65,10 @@ function EmailList() {
           console.log(
             `Call to doSomething took ${endTime - startTime} milliseconds`
           );
+
+          array.sort((a, b) => {
+            return b.time - a.time;
+          });
           setEmails([...array]);
         }
       }
@@ -74,7 +78,7 @@ function EmailList() {
   const renderEmails = () => {
     return emails.map(
       (
-        { subject, sender, recipient, body, id, senderEpub, keys },
+        { subject, sender, recipient, body, id, senderEpub, keys, time },
         reactKey
       ) => (
         <EmailRow
@@ -86,7 +90,7 @@ function EmailList() {
           id={id}
           senderEpub={senderEpub}
           keys={keys}
-          // time={new Date(timestamp?.seconds * 1000).toUTCString()}
+          time={time}
         />
       )
     );

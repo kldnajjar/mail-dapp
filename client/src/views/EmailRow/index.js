@@ -1,5 +1,6 @@
 import React from "react";
 import { useDispatch } from "react-redux";
+import moment from "moment";
 
 import { Checkbox, IconButton } from "@material-ui/core";
 import StarBorderOutlinedIcon from "@material-ui/icons/StarBorderOutlined";
@@ -9,7 +10,16 @@ import { selectMail, openSendMessage } from "../../slices/mailSlice";
 
 import styles from "./EmailRow.module.css";
 
-function EmailRow({ subject, sender, recipient, body, id, senderEpub, keys }) {
+function EmailRow({
+  subject,
+  sender,
+  recipient,
+  body,
+  id,
+  senderEpub,
+  keys,
+  time,
+}) {
   const dispatch = useDispatch();
   const openMail = () => {
     dispatch(
@@ -21,6 +31,7 @@ function EmailRow({ subject, sender, recipient, body, id, senderEpub, keys }) {
         id,
         senderEpub,
         keys,
+        time,
       })
     );
     dispatch(openSendMessage());
@@ -42,6 +53,9 @@ function EmailRow({ subject, sender, recipient, body, id, senderEpub, keys }) {
           {subject}{" "}
           <span className={styles["emailRow-description"]}> - {body}</span>
         </h4>
+        <div className={styles["emailRow-time"]}>
+          {time && moment(time).format("MMMM Do YYYY, h:mm:ss a")}
+        </div>
       </div>
     </div>
   );

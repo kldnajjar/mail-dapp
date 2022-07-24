@@ -18,7 +18,7 @@
 
 .emailRow-message {
   display: flex;
-  flex: 0.8;
+  flex: 1;
   align-items: center;
   font-size: 13px;
 }
@@ -45,6 +45,15 @@
 }
 
 .emailRow-description {
+  font-weight: 400;
+  color: grey;
+}
+
+.emailRow-time {
+  display: block;
+  width: 100%;
+  text-align: right;
+  margin-right: 10px;
   font-weight: 400;
   color: grey;
 }

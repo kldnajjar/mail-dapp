@@ -1,6 +1,5 @@
 import { closeSendMessage } from "../../../slices/mailSlice";
 import { toast } from "react-toastify";
-import Gun from "gun/gun";
 
 const getMailEmails = (obj) => {
   const recipientsArray = obj.recipient.split(";");
@@ -48,13 +47,14 @@ const handleConversationAndMessages = (
 
   conversationObj.id = conversationId;
   conversationObj.recentBody = encryptedMessage || "";
+  conversationObj.timestamp = new Date().getTime();
 
   messageObj.id = messageId;
   messageObj.type = messageType;
   messageObj.body = encryptedMessage || "";
   messageObj.sender = sender || "";
   messageObj.recipients = recipient || "";
-  messageObj.timestamp = Gun.state();
+  messageObj.timestamp = new Date().getTime();
 
   if (messageObj.type === "reply") {
     return {
