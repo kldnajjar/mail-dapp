@@ -1,6 +1,6 @@
 import { toast } from "react-toastify";
 
-const isValidEmail = (emailsObj) => {
+const isValidEmails = (emailsObj) => {
   const { allEmails } = emailsObj;
   let isValid = true;
 
@@ -36,4 +36,4 @@ const isMyKloudEmail = (email) => {
   return true;
 };
 
-export { isValidEmail };
+export { isValidEmails };

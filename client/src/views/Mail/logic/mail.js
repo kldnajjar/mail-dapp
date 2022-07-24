@@ -4,14 +4,14 @@ import {
   handleConversationAndMessages,
   createMessagesWithRelatedConversation,
 } from "./send";
-import { isValidEmail } from "./validation";
+import { isValidEmails } from "./validation";
 
 export const createEmail = async (emailObject, context) => {
   const { getGun, getUser } = context;
   const isReply = emailObject.messageType === "reply" ? true : false;
 
   const emailsArray = getMailEmails(emailObject);
-  const isValid = isValidEmail(emailsArray);
+  const isValid = isValidEmails(emailsArray);
 
   if (!isValid) return;
 

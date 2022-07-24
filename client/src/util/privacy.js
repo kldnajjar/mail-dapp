@@ -3,54 +3,37 @@ import { toast } from "react-toastify";
 
 // ENCRYPTION
 export async function encryption(email, getGun, getUser, isReply) {
-  // TODO
+  // TODO: This key is just an example. Ideally I think we should generate it every time sender sends an email.
   const encryptionKey = process.env.APP_MAIL_ENCRYPTION_KEY;
-  // <-- This key is just an example. Ideally I think we should generate it every time sender sends an email.
+  const { recipients, sender, subject, body, cc, bcc } = email;
+
   const encryptedSubject = isReply
     ? ""
-    : await SEA.encrypt(email.subject, encryptionKey);
-  const encryptedMessage = await SEA.encrypt(email.body, encryptionKey);
+    : await SEA.encrypt(subject, encryptionKey);
+  const encryptedMessage = await SEA.encrypt(body, encryptionKey);
   const senderEpub = await getUser()._.sea.epub;
   const senderPair = await getUser()._.sea;
-  const sender = email.sender;
 
   const encryptedEncryptionKeySender = await SEA.encrypt(
     encryptionKey,
     await SEA.secret(senderEpub, senderPair)
   );
 
-  const encryptedKeysByUsers = {};
-  const encryptedKeysCarbonCopy = {};
-  const encryptedKeysBlindCarbonCopy = {};
-
-  encryptedKeysByUsers[sender] = encryptedEncryptionKeySender;
-  await getRecipientKeys(
-    encryptedKeysByUsers,
-    email.recipients,
+  const encryptedKeysByUsers = await getRecipientKeys(
+    recipients,
     getGun,
     encryptionKey,
     senderPair
   );
+  encryptedKeysByUsers[sender] = encryptedEncryptionKeySender;
 
-  if (email?.cc) {
-    await getRecipientKeys(
-      encryptedKeysCarbonCopy,
-      email.cc,
-      getGun,
-      encryptionKey,
-      senderPair
-    );
-  }
+  const encryptedKeysCarbonCopy = cc
+    ? await getRecipientKeys(cc, getGun, encryptionKey, senderPair)
+    : {};
 
-  if (email?.bcc) {
-    await getRecipientKeys(
-      encryptedKeysBlindCarbonCopy,
-      email.bcc,
-      getGun,
-      encryptionKey,
-      senderPair
-    );
-  }
+  const encryptedKeysBlindCarbonCopy = bcc
+    ? await getRecipientKeys(bcc, getGun, encryptionKey, senderPair)
+    : {};
 
   const encryptedUsersKeys = {
     encryptedKeysByUsers,
@@ -67,41 +50,42 @@ export async function encryption(email, getGun, getUser, isReply) {
   };
 }
 
-async function getRecipientKeys(
-  encryptedKeysObj,
-  recipients,
-  getGun,
-  encryptionKey,
-  senderPair
-) {
+async function getRecipientKeys(recipients, getGun, encryptionKey, senderPair) {
+  const encryptedKeysObj = {};
+  // TODO: getRecipientEpub change structre
   const recipientEpubObj = await getRecipientEpub(recipients, getGun);
+  console.log("recipientEpubObj", recipientEpubObj);
+
   for (const key in recipientEpubObj) {
+    const secret = await SEA.secret(recipientEpubObj[key], senderPair);
     const encryptedEncryptionKeyRecipient = await SEA.encrypt(
       encryptionKey,
-      await SEA.secret(recipientEpubObj[key], senderPair)
+      secret
     );
-
     encryptedKeysObj[key] = encryptedEncryptionKeyRecipient;
   }
+  return encryptedKeysObj;
 }
 
 async function getRecipientEpub(emails, getGun) {
   const epubObj = {};
-  for (let i = 0; i < emails.length; i++) {
-    let j = i;
+
+  await emails.forEach(async (email) => {
     await getGun()
-      .get(`~@${emails[i]}`)
+      .get(`~@${email}`)
       .once((data) => {
         if (!data) {
           return toast.error(`${emails[i]} not exist`);
         }
       })
       .map()
-      .once(async (user) => {
-        epubObj[`${emails[j]}`] = await user.epub;
+      .once((user) => {
+        if (user) {
+          epubObj[email] = user.epub;
+        }
       });
     return epubObj;
-  }
+  });
 }
 
 // DECRYPTION
