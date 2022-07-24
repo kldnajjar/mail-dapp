@@ -48,8 +48,6 @@ function Reply() {
     createEmail(emailObject, context);
   };
 
-  // if (!alias) return null;
-
   return (
     <div className={styles["mail-body"]}>
       <div className={`${styles["edit-mail-header"]}`}>
