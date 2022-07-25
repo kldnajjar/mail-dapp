@@ -37,42 +37,52 @@ function EmailList() {
   const getAllEmails = async (getGun, getUser) => {
     const alias = await getCurrentUserAlias(user, getUser);
     let emailsNum = 0;
+
     const folderNode = getGun()
       .get("accounts")
       .get(alias)
       .get("folders")
       .get(folderName);
-    await folderNode.once(async (data) => {
-      delete data.label;
-      emailsNum = Object.keys(data).slice(1).length;
-    });
 
     var startTime = performance.now();
     const emails = [];
     let counter = 0;
-    await folderNode.map().once(async (data) => {
-      if (data && typeof data !== "string") {
-        const conversation = await decryption(data, getUser, alias);
 
-        emails.push(conversation);
-        counter++;
-        if (counter > emailsNum) {
-          setEmails((prev) => [conversation, ...prev]);
+    folderNode
+      .once((data) => {
+        delete data.label;
+        const obj = Object.keys(data);
+        emailsNum = obj.slice(1).length;
+        if (obj.length === 1) {
+          setEmails([]);
         }
-        var endTime = performance.now();
-        if (counter == emailsNum) {
+      })
+      .map()
+      .once(async (data) => {
+        if (data && typeof data !== "string") {
+          const conversation = await decryption(data, getUser, alias);
+
+          emails.push(conversation);
+          counter++;
+          if (counter > emailsNum) {
+            setEmails((prev) => [conversation, ...prev]);
+          }
+
           var endTime = performance.now();
-          console.log(
-            `Call to doSomething took ${endTime - startTime} milliseconds`
-          );
+          if (counter == emailsNum) {
+            var endTime = performance.now();
+            console.log(
+              `Call to doSomething took ${endTime - startTime} milliseconds`
+            );
 
-          emails.sort((a, b) => {
-            return b.time - a.time;
-          });
-          setEmails([...emails]);
+            emails.sort((a, b) => {
+              return b.time - a.time;
+            });
+
+            setEmails([...emails]);
+          }
         }
-      }
-    });
+      });
   };
 
   const renderEmails = () => {
