@@ -25,6 +25,7 @@ export async function encryption(email, getGun, getUser, isReply) {
     encryptionKey,
     senderPair
   );
+  console.log(encryptedKeysByUsers)
   encryptedKeysByUsers[sender] = encryptedEncryptionKeySender;
 
   const encryptedKeysCarbonCopy = cc
@@ -35,24 +36,25 @@ export async function encryption(email, getGun, getUser, isReply) {
     ? await getRecipientKeys(bcc, getGun, encryptionKey, senderPair)
     : {};
 
-  // if (keys) {
-  //   for (const key in encryptedKeysByUsers) {
-  //     if (!key === keys[key]) {
-
-  //     }
-  //   }
-  //   encryptedKeysByUsers.forEach(user, key => {
-  //     if (!user === email.keys[key]) {
-
-  //     }
-  //   });
-  // }
+  if (keys) {
+    for (const user in encryptedKeysByUsers) {
+      for (const key in keys) {
+        if (user !== key) {
+          console.log("HERE", user, key)
+          encryptedKeysByUsers[key] = keys[key];
+        }
+      }
+    }
+  }
 
   const encryptedUsersKeys = {
     encryptedKeysByUsers,
     encryptedKeysCarbonCopy,
     encryptedKeysBlindCarbonCopy,
   };
+
+  console.log(keys)
+  console.log(encryptedUsersKeys)
 
   return {
     encryptedSubject,
@@ -98,6 +100,30 @@ async function getRecipientEpub(emails, getGun) {
         }
       });
     return epubObj;
+  }
+}
+
+const prepareTheUsersKeys = (keys, encryptedKeysByUsers, encryptedKeysCarbonCopy, encryptedKeysBlindCarbonCopy) => {
+  for (const user in encryptedKeysByUsers) {
+    for (const key in keys) {
+      if (!encryptedKeysByUsers[user] === keys[key]) {
+        encryptedKeysByUsers[key] = keys[key];
+      }
+    }
+  }
+  for (const user in encryptedKeysCarbonCopy) {
+    for (const key in keys) {
+      if (!encryptedKeysCarbonCopy[user] === keys[key]) {
+        encryptedKeysCarbonCopy[key] = keys[key];
+      }
+    }
+  }
+  for (const user in encryptedKeysBlindCarbonCopy) {
+    for (const key in keys) {
+      if (!encryptedKeysBlindCarbonCopy[user] === keys[key]) {
+        encryptedKeysBlindCarbonCopy[key] = keys[key];
+      }
+    }
   }
 }
 
