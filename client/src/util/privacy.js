@@ -70,9 +70,9 @@ async function getRecipientKeys(recipients, getGun, encryptionKey, senderPair) {
 async function getRecipientEpub(emails, getGun) {
   const epubObj = {};
 
-  await emails.forEach(async (email) => {
+  for (let i = 0; i < emails.length; i++) {
     await getGun()
-      .get(`~@${email}`)
+      .get(`~@${emails[i]}`)
       .once((data) => {
         if (!data) {
           return toast.error(`${emails[i]} not exist`);
@@ -81,11 +81,11 @@ async function getRecipientEpub(emails, getGun) {
       .map()
       .once((user) => {
         if (user) {
-          epubObj[email] = user.epub;
+          epubObj[emails[i]] = user.epub;
         }
       });
     return epubObj;
-  });
+  }
 }
 
 // DECRYPTION
