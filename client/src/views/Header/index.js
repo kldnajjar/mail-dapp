@@ -86,7 +86,7 @@ function Header() {
           className="pointer"
         >
           <div className={styles["popup-container"]}>
-            <div className="top-content">
+            <div className={styles["top-content"]}>
               <Avatar src={currentUser?.photoUrl} className="margin-auto" />
               <b>{`${currentUser.firstName} ${currentUser.lastName}`}</b>
               <p>{currentUser.email}</p>

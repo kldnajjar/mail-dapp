@@ -53,6 +53,13 @@
   padding: 10px 0;
 }
 
+.top-content {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
 @media only screen and (max-width: 500px) {
   .header-left > .MuiIconButton-root {
     display: none !important;
