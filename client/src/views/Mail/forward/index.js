@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import moment from "moment";
 import { v4 as uuid } from "uuid";
 
 import Input from "../../../components/input";
@@ -29,9 +30,15 @@ function Forward() {
   const [body, setBody] = useState("");
 
   useEffect(() => {
-    let message = `\n\n\n---------- Forwarded message ---------\n${selectedMail.subject}\n\n\n`;
-    for (let i = 0; i < selectedMailToForward.length; i++) {
-      message += `${selectedMailToForward[i].body}\n\n`;
+    let message = `\n\n\n---------- Forwarded message ---------\nSubject: ${selectedMail.subject}\n\n`;
+    let firstName
+    let lastName
+    for (let i = 0; i < selectedMailToForward.messageArray.length; i++) {
+      firstName = selectedMailToForward.messageArray[i].senderFirstName
+      lastName = selectedMailToForward.messageArray[i].senderLastName
+      message += `On ${moment(message.timestamp).format("ddd, MMMM D, YYYY")} at` +
+      `${moment(message.timestamp).format("h:mm A")}, ${firstName} ${lastName} wrote:
+      \n${selectedMailToForward.messageArray[i].body}\n\n`;
     }
     setBody(message);
     // setSubject(selectedMail.subject);
@@ -50,13 +57,11 @@ function Forward() {
       cc: emailCC,
       bcc: emailBCC,
       body,
-      conversationId: uuid(),
+      keys: selectedMailToForward.keys,
+      conversationId: selectedMail.id.split("/")[1],
       messageId: uuid(),
       messageType: "forward",
     };
-
-    console.log("emailObject", emailObject);
-    console.log("MessegeToForward", selectedMailToForward);
 
     const context = {
       dispatch,
@@ -65,7 +70,7 @@ function Forward() {
       getMails,
     };
 
-    // createEmail(emailObject, context);
+    createEmail(emailObject, context);
   };
 
   if (!currentUserEmail) return null;

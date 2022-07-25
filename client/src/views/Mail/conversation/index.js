@@ -33,6 +33,7 @@ function Conversation() {
 
   const [messages, setMessages] = useState([]);
   const [syncing, setSyncing] = useState(false);
+  const [alias, setAlias] = useState("")
 
   useEffect(async () => {
     dispatch(resetEmailActions());
@@ -40,8 +41,10 @@ function Conversation() {
   }, []);
 
   const getAllMessages = async (getGun, getMails, getUser) => {
-    const alias = await getCurrentUserAlias(user, getUser);
+    const currentAlias = await getCurrentUserAlias(user, getUser);
+    setAlias(currentAlias)
 
+    console.log("ID", selectedMail.id.split("/")[1])
     const conversationNode = getMails()
       .get(selectedMail.id.split("/")[1])
       .get("messages");
@@ -61,10 +64,11 @@ function Conversation() {
       const message = await decryptionMessage(
         data,
         getUser,
-        alias,
+        currentAlias,
         selectedMail?.keys,
         selectedMail?.senderEpub
       );
+      // message.keys = selectedMail?.keys;
       array.push(message);
       counter++;
       if (counter > emailsNum) {
@@ -90,7 +94,11 @@ function Conversation() {
         messageArray.push(msg);
       }
     });
-    return messageArray.sort((a, b) => {
+    const messageObj = {
+      keys: selectedMail?.keys,
+      messageArray
+    }
+    return messageObj.messageArray.sort((a, b) => {
       return b.timestamp - a.timestamp;
     });
   };
@@ -108,6 +116,9 @@ function Conversation() {
   }
 
   return messages.map((message, key) => {
+    console.log(message)
+    const allEmails = JSON.parse(message.allEmails)
+    if (!allEmails.includes(alias)) { return null }
     return (
       <div className={styles["mail-body"]} key={`mail-message-${key}`}>
         <div className={styles["mail-bodyHeader"]}>
@@ -128,7 +139,7 @@ function Conversation() {
               )}
               <p className={styles["mail-time"]}>
                 {message.timestamp &&
-                  moment(message.timestamp).format("MMMM Do YYYY, h:mm:ss a")}
+                  moment(message.timestamp).format("MMMM D, YYYY, h:mm A")}
               </p>
             </div>
 
@@ -156,8 +167,8 @@ function Conversation() {
             <IconButton
               onClick={() => {
                 dispatch(setForward(true));
-                const messageArray = getMessagesToForward(message);
-                dispatch(setForwardMessage(messageArray));
+                const messageObj = getMessagesToForward(message);
+                dispatch(setForwardMessage(messageObj));
               }}
             >
               <ForwardIcon />

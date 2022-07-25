@@ -32,16 +32,19 @@ const handleConversationAndMessages = (
   emailEncrypted,
   emailsArray
 ) => {
-  const { conversationId, messageId, messageType, sender, recipient, cc, bcc } =
+  const { conversationId, messageId, messageType, sender, recipient, cc, bcc, senderFirstName, senderLastName } =
     emailObject;
   let updatedRecipient = recipient
   const { encryptedUsersKeys, encryptedMessage, encryptedSubject, senderEpub } =
     emailEncrypted;
-  const { carbonCopyArray, blindCarbonCopyArray } = emailsArray;
+  const { carbonCopyArray, blindCarbonCopyArray, allEmails } = emailsArray;
+
+  const allEmailsWithSender = [...allEmails, sender]
 
   const jsonObj = JSON.stringify(encryptedUsersKeys || "");
   const carbonCopyJsonObj = JSON.stringify(carbonCopyArray);
   const blindCarbonCopyJsonObj = JSON.stringify(blindCarbonCopyArray);
+  const allEmailsObj = JSON.stringify(allEmailsWithSender);
 
   const conversationObj = {};
   const messageObj = {};
@@ -56,7 +59,12 @@ const handleConversationAndMessages = (
   messageObj.type = messageType;
   messageObj.body = encryptedMessage || "";
   messageObj.sender = sender || "";
+  messageObj.senderFirstName = senderFirstName || "";
+  messageObj.senderLastName = senderLastName || "";
+  messageObj.allEmails = allEmailsObj || "";
   messageObj.recipients = recipient || "";
+  messageObj.carbonCopy = cc || "";
+  messageObj.blindCarbonCopy = bcc || "";
   messageObj.timestamp = new Date().getTime();
 
   if (messageObj.type === "reply") {

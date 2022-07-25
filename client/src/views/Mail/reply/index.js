@@ -4,7 +4,7 @@ import { v4 as uuid } from "uuid";
 
 import { selectOpenMail, selectedMessage } from "../../../slices/mailSlice";
 import { selectCurrentUser } from "../../../slices/userSlice";
-import { getCurrentUserAlias } from "../../../util/user";
+import { getCurrentUserAlias, getCurrentUserFirstAndLastNames } from "../../../util/user";
 import useGunContext from "../../../context/useGunContext";
 import { createEmail } from "../logic/mail";
 
@@ -17,20 +17,24 @@ function Reply() {
   const selectedMail = useSelector(selectOpenMail);
   const messageToReply = useSelector(selectedMessage);
 
+  const [currentFirstAndLastNames, setCurrentFirstAndLastNames] = useState({})
   const [from, setFrom] = useState("");
   const [body, setBody] = useState("");
 
   useEffect(async () => {
-    // setBody(`\n\n\n${selectedMail.body}`);
-    // setSubject(`fwd: ${selectedMail.subject}`);
     const alias = await getCurrentUserAlias(user, getUser);
     setFrom(alias);
+
+    const first_And_LastNames = await getCurrentUserFirstAndLastNames(user, getUser);
+    setCurrentFirstAndLastNames(first_And_LastNames)
   }, []);
 
   const sendEmail = () => {
     const recipient = messageToReply.sender;
     const emailObject = {
       sender: from,
+      senderFirstName: currentFirstAndLastNames.firstName,
+      senderLastName: currentFirstAndLastNames.lastName,
       recipient,
       body,
       conversationId: selectedMail.id.split("/")[1],

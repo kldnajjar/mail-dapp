@@ -21,6 +21,7 @@ export const createEmail = async (emailObject, context) => {
     subject: emailObject.subject,
     sender: emailObject.sender,
     body: emailObject.body,
+    keys: emailObject.keys,
     recipients: emailsArray.recipientsArray,
     cc: emailsArray.carbonCopyArray,
     bcc: emailsArray.blindCarbonCopyArray,

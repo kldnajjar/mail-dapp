@@ -5,7 +5,7 @@ import { v4 as uuid } from "uuid";
 import useGunContext from "../../../context/useGunContext";
 import { selectOpenMail, selectedMessage } from "../../../slices/mailSlice";
 import { selectCurrentUser } from "../../../slices/userSlice";
-import { getCurrentUserAlias } from "../../../util/user";
+import { getCurrentUserAlias, getCurrentUserFirstAndLastNames } from "../../../util/user";
 import { createEmail } from "../logic/mail";
 
 import styles from "../Mail.module.css";
@@ -17,14 +17,16 @@ function ReplyToAll() {
   const selectedMail = useSelector(selectOpenMail);
   const messageToReply = useSelector(selectedMessage);
 
+  const [currentFirstAndLastNames, setCurrentFirstAndLastNames] = useState({})
   const [from, setFrom] = useState("");
   const [body, setBody] = useState("");
 
   useEffect(async () => {
-    // setBody(`\n\n\n${selectedMail.body}`);
-    // setSubject(selectedMail.subject);
     const alias = await getCurrentUserAlias(user, getUser);
     setFrom(alias);
+
+    const first_And_LastNames = await getCurrentUserFirstAndLastNames(user, getUser);
+    setCurrentFirstAndLastNames(first_And_LastNames)
   }, []);
 
   const replyToAll = async () => {
@@ -48,6 +50,8 @@ function ReplyToAll() {
           recipient,
           body,
           sender: from,
+          senderFirstName: currentFirstAndLastNames.firstName,
+          senderLastName: currentFirstAndLastNames.lastName,
           cc: messageToReply.recipients,
           conversationId: selectedMail.id.split("/")[1],
           messageId: uuid(),
@@ -65,6 +69,8 @@ function ReplyToAll() {
       recipient,
       body,
       sender: from,
+      senderFirstName: currentFirstAndLastNames.firstName,
+      senderLastName: currentFirstAndLastNames.lastName,
       cc: messageToReply.cc,
       conversationId: selectedMail.id.split("/")[1],
       messageId: uuid(),

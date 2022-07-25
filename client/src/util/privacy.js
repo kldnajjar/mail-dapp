@@ -5,7 +5,7 @@ import { toast } from "react-toastify";
 export async function encryption(email, getGun, getUser, isReply) {
   // TODO: This key is just an example. Ideally I think we should generate it every time sender sends an email.
   const encryptionKey = process.env.APP_MAIL_ENCRYPTION_KEY;
-  const { recipients, sender, subject, body, cc, bcc } = email;
+  const { recipients, sender, subject, body, cc, bcc, keys } = email;
 
   const encryptedSubject = isReply
     ? ""
@@ -34,6 +34,19 @@ export async function encryption(email, getGun, getUser, isReply) {
   const encryptedKeysBlindCarbonCopy = bcc
     ? await getRecipientKeys(bcc, getGun, encryptionKey, senderPair)
     : {};
+
+  // if (keys) {
+  //   for (const key in encryptedKeysByUsers) {
+  //     if (!key === keys[key]) {
+
+  //     }
+  //   }
+  //   encryptedKeysByUsers.forEach(user, key => {
+  //     if (!user === email.keys[key]) {
+
+  //     }
+  //   });
+  // }
 
   const encryptedUsersKeys = {
     encryptedKeysByUsers,
@@ -151,6 +164,9 @@ export async function decryptionMessage(
     timestamp: message.timestamp,
     body: decryptedBody,
     sender: message?.sender,
+    allEmails: message.allEmails,
+    senderFirstName: message.senderFirstName,
+    senderLastName: message.senderLastName,
     recipients: `${message?.recipients}`,
     cc: `${message?.carbonCopy}`,
   };
