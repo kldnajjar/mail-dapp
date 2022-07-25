@@ -11,10 +11,10 @@ export const createEmail = async (emailObject, context) => {
   const isReply = emailObject.messageType === "reply" ? true : false;
 
   const emailsArray = getMailEmails(emailObject);
-  const isValid = await isValidEmails(emailsArray , getGun);
+  const isValid = await isValidEmails(emailsArray, getGun);
 
-  console.log(isValid)
-  
+  console.log(isValid);
+
   if (!isValid) return;
 
   const obj = {

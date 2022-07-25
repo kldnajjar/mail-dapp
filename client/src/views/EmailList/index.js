@@ -36,25 +36,25 @@ function EmailList() {
 
   const getAllEmails = async (getGun, getUser) => {
     const alias = await getCurrentUserAlias(user, getUser);
-    console.log(folderName);
     let emailsNum = 0;
-    const inboxNode = getGun()
+    const folderNode = getGun()
       .get("accounts")
       .get(alias)
       .get("folders")
       .get(folderName);
-    await inboxNode.once(async (data) => {
+    await folderNode.once(async (data) => {
       delete data.label;
       emailsNum = Object.keys(data).slice(1).length;
     });
+
     var startTime = performance.now();
-    const array = [];
+    const emails = [];
     let counter = 0;
-    await inboxNode.map().once(async (data) => {
-      if (data !== "inbox") {
+    await folderNode.map().once(async (data) => {
+      if (data && typeof data !== "string") {
         const conversation = await decryption(data, getUser, alias);
 
-        array.push(conversation);
+        emails.push(conversation);
         counter++;
         if (counter > emailsNum) {
           setEmails((prev) => [conversation, ...prev]);
@@ -66,10 +66,10 @@ function EmailList() {
             `Call to doSomething took ${endTime - startTime} milliseconds`
           );
 
-          array.sort((a, b) => {
+          emails.sort((a, b) => {
             return b.time - a.time;
           });
-          setEmails([...array]);
+          setEmails([...emails]);
         }
       }
     });
