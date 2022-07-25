@@ -36,7 +36,7 @@ function EmailList() {
 
   const getAllEmails = async (getGun, getUser) => {
     const alias = await getCurrentUserAlias(user, getUser);
-
+    console.log(folderName);
     let emailsNum = 0;
     const inboxNode = getGun()
       .get("accounts")
@@ -116,28 +116,28 @@ function EmailList() {
     <div className={styles.emailList}>
       <div className={styles["emailList-settings"]}>
         <div className={styles["emailList-settingsLeft"]}>
-          <Checkbox />
-          <IconButton>
+          <Checkbox className="unused" />
+          <IconButton className="unused">
             <ArrowDropDownIcon />
           </IconButton>
-          <IconButton>
+          <IconButton className="unused">
             <RedoIcon />
           </IconButton>
-          <IconButton>
+          <IconButton className="unused">
             <MoreVertIcon />
           </IconButton>
         </div>
         <div className={styles["emailList-settingsRight"]}>
-          <IconButton>
+          <IconButton className="unused">
             <ChevronLeftIcon />
           </IconButton>
-          <IconButton>
+          <IconButton className="unused">
             <ChevronRightIcon />
           </IconButton>
-          <IconButton>
+          <IconButton className="unused">
             <KeyboardHideIcon />
           </IconButton>
-          <IconButton>
+          <IconButton className="unused">
             <SettingsIcon />
           </IconButton>
         </div>

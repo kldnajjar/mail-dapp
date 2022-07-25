@@ -34,11 +34,11 @@ function EmailRow(props) {
   return (
     <div onClick={openMail} className={styles.emailRow}>
       <div className={styles["emailRow-options"]}>
-        <Checkbox />
-        <IconButton>
+        <Checkbox className="unused" />
+        <IconButton className="unused">
           <StarBorderOutlinedIcon />
         </IconButton>
-        <IconButton>
+        <IconButton className="unused">
           <LabelImportantOutlinedIcon />
         </IconButton>
       </div>

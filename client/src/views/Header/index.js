@@ -6,7 +6,7 @@ import { useSelector, useDispatch } from "react-redux";
 import MenuIcon from "@material-ui/icons/Menu";
 import { Avatar, IconButton } from "@material-ui/core";
 import SearchIcon from "@material-ui/icons/Search";
-import ArrowDropDownIcon from "@material-ui/icons/ArrowDropDown";
+// import ArrowDropDownIcon from "@material-ui/icons/ArrowDropDown";
 import AppsIcon from "@material-ui/icons/Apps";
 import NotificationsIcon from "@material-ui/icons/Notifications";
 import HelpOutlineIcon from "@material-ui/icons/HelpOutline";
@@ -66,17 +66,17 @@ function Header() {
       </div>
       <div className={styles["header-middle"]}>
         <SearchIcon />
-        <input type="text" placeholder="Search mail" />
-        <ArrowDropDownIcon className={styles["header-inputCaret"]} />
+        <input type="text" placeholder="Search mail" className="unused" />
+        {/* <ArrowDropDownIcon className={styles["header-inputCaret"]} /> */}
       </div>
       <div className={styles["header-right"]}>
-        <IconButton>
+        <IconButton className="unused">
           <HelpOutlineIcon />
         </IconButton>
-        <IconButton>
+        <IconButton className="unused">
           <NotificationsIcon />
         </IconButton>
-        <IconButton>
+        <IconButton className="unused">
           <AppsIcon />
         </IconButton>
 

@@ -133,7 +133,7 @@ function Compose() {
           Send
         </button>
 
-        <button onClick={generateEmails}>generate</button>
+        {/* <button onClick={generateEmails}>generate</button> */}
       </div>
     </div>
   );
