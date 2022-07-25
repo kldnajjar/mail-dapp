@@ -1,20 +1,19 @@
 import { toast } from "react-toastify";
 
-const isValidEmails = (emailsObj) => {
+const isValidEmails =  async (emailsObj , getGun) => {
   const { allEmails } = emailsObj;
-  let isValid = true;
-
-  allEmails.forEach((email) => {
-    if (!isEmail(email)) {
-      toast.error(`Invalid email ${email}`);
-      isValid = false;
-    } else if (!isMyKloudEmail(email)) {
-      toast.error(`not myKloud email ${email}`);
-      isValid = false;
+  for( let i = 0; i < allEmails.length; i++){
+    if (!isEmail(allEmails[i])) {
+      toast.error(`Invalid email ${allEmails[i]}`);
+      return false;
     }
-  });
-
-  return isValid;
+    const valid = await isMyKloudEmail(allEmails[i] , getGun);
+    if (!valid) {
+      toast.error(`not myKloud email ${allEmails[i]}`);
+      return false;
+    }
+  }
+  return true;
 };
 
 const isEmail = (email) => {
@@ -29,11 +28,17 @@ const isEmail = (email) => {
   return true;
 };
 
-const isMyKloudEmail = (email) => {
+const isMyKloudEmail = async (email , getGun) => {
   if (email.indexOf("mykloud.io") === -1) {
     return false;
+  }else{
+    let isExist = null;
+    await getGun()
+    .get(`~@${email}`)
+    .once((data) => {
+      isExist = data
+    })
+    return isExist ? true : false;
   }
-  return true;
 };
-
 export { isValidEmails };

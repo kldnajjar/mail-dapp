@@ -73,11 +73,11 @@ async function getRecipientEpub(emails, getGun) {
   for (let i = 0; i < emails.length; i++) {
     await getGun()
       .get(`~@${emails[i]}`)
-      .once((data) => {
-        if (!data) {
-          return toast.error(`${emails[i]} not exist`);
-        }
-      })
+      // .once((data) => {
+      //   if (!data) {
+      //     return toast.error(`${emails[i]} not exist`);
+      //   }
+      // })
       .map()
       .once((user) => {
         if (user) {
