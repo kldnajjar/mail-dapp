@@ -73,6 +73,6 @@ export const selectSendMessageIsOpen = (state) => state.mail.sendMessageIsOpen;
 export const selectedMailToReply = (state) => state.mail.isReply;
 export const selectedMailToReplyAll = (state) => state.mail.isReplyToAll;
 export const selectedMailToForward = (state) => state.mail.isForward;
-export const selecteFolder = (state) => state.mail.folder;
+export const selectedFolder = (state) => state.mail.folder;
 
 export default mailSlice.reducer;

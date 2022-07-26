@@ -19,7 +19,7 @@ import {
   openSendMessage,
   selectMail,
   setFolder,
-  selecteFolder,
+  selectedFolder,
   closeSendMessage,
 } from "../../slices/mailSlice";
 import SidebarOption from "./Option";
@@ -28,7 +28,7 @@ import styles from "./Sidebar.module.css";
 
 function Sidebar() {
   const dispatch = useDispatch();
-  const folderName = useSelector(selecteFolder);
+  const folderName = useSelector(selectedFolder);
 
   const onCompose = () => {
     dispatch(selectMail(null));

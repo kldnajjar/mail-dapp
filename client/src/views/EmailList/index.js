@@ -12,7 +12,7 @@ import ChevronRightIcon from "@material-ui/icons/ChevronRight";
 import KeyboardHideIcon from "@material-ui/icons/KeyboardHide";
 import SettingsIcon from "@material-ui/icons/Settings";
 
-import { resetEmailActions, selecteFolder } from "../../slices/mailSlice";
+import { resetEmailActions, selectedFolder } from "../../slices/mailSlice";
 import { selectCurrentUser } from "../../slices/userSlice";
 import { getCurrentUserAlias } from "../../util/user";
 import useGunContext from "../../context/useGunContext";
@@ -25,13 +25,16 @@ function EmailList() {
   const dispatch = useDispatch();
   const { getGun, getUser } = useGunContext();
   const user = useSelector(selectCurrentUser);
-  const folderName = useSelector(selecteFolder);
+  const folderName = useSelector(selectedFolder);
 
   const [emails, setEmails] = useState([]);
 
   useEffect(async () => {
     dispatch(resetEmailActions());
     await getAllEmails(getGun, getUser);
+    return () => {
+      console.log("cleanup")
+    }
   }, [folderName]);
 
   const getAllEmails = async (getGun, getUser) => {
@@ -49,7 +52,7 @@ function EmailList() {
     let counter = 0;
 
     folderNode
-      .once((data) => {
+      .on((data) => {
         delete data.label;
         const obj = Object.keys(data);
         emailsNum = obj.slice(1).length;
@@ -59,17 +62,24 @@ function EmailList() {
       })
       .map()
       .once(async (data) => {
+        // try {
+        //   if (typeof data.id === "undefined") {
+        //     return null
+        //   }
+        // } catch (error) {
+        //   return null
+        // }
         if (data && typeof data !== "string") {
           const conversation = await decryption(data, getUser, alias);
-
+  
           emails.push(conversation);
           counter++;
           if (counter > emailsNum) {
             setEmails((prev) => [conversation, ...prev]);
           }
-
+  
           var endTime = performance.now();
-          if (counter == emailsNum) {
+          if (counter === emailsNum) {
             var endTime = performance.now();
             console.log(
               `Call to doSomething took ${endTime - startTime} milliseconds`
@@ -78,11 +88,11 @@ function EmailList() {
             emails.sort((a, b) => {
               return b.time - a.time;
             });
-
+            
             setEmails([...emails]);
           }
         }
-      });
+    });
   };
 
   const renderEmails = () => {

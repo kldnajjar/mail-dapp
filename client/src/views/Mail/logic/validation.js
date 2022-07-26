@@ -45,6 +45,7 @@ const isMyKloudEmailExists = async (email , getGun)=>{
     await getGun()
     .get(`~@${email}`)
     .once((data) => {
+      console.log("email", data)
       isExist = data
     })
     return isExist ? true : false;

@@ -118,6 +118,8 @@ const prepareTheUsersKeys = (keys, encryptedKeysByUsers, encryptedKeysCarbonCopy
 
 // DECRYPTION
 export async function decryption(conversation, getUser, currentAlias) {
+  // console.log("in privacy with ?", conversation?.keys)
+  // console.log("in privacy", conversation.keys)
   const keysObjectJson = JSON.parse(conversation?.keys);
   const keysObject = Object.assign(
     {},
