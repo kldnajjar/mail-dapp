@@ -36,17 +36,6 @@ export async function encryption(email, getGun, getUser, isReply) {
     ? await getRecipientKeys(bcc, getGun, encryptionKey, senderPair)
     : {};
 
-  if (keys) {
-    for (const user in encryptedKeysByUsers) {
-      for (const key in keys) {
-        if (user !== key) {
-          console.log("HERE", user, key)
-          encryptedKeysByUsers[key] = keys[key];
-        }
-      }
-    }
-  }
-
   const encryptedUsersKeys = {
     encryptedKeysByUsers,
     encryptedKeysCarbonCopy,

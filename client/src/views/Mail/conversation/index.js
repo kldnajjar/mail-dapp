@@ -50,7 +50,7 @@ function Conversation() {
       .get("messages");
 
     let emailsNum = 0;
-    await conversationNode.once(async (data) => {
+    await conversationNode.on(async (data) => {
       if (data) {
         emailsNum = Object.keys(data).filter((elem) => elem != "_").length;
       } else {
@@ -68,7 +68,6 @@ function Conversation() {
         selectedMail?.keys,
         selectedMail?.senderEpub
       );
-      // message.keys = selectedMail?.keys;
       array.push(message);
       counter++;
       if (counter > emailsNum) {
@@ -118,7 +117,6 @@ function Conversation() {
   }
 
   return messages.map((message, key) => {
-    console.log(message)
     const allEmails = JSON.parse(message.allEmails)
     if (!allEmails.includes(alias)) { return null }
     return (

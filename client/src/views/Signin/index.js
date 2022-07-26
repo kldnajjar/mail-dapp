@@ -52,6 +52,9 @@ const SignIn = () => {
       .get("accounts")
       .get(getUser().is.alias)
       .once((user) => {
+        if (!user) {
+          return toast.error("Please retry login")
+        }
         sessionStorage.setItem("account", JSON.stringify(user));
         dispatch(setUser(user));
         pageRedirection("/account");
