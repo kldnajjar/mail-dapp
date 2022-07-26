@@ -176,7 +176,7 @@ export async function decryptionMessage(
   );
 
   return {
-    timestamp: message.timestamp,
+    timestamp: message?.timestamp,
     body: decryptedBody,
     sender: message?.sender,
     allEmails: message.allEmails,

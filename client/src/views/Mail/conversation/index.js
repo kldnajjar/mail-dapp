@@ -97,7 +97,6 @@ function Conversation() {
       keys: selectedMail?.keys,
       messageArray
     }
-    console.log(messageObj)
     messageObj.messageArray.sort((a, b) => {
       return b.timestamp - a.timestamp;
     });
@@ -168,7 +167,6 @@ function Conversation() {
               onClick={() => {
                 dispatch(setForward(true));
                 const messageObj = getMessagesToForward(message);
-                console.log(messageObj)
                 dispatch(setForwardMessage(messageObj));
               }}
             >
