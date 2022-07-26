@@ -7,9 +7,14 @@ const isValidEmails =  async (emailsObj , getGun) => {
       toast.error(`Invalid email ${allEmails[i]}`);
       return false;
     }
-    const valid = await isMyKloudEmail(allEmails[i] , getGun);
-    if (!valid) {
+    const isValid = isMyKloudEmail(allEmails[i]);
+    if (!isValid) {
       toast.error(`not myKloud email ${allEmails[i]}`);
+      return false;
+    }
+    const isExist = await isMyKloudEmailExists(allEmails[i],getGun);
+    if (!isExist) {
+      toast.error(`${allEmails[i]} email not exists`);
       return false;
     }
   }
@@ -28,10 +33,14 @@ const isEmail = (email) => {
   return true;
 };
 
-const isMyKloudEmail = async (email , getGun) => {
+const isMyKloudEmail = (email) => {
   if (email.indexOf("mykloud.io") === -1) {
     return false;
-  }else{
+  }
+  return true;
+};
+
+const isMyKloudEmailExists = async (email , getGun)=>{
     let isExist = null;
     await getGun()
     .get(`~@${email}`)
@@ -39,6 +48,5 @@ const isMyKloudEmail = async (email , getGun) => {
       isExist = data
     })
     return isExist ? true : false;
-  }
-};
+}
 export { isValidEmails };
