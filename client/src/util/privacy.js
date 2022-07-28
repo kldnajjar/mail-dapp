@@ -2,7 +2,7 @@ import SEA from "gun/sea";
 import { toast } from "react-toastify";
 
 // ENCRYPTION
-export async function encryption(email, getGun, getUser, isReply) {
+export async function encryption(email, getGun, getUser, getUsersEpub, isReply) {
   // TODO: This key is just an example. Ideally I think we should generate it every time sender sends an email.
   const encryptionKey = process.env.APP_MAIL_ENCRYPTION_KEY;
   const { recipients, sender, subject, body, cc, bcc, keys } = email;
@@ -22,6 +22,7 @@ export async function encryption(email, getGun, getUser, isReply) {
   const encryptedKeysByUsers = await getRecipientKeys(
     recipients,
     getGun,
+    getUsersEpub,
     encryptionKey,
     senderPair
   );
@@ -54,20 +55,31 @@ export async function encryption(email, getGun, getUser, isReply) {
   };
 }
 
-async function getRecipientKeys(recipients, getGun, encryptionKey, senderPair) {
+async function getRecipientKeys(recipients, getGun,getUsersEpub, encryptionKey, senderPair) {
   const encryptedKeysObj = {};
-  // TODO: getRecipientEpub change structre
-  const recipientEpubObj = await getRecipientEpub(recipients, getGun);
-  console.log("recipientEpubObj", recipientEpubObj);
+  await getGun().get("accounts").get("usersEpub").once( async (data) => {
+    // epubKeys = JSON.parse(data?.usersEpub || "{}");
+    for (let i = 0; i < recipients.length; i++) {
+      const secret = await SEA.secret(data[recipients[i]], senderPair);
+      const encryptedEncryptionKeyRecipient = await SEA.encrypt(
+        encryptionKey,
+        secret
+      );
+      encryptedKeysObj[recipients[i]] = encryptedEncryptionKeyRecipient;
+    }
+  });
+  // // TODO: getRecipientEpub change structre
+  // const recipientEpubObj = await getRecipientEpub(recipients, getGun);
+  // console.log("recipientEpubObj", recipientEpubObj);
 
-  for (const key in recipientEpubObj) {
-    const secret = await SEA.secret(recipientEpubObj[key], senderPair);
-    const encryptedEncryptionKeyRecipient = await SEA.encrypt(
-      encryptionKey,
-      secret
-    );
-    encryptedKeysObj[key] = encryptedEncryptionKeyRecipient;
-  }
+  // for (const key in recipientEpubObj) {
+  //   const secret = await SEA.secret(recipientEpubObj[key], senderPair);
+  //   const encryptedEncryptionKeyRecipient = await SEA.encrypt(
+  //     encryptionKey,
+  //     secret
+  //   );
+  //   encryptedKeysObj[key] = encryptedEncryptionKeyRecipient;
+  // }
   return encryptedKeysObj;
 }
 

@@ -9,7 +9,7 @@ import styles from "./Signup.module.css";
 
 const SignUp = () => {
   let navigate = useNavigate();
-  const { getGun, getUser } = useGunContext();
+  const { getGun, getUser , getUsersEpub } = useGunContext();
 
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
@@ -19,6 +19,14 @@ const SignUp = () => {
   const pageRedirection = () => {
     navigate("/sign-in", { replace: true });
   };
+
+  // function to store all users epub in the database
+  const addUsersEpub = (getGun , getUsersEpub , email , pub  ) => {
+    getGun().get(`~@${email}`).get(`~${pub}`).once((user) => {
+      getUsersEpub().put({[email] : user.epub})
+    })
+
+  }
 
   const handleSubmit = (event) => {
     event.preventDefault();
@@ -30,6 +38,7 @@ const SignUp = () => {
           toast.error("Email already taken");
         } else {
           getUser().create(email, password, ({ err, pub }) => {
+            addUsersEpub(getGun , getUsersEpub , email , pub);
             if (err) {
               console.log(`Error: creating user: ${err}`);
               toast.error(err);

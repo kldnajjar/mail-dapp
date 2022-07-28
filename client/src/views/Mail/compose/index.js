@@ -13,7 +13,7 @@ import styles from "../Mail.module.css";
 function Compose() {
   const dispatch = useDispatch();
   const user = useSelector(selectCurrentUser);
-  const { getGun, getUser, getMails } = useGunContext();
+  const { getGun, getUser, getMails , getUsersEpub } = useGunContext();
 
   const [currentUserEmail, setCurrentUserEmail] = useState(null);
   const [currentFirstAndLastNames, setCurrentFirstAndLastNames] = useState({})
@@ -51,6 +51,7 @@ function Compose() {
       getGun,
       getUser,
       getMails,
+      getUsersEpub
     };
 
     createEmail(emailObject, context);

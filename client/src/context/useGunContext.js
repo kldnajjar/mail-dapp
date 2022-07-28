@@ -26,6 +26,7 @@ const GunContext = createContext({
   getGun: () => {},
   getUser: () => {},
   getMails: () => {},
+  getUsersEpub: () => {},
   onAuth: () => () => {},
 });
 
@@ -33,6 +34,7 @@ export const GunContextProvider = ({ children }) => {
   const gunRef = useRef();
   const userRef = useRef();
   const mailsRef = useRef();
+  const usersEpubRef = useRef();
   const onAuthCbRef = useRef();
 
   useEffect(() => {
@@ -48,10 +50,12 @@ export const GunContextProvider = ({ children }) => {
       .recall({ sessionStorage: true });
 
     const mails = gun.get("conversations");
+    const usersEpub = gun.get("accounts").get("usersEpub")
 
     gunRef.current = gun;
     userRef.current = user;
     mailsRef.current = mails;
+    usersEpubRef.current =usersEpub;
   }, []);
 
   return (
@@ -60,6 +64,7 @@ export const GunContextProvider = ({ children }) => {
         getGun: () => gunRef.current,
         getUser: () => userRef.current,
         getMails: () => mailsRef.current,
+        getUsersEpub: () => usersEpubRef.current,
         onAuth: (cb) => {
           onAuthCbRef.current = cb;
         },
@@ -72,4 +77,4 @@ export const GunContextProvider = ({ children }) => {
 
 export default function useGunContext() {
   return useContext(GunContext);
-}
+} 
