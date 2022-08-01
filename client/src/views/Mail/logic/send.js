@@ -25,16 +25,25 @@ const getMailEmails = (obj) => {
 
 const handleConversationAndMessages = (
   emailObject,
-  emailEncrypted,
+  emailParam,
   emailsArray
 ) => {
-  const { conversationId, messageId, messageType, sender, recipient, cc, bcc, senderFirstName, senderLastName } =
-    emailObject;
-  let updatedRecipient = recipient
+  const {
+    conversationId,
+    messageId,
+    messageType,
+    sender,
+    recipient,
+    cc,
+    bcc,
+    senderFirstName,
+    senderLastName,
+  } = emailObject;
+  let updatedRecipient = recipient;
   const { encryptedUsersKeys, encryptedMessage, encryptedSubject, senderEpub } =
-    emailEncrypted;
+    emailParam;
   const { carbonCopyArray, blindCarbonCopyArray, allEmails } = emailsArray;
-  const allEmailsWithSender = [...allEmails, sender]
+  const allEmailsWithSender = [...allEmails, sender];
   const jsonObj = JSON.stringify(encryptedUsersKeys || "");
   const carbonCopyJsonObj = JSON.stringify(carbonCopyArray);
   const blindCarbonCopyJsonObj = JSON.stringify(blindCarbonCopyArray);
@@ -42,9 +51,12 @@ const handleConversationAndMessages = (
   const conversationObj = {};
   const messageObj = {};
 
-  if (recipient.includes(";")) { updatedRecipient = recipient.replace(";", "") }
+  if (recipient.includes(";")) {
+    updatedRecipient = recipient.replace(";", "");
+  }
 
   conversationObj.id = conversationId;
+  conversationObj.subject = encryptedSubject || "";
   conversationObj.sender = sender || "";
   conversationObj.recentBody = encryptedMessage || "";
   conversationObj.timestamp = new Date().getTime();
@@ -68,7 +80,6 @@ const handleConversationAndMessages = (
     };
   }
 
-  conversationObj.subject = encryptedSubject || "";
   conversationObj.keys = jsonObj;
   conversationObj.senderEpub = senderEpub || "";
   conversationObj.cc = carbonCopyJsonObj ? carbonCopyJsonObj : "";

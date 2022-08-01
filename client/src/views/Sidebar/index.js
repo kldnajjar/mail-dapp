@@ -21,6 +21,7 @@ import {
   setFolder,
   selectedFolder,
   closeSendMessage,
+  selectedNumberOfMessages,
 } from "../../slices/mailSlice";
 import SidebarOption from "./Option";
 
@@ -29,6 +30,7 @@ import styles from "./Sidebar.module.css";
 function Sidebar() {
   const dispatch = useDispatch();
   const folderName = useSelector(selectedFolder);
+  const numberOfMessages = useSelector(selectedNumberOfMessages);
 
   const onCompose = () => {
     dispatch(selectMail(null));
@@ -49,7 +51,7 @@ function Sidebar() {
       <SidebarOption
         Icon={InboxIcon}
         title="Inbox"
-        number={54}
+        number={folderName === "inbox" ? numberOfMessages : ""}
         selected={folderName === "inbox" ? true : false}
         onClick={() => {
           dispatch(closeSendMessage());
@@ -61,7 +63,7 @@ function Sidebar() {
         customClassName="unused"
         Icon={StarIcon}
         title="Starred"
-        number={12}
+        number={folderName === "starred" ? numberOfMessages : ""}
         selected={folderName === "starred" ? true : false}
         onClick={() => {
           dispatch(closeSendMessage());
@@ -72,7 +74,7 @@ function Sidebar() {
         customClassName="unused"
         Icon={AccessTimeIcon}
         title="Snoozed"
-        number={9}
+        number={folderName === "snoozed" ? numberOfMessages : ""}
         selected={folderName === "snoozed" ? true : false}
         onClick={() => {
           dispatch(closeSendMessage());
@@ -83,7 +85,7 @@ function Sidebar() {
         customClassName="unused"
         Icon={LabelImportantIcon}
         title="Important"
-        number={12}
+        number={folderName === "important" ? numberOfMessages : ""}
         selected={folderName === "important" ? true : false}
         onClick={() => {
           dispatch(closeSendMessage());
@@ -94,7 +96,7 @@ function Sidebar() {
       <SidebarOption
         Icon={NearMeIcon}
         title="Sent"
-        number={81}
+        number={folderName === "sent" ? numberOfMessages : ""}
         selected={folderName === "sent" ? true : false}
         onClick={() => {
           dispatch(closeSendMessage());
@@ -106,7 +108,7 @@ function Sidebar() {
         customClassName="unused"
         Icon={NoteIcon}
         title="Drafts"
-        number={5}
+        number={folderName === "drafts" ? numberOfMessages : ""}
         selected={folderName === "drafts" ? true : false}
         onClick={() => {
           dispatch(closeSendMessage());

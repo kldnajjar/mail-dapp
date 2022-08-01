@@ -13,8 +13,6 @@ export const createEmail = async (emailObject, context) => {
   const emailsArray = getMailEmails(emailObject);
   const isValid = await isValidEmails(emailsArray, getGun);
 
- 
-
   if (!isValid) return;
 
   const obj = {
@@ -27,36 +25,30 @@ export const createEmail = async (emailObject, context) => {
     bcc: emailsArray.blindCarbonCopyArray,
   };
 
+  console.log(process.env.APP_WITH_ENCRYPTION);
 
-  console.log(process.env.APP_WITH_ENCRYPTION)
-
-  let emailEncrypted = {
+  let emailParam = {
     encryptedMessage: obj?.body,
     encryptedSubject: obj?.subject,
     encryptedUsersKeys: {},
-    sender:obj?.sender,
-    senderEpub:""
-  }
-  if(process.env.APP_WITH_ENCRYPTION === "true"){
-    emailEncrypted = await encryption(obj, getGun, getUser, isReply);
+    sender: obj?.sender,
+    senderEpub: "",
+  };
+  if (process.env.APP_WITH_ENCRYPTION === "true") {
+    emailParam = await encryption(obj, getGun, getUser, isReply);
   }
   const msgObj = await handleConversationAndMessages(
     emailObject,
-    emailEncrypted,
+    emailParam,
     emailsArray
   );
-  console.log("emailObject" , emailObject)
-  console.log("emailEncrypted" , emailEncrypted)
-  console.log("emailsArray" , emailsArray)
+  console.log("emailObject", emailObject);
+  console.log("emailParam", emailParam);
+  console.log("emailsArray", emailsArray);
   createMessagesWithRelatedConversation(
     context,
     msgObj,
     emailObject,
     emailsArray
   );
-  
-  
-   
-  
-  
 };

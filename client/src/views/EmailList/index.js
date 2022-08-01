@@ -12,7 +12,11 @@ import ChevronRightIcon from "@material-ui/icons/ChevronRight";
 import KeyboardHideIcon from "@material-ui/icons/KeyboardHide";
 import SettingsIcon from "@material-ui/icons/Settings";
 
-import { resetEmailActions, selectedFolder } from "../../slices/mailSlice";
+import {
+  resetEmailActions,
+  selectedFolder,
+  setNumberOfMessage,
+} from "../../slices/mailSlice";
 import { selectCurrentUser } from "../../slices/userSlice";
 import { getCurrentUserAlias } from "../../util/user";
 import useGunContext from "../../context/useGunContext";
@@ -33,8 +37,8 @@ function EmailList() {
     dispatch(resetEmailActions());
     await getAllEmails(getGun, getUser);
     return () => {
-      console.log("cleanup")
-    }
+      console.log("cleanup");
+    };
   }, [folderName]);
 
   const getAllEmails = async (getGun, getUser) => {
@@ -56,6 +60,8 @@ function EmailList() {
         delete data.label;
         const obj = Object.keys(data);
         emailsNum = obj.slice(1).length;
+        // TODO: check if i recieved a new email it will be reflected into the count of the folder
+        dispatch(setNumberOfMessage(emailsNum));
         if (obj.length === 1) {
           setEmails([]);
         }
@@ -81,7 +87,7 @@ function EmailList() {
             setEmails([...emails]);
           }
         }
-    });
+      });
   };
 
   const renderEmails = () => {
