@@ -64,24 +64,20 @@ function EmailList() {
       .once(async (data) => {
         if (data && typeof data !== "string") {
           const conversation = await decryption(data, getUser, alias);
-  
           emails.push(conversation);
           counter++;
           if (counter > emailsNum) {
             setEmails((prev) => [conversation, ...prev]);
           }
-  
           var endTime = performance.now();
           if (counter === emailsNum) {
             var endTime = performance.now();
             console.log(
               `Call to doSomething took ${endTime - startTime} milliseconds`
             );
-
             emails.sort((a, b) => {
               return b.time - a.time;
             });
-            
             setEmails([...emails]);
           }
         }

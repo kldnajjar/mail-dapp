@@ -127,7 +127,17 @@ const prepareTheUsersKeys = (keys, encryptedKeysByUsers, encryptedKeysCarbonCopy
 export async function decryption(conversation, getUser, currentAlias) {
   // console.log("in privacy with ?", conversation?.keys)
   // console.log("in privacy", conversation.keys)
-  if(process.env.APP_WITH_ENCRYPTION === "true"){
+  if(process.env.APP_WITH_ENCRYPTION === "false"){
+    return {
+      sender: conversation?.sender,
+      subject: conversation?.subject,
+      body: conversation?.recentBody,
+      senderEpub: conversation?.senderEpub,
+      id: `conversations/${conversation?.id}`,
+      keys: {},
+      time: conversation.timestamp,
+    };
+  }
   const keysObjectJson = JSON.parse(conversation?.keys);
   const keysObject = Object.assign(
     {},
@@ -161,17 +171,7 @@ export async function decryption(conversation, getUser, currentAlias) {
     keys: keysObject,
     time: conversation.timestamp,
   };
- }else{
-  return {
-    sender: conversation?.sender,
-    subject: conversation?.subject,
-    body: conversation?.recentBody,
-    senderEpub: conversation?.senderEpub,
-    id: `conversations/${conversation?.id}`,
-    keys: {},
-    time: conversation.timestamp,
-  };
- }
+
 }
 
 export async function decryptionMessage(
@@ -181,7 +181,19 @@ export async function decryptionMessage(
   keys,
   senderEpub
 ) {
-  if(process.env.APP_WITH_ENCRYPTION === "true"){
+
+  if(process.env.APP_WITH_ENCRYPTION === "false"){
+    return {
+      timestamp: message?.timestamp,
+      body: message?.body,
+      sender: message?.sender,
+      allEmails: message.allEmails,
+      senderFirstName: message.senderFirstName,
+      senderLastName: message.senderLastName,
+      recipients: `${message?.recipients}`,
+      cc: `${message?.carbonCopy}`,
+    };
+  }
   const myPair = await getUser()._.sea;
   const decryptedEncryptionKeyForUser = await SEA.decrypt(
     keys[alias],
@@ -201,16 +213,4 @@ export async function decryptionMessage(
     recipients: `${message?.recipients}`,
     cc: `${message?.carbonCopy}`,
   };
- }else{
-  return {
-    timestamp: message?.timestamp,
-    body: message?.body,
-    sender: message?.sender,
-    allEmails: message.allEmails,
-    senderFirstName: message.senderFirstName,
-    senderLastName: message.senderLastName,
-    recipients: `${message?.recipients}`,
-    cc: `${message?.carbonCopy}`,
-  };
- }
 }

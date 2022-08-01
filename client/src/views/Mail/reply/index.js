@@ -23,9 +23,11 @@ function Reply() {
 
   const [currentFirstAndLastNames, setCurrentFirstAndLastNames] = useState({});
   const [from, setFrom] = useState("");
+
   const [recipient, setRecipient] = useState("");
   const [emailCC, setEmailCC] = useState("");
   const [emailBCC, setEmailBCC] = useState("");
+  
   const [body, setBody] = useState("");
 
   useEffect(async () => {
