@@ -62,13 +62,6 @@ function EmailList() {
       })
       .map()
       .once(async (data) => {
-        // try {
-        //   if (typeof data.id === "undefined") {
-        //     return null
-        //   }
-        // } catch (error) {
-        //   return null
-        // }
         if (data && typeof data !== "string") {
           const conversation = await decryption(data, getUser, alias);
   

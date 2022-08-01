@@ -26,7 +26,6 @@ export async function encryption(email, getGun, getUser, getUsersEpub, isReply) 
     encryptionKey,
     senderPair
   );
-  console.log(encryptedKeysByUsers)
   encryptedKeysByUsers[sender] = encryptedEncryptionKeySender;
 
   const encryptedKeysCarbonCopy = cc
@@ -42,10 +41,6 @@ export async function encryption(email, getGun, getUser, getUsersEpub, isReply) 
     encryptedKeysCarbonCopy,
     encryptedKeysBlindCarbonCopy,
   };
-
-  console.log(keys)
-  console.log(encryptedUsersKeys)
-
   return {
     encryptedSubject,
     encryptedMessage,

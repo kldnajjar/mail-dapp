@@ -44,7 +44,7 @@ function Conversation() {
     const currentAlias = await getCurrentUserAlias(user, getUser);
     setAlias(currentAlias)
 
-    console.log("ID", selectedMail.id.split("/")[1])
+    
     const conversationNode = getMails()
       .get(selectedMail.id.split("/")[1])
       .get("messages");

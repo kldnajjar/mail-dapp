@@ -13,7 +13,7 @@ export const createEmail = async (emailObject, context) => {
   const emailsArray = getMailEmails(emailObject);
   const isValid = await isValidEmails(emailsArray, getGun);
 
-  console.log(isValid);
+ 
 
   if (!isValid) return;
 

@@ -40,8 +40,9 @@ const handleConversationAndMessages = (
   const { carbonCopyArray, blindCarbonCopyArray, allEmails } = emailsArray;
 
   const allEmailsWithSender = [...allEmails, sender]
-
+  
   const jsonObj = JSON.stringify(encryptedUsersKeys || "");
+  
   const carbonCopyJsonObj = JSON.stringify(carbonCopyArray);
   const blindCarbonCopyJsonObj = JSON.stringify(blindCarbonCopyArray);
   const allEmailsObj = JSON.stringify(allEmailsWithSender);
@@ -52,6 +53,7 @@ const handleConversationAndMessages = (
   if (recipient.includes(";")) { updatedRecipient = recipient.replace(";", "") }
 
   conversationObj.id = conversationId;
+  conversationObj.sender = sender || "";
   conversationObj.recentBody = encryptedMessage || "";
   conversationObj.timestamp = new Date().getTime();
 
