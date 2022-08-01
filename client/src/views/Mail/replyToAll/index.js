@@ -26,6 +26,7 @@ function ReplyToAll() {
   const [recipient, setRecipient] = useState("");
   const [emailCC, setEmailCC] = useState("");
   const [emailBCC, setEmailBCC] = useState("");
+  const [subject, setSubject] = useState("");
   const [body, setBody] = useState("");
 
   useEffect(async () => {
@@ -41,6 +42,7 @@ function ReplyToAll() {
     setRecipient(messageToReply.sender);
     if (messageToReply.cc) setEmailCC(messageToReply.cc);
     if (messageToReply.bcc) setEmailBCC(messageToReply.bcc);
+    setSubject(`Re: ${selectedMail.subject}`);
   }, []);
 
   const replyToAll = async () => {
@@ -80,6 +82,7 @@ function ReplyToAll() {
   const handleRecipientEmails = (context) => {
     const recipient = `${messageToReply.sender}`;
     const emailObject = {
+      subject,
       recipient,
       body,
       sender: from,
@@ -123,6 +126,13 @@ function ReplyToAll() {
           placeholder="Seperate multiple emails with ;"
           value={emailBCC}
           onChange={(event) => setEmailBCC(event.target.value)}
+        />
+        <Input
+          type="text"
+          label="Subject"
+          placeholder="Subject"
+          value={subject}
+          onChange={(event) => setSubject(event.target.value)}
         />
       </div>
 

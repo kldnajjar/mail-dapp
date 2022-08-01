@@ -31,17 +31,20 @@ function Forward() {
 
   useEffect(() => {
     let message = `\n\n\n---------- Forwarded message ---------\nSubject: ${selectedMail.subject}\n\n`;
-    let firstName
-    let lastName
+    let firstName;
+    let lastName;
     for (let i = 0; i < selectedMailToForward.messageArray.length; i++) {
-      firstName = selectedMailToForward.messageArray[i].senderFirstName
-      lastName = selectedMailToForward.messageArray[i].senderLastName
-      message += `On ${moment(message.timestamp).format("ddd, MMMM D, YYYY")} at` +
-      `${moment(message.timestamp).format("h:mm A")}, ${firstName} ${lastName} wrote:
+      firstName = selectedMailToForward.messageArray[i].senderFirstName;
+      lastName = selectedMailToForward.messageArray[i].senderLastName;
+      message +=
+        `On ${moment(message.timestamp).format("ddd, MMMM D, YYYY")} at` +
+        `${moment(message.timestamp).format(
+          "h:mm A"
+        )}, ${firstName} ${lastName} wrote:
       \n${selectedMailToForward.messageArray[i].body}\n\n`;
     }
     setBody(message);
-    // setSubject(selectedMail.subject);
+    setSubject(`Fwd: ${selectedMail.subject}`);
   }, []);
 
   useEffect(async () => {
@@ -105,13 +108,13 @@ function Forward() {
           value={emailBCC}
           onChange={(event) => setEmailBCC(event.target.value)}
         />
-        {/* <Input
+        <Input
           type="text"
           label="Subject"
           placeholder="Subject"
           value={subject}
           onChange={(event) => setSubject(event.target.value)}
-        /> */}
+        />
       </div>
 
       <div className={styles["mail-message"]}>

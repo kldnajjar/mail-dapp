@@ -23,11 +23,10 @@ function Reply() {
 
   const [currentFirstAndLastNames, setCurrentFirstAndLastNames] = useState({});
   const [from, setFrom] = useState("");
-
   const [recipient, setRecipient] = useState("");
   const [emailCC, setEmailCC] = useState("");
   const [emailBCC, setEmailBCC] = useState("");
-  
+  const [subject, setSubject] = useState("");
   const [body, setBody] = useState("");
 
   useEffect(async () => {
@@ -39,14 +38,16 @@ function Reply() {
       getUser
     );
     setCurrentFirstAndLastNames(first_And_LastNames);
-    console.log("messageToReply", messageToReply);
+
     setRecipient(messageToReply.sender);
     if (messageToReply.cc) setEmailCC(messageToReply.cc);
     if (messageToReply.bcc) setEmailBCC(messageToReply.bcc);
+    setSubject(`Re: ${selectedMail.subject}`);
   }, []);
 
   const sendEmail = () => {
     const emailObject = {
+      subject,
       sender: from,
       senderFirstName: currentFirstAndLastNames.firstName,
       senderLastName: currentFirstAndLastNames.lastName,
@@ -98,6 +99,13 @@ function Reply() {
           placeholder="Seperate multiple emails with ;"
           value={emailBCC}
           onChange={(event) => setEmailBCC(event.target.value)}
+        />
+        <Input
+          type="text"
+          label="Subject"
+          placeholder="Subject"
+          value={subject}
+          onChange={(event) => setSubject(event.target.value)}
         />
       </div>
 
