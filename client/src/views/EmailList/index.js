@@ -60,7 +60,6 @@ function EmailList() {
         delete data.label;
         const obj = Object.keys(data);
         emailsNum = obj.slice(1).length;
-        // TODO: check if i recieved a new email it will be reflected into the count of the folder
         dispatch(setNumberOfMessage(emailsNum));
         if (obj.length === 1) {
           setEmails([]);
