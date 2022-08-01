@@ -6,17 +6,20 @@ import Input from "../../../components/input";
 import useGunContext from "../../../context/useGunContext";
 import { createEmail } from "../logic/mail";
 import { selectCurrentUser } from "../../../slices/userSlice";
-import { getCurrentUserAlias, getCurrentUserFirstAndLastNames } from "../../../util/user";
+import {
+  getCurrentUserAlias,
+  getCurrentUserFirstAndLastNames,
+} from "../../../util/user";
 
 import styles from "../Mail.module.css";
 
 function Compose() {
   const dispatch = useDispatch();
   const user = useSelector(selectCurrentUser);
-  const { getGun, getUser, getMails , getUsersEpub } = useGunContext();
+  const { getGun, getUser, getMails, getUsersEpub } = useGunContext();
 
   const [currentUserEmail, setCurrentUserEmail] = useState(null);
-  const [currentFirstAndLastNames, setCurrentFirstAndLastNames] = useState({})
+  const [currentFirstAndLastNames, setCurrentFirstAndLastNames] = useState({});
   const [recipient, setRecipient] = useState("");
   const [emailCC, setEmailCC] = useState("");
   const [emailBCC, setEmailBCC] = useState("");
@@ -27,11 +30,12 @@ function Compose() {
     const current_user_email = await getCurrentUserAlias(user, getUser);
     setCurrentUserEmail(current_user_email);
 
-    const first_And_LastNames = await getCurrentUserFirstAndLastNames(user, getUser);
-    setCurrentFirstAndLastNames(first_And_LastNames)
+    const first_And_LastNames = await getCurrentUserFirstAndLastNames(
+      user,
+      getUser
+    );
+    setCurrentFirstAndLastNames(first_And_LastNames);
   }, []);
-
-
 
   const sendEmail = () => {
     const emailObject = {
@@ -53,7 +57,7 @@ function Compose() {
       getGun,
       getUser,
       getMails,
-      getUsersEpub
+      getUsersEpub,
     };
 
     createEmail(emailObject, context);

@@ -2,9 +2,13 @@ import React, { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { v4 as uuid } from "uuid";
 
+import Input from "../../../components/input";
 import { selectOpenMail, selectedMessage } from "../../../slices/mailSlice";
 import { selectCurrentUser } from "../../../slices/userSlice";
-import { getCurrentUserAlias, getCurrentUserFirstAndLastNames } from "../../../util/user";
+import {
+  getCurrentUserAlias,
+  getCurrentUserFirstAndLastNames,
+} from "../../../util/user";
 import useGunContext from "../../../context/useGunContext";
 import { createEmail } from "../logic/mail";
 
@@ -17,25 +21,36 @@ function Reply() {
   const selectedMail = useSelector(selectOpenMail);
   const messageToReply = useSelector(selectedMessage);
 
-  const [currentFirstAndLastNames, setCurrentFirstAndLastNames] = useState({})
+  const [currentFirstAndLastNames, setCurrentFirstAndLastNames] = useState({});
   const [from, setFrom] = useState("");
+  const [recipient, setRecipient] = useState("");
+  const [emailCC, setEmailCC] = useState("");
+  const [emailBCC, setEmailBCC] = useState("");
   const [body, setBody] = useState("");
 
   useEffect(async () => {
     const alias = await getCurrentUserAlias(user, getUser);
     setFrom(alias);
 
-    const first_And_LastNames = await getCurrentUserFirstAndLastNames(user, getUser);
-    setCurrentFirstAndLastNames(first_And_LastNames)
+    const first_And_LastNames = await getCurrentUserFirstAndLastNames(
+      user,
+      getUser
+    );
+    setCurrentFirstAndLastNames(first_And_LastNames);
+    console.log("messageToReply", messageToReply);
+    setRecipient(messageToReply.sender);
+    if (messageToReply.cc) setEmailCC(messageToReply.cc);
+    if (messageToReply.bcc) setEmailBCC(messageToReply.bcc);
   }, []);
 
   const sendEmail = () => {
-    const recipient = messageToReply.sender;
     const emailObject = {
       sender: from,
       senderFirstName: currentFirstAndLastNames.firstName,
       senderLastName: currentFirstAndLastNames.lastName,
       recipient,
+      cc: emailCC,
+      bcc: emailBCC,
       body,
       conversationId: selectedMail.id.split("/")[1],
       messageId: uuid(),
@@ -61,12 +76,27 @@ function Reply() {
             <b>{from}</b>
           </div>
         </div>
-        <div className="form-group mb-3">
-          <label>Recipient</label>
-          <div className="mb-3">
-            <b>{messageToReply.sender}</b>
-          </div>
-        </div>
+        <Input
+          type="email"
+          label="Recipient"
+          placeholder="Seperate multiple emails with ;"
+          value={recipient}
+          onChange={(event) => setRecipient(event.target.value)}
+        />
+        <Input
+          type="email"
+          label="CC"
+          placeholder="Seperate multiple emails with ;"
+          value={emailCC}
+          onChange={(event) => setEmailCC(event.target.value)}
+        />
+        <Input
+          type="email"
+          label="Bcc"
+          placeholder="Seperate multiple emails with ;"
+          value={emailBCC}
+          onChange={(event) => setEmailBCC(event.target.value)}
+        />
       </div>
 
       <div className={styles["mail-message"]}>
