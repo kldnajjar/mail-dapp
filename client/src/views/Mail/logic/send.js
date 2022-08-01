@@ -3,22 +3,18 @@ import { toast } from "react-toastify";
 
 const getMailEmails = (obj) => {
   const recipientsArray = obj.recipient.split(";");
-
   let carbonCopyArray = [];
   if (obj.cc?.length) {
     carbonCopyArray = obj.cc.split(";");
   }
-
   let blindCarbonCopyArray = [];
   if (obj.bcc?.length) {
     blindCarbonCopyArray = obj.bcc.split(";");
   }
-
   const allEmails = recipientsArray.concat(
     carbonCopyArray,
     blindCarbonCopyArray
   );
-
   return {
     recipientsArray,
     carbonCopyArray,
@@ -38,15 +34,11 @@ const handleConversationAndMessages = (
   const { encryptedUsersKeys, encryptedMessage, encryptedSubject, senderEpub } =
     emailEncrypted;
   const { carbonCopyArray, blindCarbonCopyArray, allEmails } = emailsArray;
-
   const allEmailsWithSender = [...allEmails, sender]
-  
   const jsonObj = JSON.stringify(encryptedUsersKeys || "");
-  
   const carbonCopyJsonObj = JSON.stringify(carbonCopyArray);
   const blindCarbonCopyJsonObj = JSON.stringify(blindCarbonCopyArray);
   const allEmailsObj = JSON.stringify(allEmailsWithSender);
-
   const conversationObj = {};
   const messageObj = {};
 
