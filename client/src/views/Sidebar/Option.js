@@ -19,7 +19,7 @@ function SidebarOption({
     >
       <Icon />
       <h3 className="mb-0">{title}</h3>
-      <p className="mb-0">{number}</p>
+      <p className={`${styles["item-number"]} mb-0`}>{number}</p>
     </div>
   );
 }

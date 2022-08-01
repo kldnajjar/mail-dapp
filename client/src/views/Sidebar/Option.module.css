@@ -47,6 +47,10 @@
   display: inline;
 }
 
+.sidebarOption:hover .item-number {
+  display: none;
+}
+
 .sidebarOption > .MuiSvgIcon-root {
   padding: 5px;
 }
