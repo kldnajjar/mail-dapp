@@ -50,9 +50,9 @@ export async function encryption(email, getGun, getUser, getUsersEpub, isReply) 
   };
 }
 
-async function getRecipientKeys(recipients, getGun,getUsersEpub, encryptionKey, senderPair) {
+async function getRecipientKeys(recipients, getGun, getUsersEpub, encryptionKey, senderPair) {
   const encryptedKeysObj = {};
-  await getGun().get("accounts").get("usersEpub").once( async (data) => {
+  await getGun().get("accounts").get("usersEpub").once(async (data) => {
     // epubKeys = JSON.parse(data?.usersEpub || "{}");
     for (let i = 0; i < recipients.length; i++) {
       const secret = await SEA.secret(data[recipients[i]], senderPair);
@@ -60,7 +60,7 @@ async function getRecipientKeys(recipients, getGun,getUsersEpub, encryptionKey, 
         encryptionKey,
         secret
       );
-      encryptedKeysObj[recipients[i]] = encryptedEncryptionKeyRecipient;
+      encryptedKeysObj[recipients[i]] = encryptedEncryptionKeyRecipient;  
     }
   });
   // // TODO: getRecipientEpub change structre
@@ -125,8 +125,6 @@ const prepareTheUsersKeys = (keys, encryptedKeysByUsers, encryptedKeysCarbonCopy
 
 // DECRYPTION
 export async function decryption(conversation, getUser, currentAlias) {
-  // console.log("in privacy with ?", conversation?.keys)
-  // console.log("in privacy", conversation.keys)
   if(process.env.APP_WITH_ENCRYPTION === "false"){
     return {
       sender: conversation?.sender,

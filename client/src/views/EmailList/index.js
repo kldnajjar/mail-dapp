@@ -1,5 +1,6 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import lodash from "lodash";
 import "gun/sea";
 import "gun/lib/path.js";
 
@@ -36,9 +37,6 @@ function EmailList() {
   useEffect(async () => {
     dispatch(resetEmailActions());
     await getAllEmails(getGun, getUser);
-    return () => {
-      console.log("cleanup");
-    };
   }, [folderName]);
 
   const getAllEmails = async (getGun, getUser) => {
@@ -59,6 +57,9 @@ function EmailList() {
       .on((data) => {
         delete data.label;
         const obj = Object.keys(data);
+
+        counter = Object.keys(data).length - 1;
+
         emailsNum = obj.slice(1).length;
         dispatch(setNumberOfMessage(emailsNum));
         if (obj.length === 1) {
@@ -67,10 +68,10 @@ function EmailList() {
       })
       .map()
       .once(async (data) => {
+        console.log("data", data)
         if (data && typeof data !== "string") {
           const conversation = await decryption(data, getUser, alias);
           emails.push(conversation);
-          counter++;
           if (counter > emailsNum) {
             setEmails((prev) => [conversation, ...prev]);
           }
@@ -78,14 +79,19 @@ function EmailList() {
           if (counter === emailsNum) {
             var endTime = performance.now();
             console.log(
-              `Call to doSomething took ${endTime - startTime} milliseconds`
+              `Call to do something took ${endTime - startTime} milliseconds`
             );
-            emails.sort((a, b) => {
+
+            const newEmails = lodash.uniqBy(emails, "id");
+
+            newEmails.sort((a, b) => {
               return b.time - a.time;
             });
-            setEmails([...emails]);
+            
+            setEmails(newEmails);
           }
         }
+        folderNode.off()
       });
   };
 

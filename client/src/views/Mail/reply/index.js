@@ -42,7 +42,7 @@ function Reply() {
     setRecipient(messageToReply.sender);
     if (messageToReply.cc) setEmailCC(messageToReply.cc);
     if (messageToReply.bcc) setEmailBCC(messageToReply.bcc);
-    setSubject(`Re: ${selectedMail.subject}`);
+    setSubject(`${selectedMail.subject}`);
   }, []);
 
   const sendEmail = () => {
@@ -104,8 +104,9 @@ function Reply() {
           type="text"
           label="Subject"
           placeholder="Subject"
+          pretext="Re: "
           value={subject}
-          onChange={(event) => setSubject(event.target.value)}
+          onChange={(event) => setSubject(`Re: ${event.target.value}`)}
         />
       </div>
 

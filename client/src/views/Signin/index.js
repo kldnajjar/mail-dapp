@@ -38,11 +38,11 @@ const SignIn = () => {
       if (err) {
         return toast.error(err);
       }
-      loginSucess();
+      loginSuccess();
     });
   };
 
-  const loginSucess = () => {
+  const loginSuccess = () => {
     sessionChannel.postMessage({
       eventName: "I_HAVE_CREDS",
       value: window.sessionStorage.getItem("pair"),
