@@ -22,6 +22,7 @@ import React, { createContext, useContext, useRef, useEffect } from "react";
 import Gun from "gun/gun";
 import "gun/sea";
 
+
 const GunContext = createContext({
   getGun: () => {},
   getUser: () => {},

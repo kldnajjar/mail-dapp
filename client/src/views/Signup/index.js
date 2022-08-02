@@ -59,6 +59,7 @@ const SignUp = () => {
 
     getGun().get("accounts").get(email).get("folders").get("inbox").put({
       label: "inbox",
+      new  : JSON.stringify([])
     });
 
     getGun().get("accounts").get(email).get("folders").get("sent").put({

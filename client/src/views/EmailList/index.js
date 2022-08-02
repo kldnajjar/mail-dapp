@@ -17,6 +17,7 @@ import {
   resetEmailActions,
   selectedFolder,
   setNumberOfMessage,
+  setNumberOfNewMessage,
 } from "../../slices/mailSlice";
 import { selectCurrentUser } from "../../slices/userSlice";
 import { getCurrentUserAlias } from "../../util/user";
@@ -33,6 +34,7 @@ function EmailList() {
   const folderName = useSelector(selectedFolder);
 
   const [emails, setEmails] = useState([]);
+  const [newEmails, setNewEmails] = useState();
 
   useEffect(async () => {
     dispatch(resetEmailActions());
@@ -54,14 +56,14 @@ function EmailList() {
     let counter = 0;
 
     folderNode
-      .on((data) => {
+      .on(async (data) => {
         delete data.label;
+        delete data.new;
         const obj = Object.keys(data);
 
         counter = Object.keys(data).length - 1;
 
         emailsNum = obj.slice(1).length;
-        dispatch(setNumberOfMessage(emailsNum));
         if (obj.length === 1) {
           setEmails([]);
         }
@@ -70,6 +72,11 @@ function EmailList() {
       .once(async (data) => {
         console.log("data", data)
         if (data && typeof data !== "string") {
+          folderNode.get("new").once((data) => {
+            let array = JSON.parse(data);
+            dispatch(setNumberOfNewMessage(array.length));
+            setNewEmails(array.length);
+          });
           const conversation = await decryption(data, getUser, alias);
           emails.push(conversation);
           if (counter > emailsNum) {

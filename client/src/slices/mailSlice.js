@@ -8,6 +8,7 @@ export const mailSlice = createSlice({
     selectedMessageToForward: null,
     sendMessageIsOpen: false,
     numberOfMessages: null,
+    numberOfNewMessages: null,
     folder: "inbox",
     isReply: false,
     isReplyToAll: false,
@@ -32,6 +33,9 @@ export const mailSlice = createSlice({
     },
     setNumberOfMessage: (state, action) => {
       state.numberOfMessages = action.payload;
+    },
+    setNumberOfNewMessage: (state, action) => {
+      state.numberOfNewMessages = action.payload;
     },
     openSendMessage: (state) => {
       state.sendMessageIsOpen = true;
@@ -69,6 +73,7 @@ export const {
   setForward,
   resetEmailActions,
   setNumberOfMessage,
+  setNumberOfNewMessage,
 } = mailSlice.actions;
 
 export const selectOpenMail = (state) => state.mail.selectedMail;
@@ -80,6 +85,7 @@ export const selectedMailToReply = (state) => state.mail.isReply;
 export const selectedMailToReplyAll = (state) => state.mail.isReplyToAll;
 export const selectedMailToForward = (state) => state.mail.isForward;
 export const selectedFolder = (state) => state.mail.folder;
-export const selectedNumberOfMessages = (state) => state.mail.numberOfMessages;
+export const selectedNumberOfMessages = (state) => state.mail.numberOfMessages ? state.mail.numberOfMessages : "";
+export const selectedNumberOfNewMessages = (state) => state.mail.numberOfNewMessages ? state.mail.numberOfNewMessages : "";
 
 export default mailSlice.reducer;

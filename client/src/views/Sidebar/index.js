@@ -22,6 +22,7 @@ import {
   selectedFolder,
   closeSendMessage,
   selectedNumberOfMessages,
+  selectedNumberOfNewMessages
 } from "../../slices/mailSlice";
 import SidebarOption from "./Option";
 
@@ -30,7 +31,7 @@ import styles from "./Sidebar.module.css";
 function Sidebar() {
   const dispatch = useDispatch();
   const folderName = useSelector(selectedFolder);
-  const numberOfMessages = useSelector(selectedNumberOfMessages);
+  const numberOfNewMessages = useSelector(selectedNumberOfNewMessages);
 
   const onCompose = () => {
     dispatch(selectMail(null));
@@ -51,7 +52,7 @@ function Sidebar() {
       <SidebarOption
         Icon={InboxIcon}
         title="Inbox"
-        number={folderName === "inbox" ? numberOfMessages : ""}
+        number={folderName === "inbox" ? numberOfNewMessages : ""}
         selected={folderName === "inbox" ? true : false}
         onClick={() => {
           dispatch(closeSendMessage());
@@ -63,7 +64,7 @@ function Sidebar() {
         customClassName="unused"
         Icon={StarIcon}
         title="Starred"
-        number={folderName === "starred" ? numberOfMessages : ""}
+        number={folderName === "starred" ? numberOfNewMessages : ""}
         selected={folderName === "starred" ? true : false}
         onClick={() => {
           dispatch(closeSendMessage());
@@ -74,7 +75,7 @@ function Sidebar() {
         customClassName="unused"
         Icon={AccessTimeIcon}
         title="Snoozed"
-        number={folderName === "snoozed" ? numberOfMessages : ""}
+        number={folderName === "snoozed" ? numberOfNewMessages : ""}
         selected={folderName === "snoozed" ? true : false}
         onClick={() => {
           dispatch(closeSendMessage());
@@ -85,7 +86,7 @@ function Sidebar() {
         customClassName="unused"
         Icon={LabelImportantIcon}
         title="Important"
-        number={folderName === "important" ? numberOfMessages : ""}
+        number={folderName === "important" ? numberOfNewMessages : ""}
         selected={folderName === "important" ? true : false}
         onClick={() => {
           dispatch(closeSendMessage());
@@ -96,7 +97,7 @@ function Sidebar() {
       <SidebarOption
         Icon={NearMeIcon}
         title="Sent"
-        number={folderName === "sent" ? numberOfMessages : ""}
+        number={folderName === "sent" ? numberOfNewMessages : ""}
         selected={folderName === "sent" ? true : false}
         onClick={() => {
           dispatch(closeSendMessage());
@@ -108,7 +109,7 @@ function Sidebar() {
         customClassName="unused"
         Icon={NoteIcon}
         title="Drafts"
-        number={folderName === "drafts" ? numberOfMessages : ""}
+        number={folderName === "drafts" ? numberOfNewMessages : ""}
         selected={folderName === "drafts" ? true : false}
         onClick={() => {
           dispatch(closeSendMessage());

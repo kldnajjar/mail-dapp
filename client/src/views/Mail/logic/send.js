@@ -121,14 +121,31 @@ const createMessagesWithRelatedConversation = async (
     .get("sent")
     .set(conversation);
 
-  allEmails.map((recipient) => {
+  allEmails.map(async (recipient) => {
     if (recipient) {
-      getGun()
+      await getGun()
         .get("accounts")
         .get(recipient)
         .get("folders")
         .get("inbox")
         .set(conversation);
+
+      await getGun()
+        .get("accounts")
+        .get(recipient)
+        .get("folders")
+        .get("inbox").get("new")
+        .once((data) => {
+          let array = JSON.parse(data);
+          array.push(conversationObj.id);
+          let newArray = JSON.stringify(array);
+          getGun()
+            .get("accounts")
+            .get(recipient)
+            .get("folders")
+            .get("inbox")
+            .put({ new: newArray });
+        });
     }
   });
 

@@ -25,7 +25,7 @@ export const createEmail = async (emailObject, context) => {
     bcc: emailsArray.blindCarbonCopyArray,
   };
 
-  console.log(process.env.APP_WITH_ENCRYPTION);
+  
 
   let emailParam = {
     encryptedMessage: obj?.body,
@@ -42,9 +42,6 @@ export const createEmail = async (emailObject, context) => {
     emailParam,
     emailsArray
   );
-  console.log("emailObject", emailObject);
-  console.log("emailParam", emailParam);
-  console.log("emailsArray", emailsArray);
   createMessagesWithRelatedConversation(
     context,
     msgObj,
